@@ -1,8 +1,8 @@
-# Bug Fix Task Generation Prompt (v1)
+# Bug Fix Task Generation Prompt (v2)
 
 > **Purpose**: Generate investigation and fix tasks for reported bugs. This prompt helps structure bug analysis and produces actionable tasks for resolution.
 >
-> **v1 Note**: This version uses the 4 core templates. Bug context (error details, affected entities) is described inline rather than referencing separate Error Catalog or Domain Model templates.
+> **v2 Note**: This version uses 10 core templates (7 system templates + 3 work item templates). Bugs should be described in a **Bug Report** (`docs/work-items/BUG-*.md`) before task generation. The inline `<bug-report>` is still supported as a fallback for quick/ad-hoc usage.
 
 ---
 
@@ -10,11 +10,11 @@
 
 **AI agents (Claude Code, etc.):** Skip the XML context assembly below — you have direct file access. Instead:
 1. Read the files listed in CLAUDE.md's routing table for "Bug fix"
-2. Gather the bug report details from the user
+2. Read the Bug Report from `docs/work-items/BUG-*.md` for the target bug. If no Bug Report exists, gather the bug details from the user and use the inline `<bug-report>` fallback
 3. Use the **Output Format** section below (three-phase structure: Investigation, Implementation, Verification) as your deliverable structure
 4. Apply the **Constraints** and **Post-Generation Checklist** to shape your output
 
-**Chat workflows (manual copy-paste):** Copy the XML template below, paste your documentation into the `<context>` sections, fill in the `<bug-report>`, and submit to Claude.
+**Chat workflows (manual copy-paste):** Copy the XML template below, paste your documentation into the `<context>` sections, fill in the `<bug-report-doc>` (or `<bug-report>` fallback), and submit to Claude.
 
 ---
 
@@ -44,9 +44,18 @@
 
 <task-type>Bug Fix</task-type>
 
-<bug-report>
-<!-- Structured bug report information -->
+<bug-report-doc>
+<!-- PREFERRED: Paste the full Bug Report document (from docs/work-items/BUG-XXX-name.md) -->
+<!-- The Bug Report template provides structured fields for reproduction steps, evidence,
+     impact assessment, affected entities, and traceability.
+     See .ai-framework/templates/bug-report.md for the full template. -->
+[Paste full Bug Report content]
+</bug-report-doc>
 
+<!-- FALLBACK: If no Bug Report document exists, use this inline report instead.
+     Remove the <bug-report-doc> block above and uncomment this block. -->
+<!--
+<bug-report>
 **Bug ID:** [BUG-XXX]
 **Severity:** [Critical | High | Medium | Low]
 **Reported Date:** [Date]
@@ -84,15 +93,14 @@
 - Related bugs: [Links to related issues]
 
 **Affected Entities/Data:**
-<!-- In v1, describe domain context inline instead of referencing a Domain Model template -->
 - [Entity 1]: [Relevant attributes and business rules]
 - [Entity 2]: [Relevant attributes]
 
 **Known Error Patterns:**
-<!-- In v1, describe error context inline instead of referencing an Error Catalog template -->
 - [Error code/pattern seen in logs]
 - [Related error handling behavior]
 </bug-report>
+-->
 
 <request>
 Generate tasks to investigate and fix this bug.
@@ -233,27 +241,31 @@ After all tasks, provide:
 
 ---
 
-## Context Selection Guide (v1)
+## Context Selection Guide (v2)
 
 ### What to Include
 
 | Document | When to Include | Why |
 |----------|-----------------|-----|
+| Bug Report | Always (preferred) | Full `docs/work-items/BUG-*.md` for target bug |
 | CLAUDE.md | Always | Navigate codebase, understand structure and patterns |
 | Architecture | Multi-component bugs | Understand data flow and component interactions |
+| Data Model | Data integrity/calculation bugs | Understand entity definitions and business rules |
+| API Specification | API response/status bugs | Understand expected endpoint behavior |
+| UI Specification | UI/display bugs | Understand expected screen behavior |
 | Stakeholder Definition | Scope questions | Clarify expected behavior from product perspective |
 | Persona | User-facing bugs | Understand user impact and priority |
 
-### v1 vs Full Framework
+### Bug Report vs Inline Report
 
-In the full framework, you would also include:
-- **Error Catalog** → In v1, describe error patterns inline in the bug report
-- **Domain Model** → In v1, describe affected entities inline in the bug report
-- **Feature Spec** → In v1, describe expected behavior in the bug report
+- **Bug Report** (preferred): Use `docs/work-items/BUG-*.md`. Provides structured impact assessment, traceability, entity mapping, and severity justification. Generates more targeted investigation tasks.
+- **Inline `<bug-report>`** (fallback): Use for quick/ad-hoc bug fixes when a full Bug Report hasn't been written yet. Faster but less structured.
 
 ---
 
 ## Example: Order Calculation Bug
+
+> **Note:** This example uses the inline `<bug-report>` fallback for brevity. For more targeted investigation tasks, use a full Bug Report document via `<bug-report-doc>` as described in the Prompt Template above.
 
 ```xml
 <task-generation-request>

@@ -1,8 +1,8 @@
-# Feature Task Generation Prompt (v1)
+# Feature Task Generation Prompt (v2)
 
-> **Purpose**: Generate implementation tasks for a new feature. Use this prompt when you have a feature idea or requirement and need to break it down into actionable development tasks.
+> **Purpose**: Generate implementation tasks for a new feature. Use this prompt when you have a Feature Brief (or feature idea) and need to break it down into actionable development tasks.
 >
-> **v1 Note**: This version uses 7 core templates (Persona, Stakeholder, Architecture, CLAUDE.md, Data Model, API Specification, UI Specification) instead of the full 10-template framework. Feature specifications are described inline rather than as separate template documents. Data Model, API Specification, and UI Specification are available as optional context blocks — use them when they exist for your project.
+> **v2 Note**: This version uses 10 core templates (7 system templates + 3 work item templates). Features should be described in a **Feature Brief** (`docs/work-items/FEAT-*.md`) before task generation. The inline `<feature-summary>` is still supported as a fallback for quick/ad-hoc usage.
 
 ---
 
@@ -10,7 +10,7 @@
 
 **AI agents (Claude Code, etc.):** Skip the XML context assembly below — you have direct file access. Instead:
 1. Read the files listed in CLAUDE.md's routing table for "New feature"
-2. Fill in the `<feature-summary>` with the feature details the user provided
+2. Read the Feature Brief from `docs/work-items/FEAT-*.md` for the target feature. If no Feature Brief exists, gather the feature details from the user and use the inline `<feature-summary>` fallback
 3. Use the **Output Format** section below as your deliverable structure
 4. Apply the **Constraints** and **Post-Generation Checklist** to shape your output
 
@@ -64,8 +64,18 @@
 
 <task-type>New Feature</task-type>
 
+<feature-brief>
+<!-- PREFERRED: Paste the full Feature Brief document (from docs/work-items/FEAT-XXX-name.md) -->
+<!-- The Feature Brief template provides structured fields for scope, acceptance criteria,
+     entity/API/UI impact, edge cases, constraints, and traceability.
+     See .ai-framework/templates/feature-brief.md for the full template. -->
+[Paste full Feature Brief content]
+</feature-brief>
+
+<!-- FALLBACK: If no Feature Brief exists, use this inline summary instead.
+     Remove the <feature-brief> block above and uncomment this block. -->
+<!--
 <feature-summary>
-<!-- Describe the feature inline (v1 doesn't use a separate feature spec template) -->
 Feature Name: [Name]
 User Story: As a [persona], I want to [action], so that [benefit]
 Primary Goal: [One sentence describing success]
@@ -83,6 +93,7 @@ Edge Cases:
 - [Edge case 1]
 - [Edge case 2]
 </feature-summary>
+-->
 
 <request>
 Generate a complete task breakdown for implementing this feature.
@@ -174,12 +185,13 @@ After all tasks, provide:
 
 ---
 
-## Context Selection Guide (v1)
+## Context Selection Guide (v2)
 
 ### What to Include
 
 | Document | When to Include | What to Include |
 |----------|-----------------|-----------------|
+| Feature Brief | Always (preferred) | Full `docs/work-items/FEAT-*.md` for target feature |
 | Stakeholder Definition | Always | Philosophy, principles, scope lock, success metrics |
 | CLAUDE.md | Always | Full document |
 | Data Model | Features involving entities | Relevant entity definitions, fields, relationships |
@@ -188,19 +200,16 @@ After all tasks, provide:
 | Architecture | Multi-component features | Affected components, data flow |
 | Persona | User-facing features | Pain points, behavior, success criteria |
 
-### v1 vs Full Framework
+### Feature Brief vs Inline Summary
 
-In the full framework, you would also include:
-- **Feature Specification** (separate template) → In v1, describe the feature inline in `<feature-summary>`
-- **Data Model** → Now available as `<data-model>` context block. If not yet created, describe key entities inline in `<feature-summary>`
-- **API Specification** → Now available as `<api-spec>` context block. If not yet created, describe endpoints inline in `<feature-summary>`
-- **UI Specification** → Now available as `<ui-specification>` context block. If not yet created, describe screens and components inline in `<feature-summary>`
-- **Risk Assessment** → In v1, mention risks in constraints or let Claude identify them
-- **Integration Spec** → In v1, describe integration needs in the architecture section
+- **Feature Brief** (preferred): Use `docs/work-items/FEAT-*.md`. Provides structured scope, traceability, entity/API/UI impact assessment, and constraint documentation. Generates higher-quality tasks.
+- **Inline `<feature-summary>`** (fallback): Use for quick/ad-hoc features when a full Feature Brief hasn't been written yet. Faster but less structured.
 
 ---
 
 ## Example: Pizza Ordering Feature
+
+> **Note:** This example uses the inline `<feature-summary>` fallback for brevity. For higher-quality task generation, use a full Feature Brief document via `<feature-brief>` as described in the Prompt Template above.
 
 ```xml
 <task-generation-request>

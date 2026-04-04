@@ -1,4 +1,4 @@
-# Base Prompt Template for Claude (v1)
+# Base Prompt Template for Claude (v2)
 
 > **Purpose**: This is the foundational structure for all Claude task generation prompts. Use this as a starting point and customize based on task type.
 
@@ -22,7 +22,12 @@
 
 <context>
 <!-- Include relevant documentation here using XML tags -->
-<!-- v1 framework uses 7 core templates: Persona, Stakeholder, Architecture, CLAUDE.md, Data Model, API Specification, UI Specification -->
+<!-- v2 framework uses 10 core templates: 7 system (Persona, Stakeholder, Architecture, CLAUDE.md, Data Model, API Specification, UI Specification) + 3 work items (Feature Brief, Bug Report, Improvement Proposal) -->
+
+<feature-brief>
+<!-- PREFERRED for features: Paste full Feature Brief from docs/work-items/FEAT-XXX-name.md -->
+[Paste Feature Brief content — or use <bug-report-doc> for bugs, <improvement-proposal> for improvements]
+</feature-brief>
 
 <stakeholder-definition>
 [Paste stakeholder definition content - philosophy, scope lock, success metrics]
@@ -105,21 +110,21 @@ Group tasks by:
 
 ## Best Practices for Using This Template
 
-### 1. Context Selection (v1 — 7 Templates)
+### 1. Context Selection (v2 — 10 Templates)
 
-With 7 templates, select based on task type:
+With 10 templates (7 system + 3 work items), select based on task type:
 
 | Task Type | Always Include | Include If Relevant |
 |-----------|---------------|---------------------|
-| New Feature | Stakeholder + CLAUDE.md | Data Model, API Spec, UI Spec, Persona, Architecture |
-| Bug Fix | CLAUDE.md | Architecture, Data Model, API Spec |
-| Refactoring | CLAUDE.md + Architecture | Data Model, Stakeholder |
+| New Feature | Feature Brief + Stakeholder + CLAUDE.md | Data Model, API Spec, UI Spec, Persona, Architecture |
+| Bug Fix | Bug Report + CLAUDE.md | Architecture, Data Model, API Spec |
+| Refactoring | Improvement Proposal + CLAUDE.md + Architecture | Data Model, Stakeholder |
 | Testing | CLAUDE.md | Architecture, API Spec, UI Spec |
 | Integration | Architecture + CLAUDE.md + Data Model + API Spec | Stakeholder |
-| Prioritization | Stakeholder + Persona | Architecture |
+| Prioritization | Work Items + Stakeholder + Persona | Architecture |
 | UI Mockup | UI Spec + CLAUDE.md | API Spec, Persona |
 
-**Rule of thumb**: CLAUDE.md is almost always required. Add Data Model + API Spec for features involving entities/endpoints. Add UI Spec for user-facing features. Add Architecture for structural tasks, Stakeholder for scope questions, Persona for user-facing decisions.
+**Rule of thumb**: Work item documents (Feature Brief, Bug Report, Improvement Proposal) are the primary input for task generation — they describe *what* to do. CLAUDE.md is almost always required for *how* to do it. Add Data Model + API Spec for features involving entities/endpoints. Add UI Spec for user-facing features. Add Architecture for structural tasks, Stakeholder for scope questions, Persona for user-facing decisions.
 
 ### 2. Request Clarity
 

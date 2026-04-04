@@ -1,6 +1,6 @@
-# Documentation Maintenance Guide (v1)
+# Documentation Maintenance Guide (v2)
 
-> **Purpose**: This guide explains when and how to update the 7 core documentation types to keep them synchronized with the codebase. Outdated documentation leads to incorrect AI task generation and wasted effort.
+> **Purpose**: This guide explains when and how to update the 10 core documentation types (7 system templates + 3 work item templates) to keep them synchronized with the codebase. Outdated documentation leads to incorrect AI task generation and wasted effort.
 
 ---
 
@@ -26,6 +26,9 @@ Treat documentation with the same rigor as code:
 | UI Specification | Project start | Screen/component changes | Per release | Major version rewrite |
 | HTML Mockups | Pre-implementation | Design/layout changes | Per release | Screen implemented |
 | Component Examples | DDR compilation | Design token changes, component DDR updates | Per release | Project design system stabilized |
+| Feature Brief | Before feature task generation | Scope/AC changes during implementation | When tasks are generated | Feature completed or cancelled |
+| Bug Report | When bug is discovered | Investigation reveals new info | When fix is verified | Bug resolved or closed |
+| Improvement Proposal | Before refactoring task generation | Risk/scope changes during implementation | When improvement is complete | Improvement completed or deferred |
 
 ---
 
@@ -260,6 +263,35 @@ Treat documentation with the same rigor as code:
 
 ---
 
+### 10. Work Items (`docs/work-items/`)
+
+**Update When:**
+- Investigation reveals new information about a bug (update Bug Report)
+- Feature scope changes during implementation (update Feature Brief)
+- Risk assessment changes during refactoring (update Improvement Proposal)
+- Tasks are generated, in progress, or completed (update Status field)
+
+**Update Process:**
+1. Update the Status field in Section 1 to reflect current state
+2. If scope/details changed, update the relevant sections and note the change
+3. When completed, update Status to final state (Completed, Resolved, etc.)
+
+**Status Lifecycle:**
+
+| Work Item Type | Status Progression |
+|---------------|-------------------|
+| Feature Brief | Not Started → In Progress → Tasks Generated → Completed · Cancelled |
+| Bug Report | Reported → Investigating → Fix In Progress → Resolved · Won't Fix |
+| Improvement Proposal | Proposed → Approved → In Progress → Completed · Deferred · Rejected |
+
+**Review Checklist:**
+- [ ] Status field reflects actual state of work?
+- [ ] Acceptance criteria still accurate (not changed during implementation)?
+- [ ] Traceability links are correct?
+- [ ] Completed work items marked as such?
+
+---
+
 ## Sync Verification Checklist
 
 Use this checklist periodically to verify documentation is in sync with code.
@@ -272,6 +304,7 @@ Use this checklist periodically to verify documentation is in sync with code.
 - [ ] API Specification reflects any endpoint/DTO changes in recent PRs
 - [ ] UI Specification reflects any screen/component changes in recent PRs
 - [ ] HTML Mockups reflect current design tokens and layout specs
+- [ ] Work item statuses reflect actual state of work
 
 ### Sprint/Release Verification
 
@@ -284,7 +317,8 @@ Use this checklist periodically to verify documentation is in sync with code.
 
 ### Quarterly Verification
 
-- [ ] Full documentation audit across all 7 document types
+- [ ] Full documentation audit across all 10 document types
+- [ ] Archive completed/resolved work items (move to `docs/work-items/archive/` or mark clearly)
 - [ ] Stakeholder definition alignment with product direction
 - [ ] Architecture review against deployed system
 - [ ] Persona assumptions validated against user data
@@ -423,4 +457,7 @@ Changed screen layout          → HTML Mockups (affected screens)
 Updated DDR in shared repo     → Re-run DDR compilation, update
                                  Component Examples, CLAUDE.md
                                  Design Patterns, UI Spec Design System
+Feature tasks generated        → Feature Brief (Status → Tasks Generated)
+Bug fix verified               → Bug Report (Status → Resolved)
+Improvement completed          → Improvement Proposal (Status → Completed)
 ```

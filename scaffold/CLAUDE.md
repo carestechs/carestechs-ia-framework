@@ -141,9 +141,9 @@ When asked to generate tasks, identify the task type, read the required files, t
 
 | Task Type | Prompt Template | Files to Read |
 |-----------|----------------|---------------|
-| New feature | `.ai-framework/prompts/feature-tasks.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/data-model.md`, `docs/api-spec.md`, `docs/ui-specification.md` |
-| Bug fix | `.ai-framework/prompts/bugfix-tasks.md` | `CLAUDE.md`, `docs/ARCHITECTURE.md` |
-| Refactoring | `.ai-framework/prompts/refactor-tasks.md` | `CLAUDE.md`, `docs/ARCHITECTURE.md` |
+| New feature | `.ai-framework/prompts/feature-tasks.md` | `docs/work-items/FEAT-*.md` (target feature), `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/data-model.md`, `docs/api-spec.md`, `docs/ui-specification.md` |
+| Bug fix | `.ai-framework/prompts/bugfix-tasks.md` | `docs/work-items/BUG-*.md` (target bug), `CLAUDE.md`, `docs/ARCHITECTURE.md` |
+| Refactoring | `.ai-framework/prompts/refactor-tasks.md` | `docs/work-items/IMP-*.md` (target improvement), `CLAUDE.md`, `docs/ARCHITECTURE.md` |
 | Spec generation | `.ai-framework/prompts/spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md` |
 | UI spec generation | `.ai-framework/prompts/ui-spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`, `docs/api-spec.md` |
 | UI mockup | `.ai-framework/prompts/mockup-generation.md` | `docs/ui-specification.md` (target screen + Design System), `CLAUDE.md` |
@@ -161,6 +161,9 @@ When asked to generate tasks, identify the task type, read the required files, t
 | Refactoring | `docs/data-model.md`, `docs/stakeholder-definition.md` | Data refactors, scope questions |
 | Spec generation | `docs/personas/primary-user.md` | User-facing entity/endpoint decisions |
 | UI mockup | `docs/api-spec.md`, `docs/personas/primary-user.md` | Data-driven screens, content tone |
+| Prioritization | `docs/work-items/FEAT-*.md`, `docs/work-items/BUG-*.md`, `docs/work-items/IMP-*.md`, `docs/stakeholder-definition.md`, `docs/personas/` | Comparing and prioritizing work items |
+
+**Work Items** (`docs/work-items/`): Feature Briefs, Bug Reports, and Improvement Proposals are the preferred input for task generation. If no work item document exists for a task, the prompts support inline fallbacks — but structured work items produce higher-quality task breakdowns.
 
 ### Workflow Enforcement
 
@@ -199,6 +202,7 @@ Read files in **Cone of Context** order — broad (strategic) to narrow (tactica
 | Architectural | `docs/ARCHITECTURE.md` | What is the system? How is it structured? |
 | Specification | `docs/data-model.md`, `docs/api-spec.md` | What are the entities and API contracts? |
 | UI | `docs/ui-specification.md` | What do screens look like? What are the components? |
+| Work Items | `docs/work-items/FEAT-*.md`, `docs/work-items/BUG-*.md`, `docs/work-items/IMP-*.md` | What specific work to do? Features, bugs, improvements |
 | Implementation | `CLAUDE.md` | How do we build things? What are the conventions? |
 
 **For large documents:** Read only the sections relevant to the task (e.g., for a task about labels, read only the Label entity from `data-model.md` and label endpoints from `api-spec.md`). Quality over quantity.
@@ -219,6 +223,9 @@ When code changes happen, check which docs need updating per `.ai-framework/guid
 | Scope or strategy change | `docs/stakeholder-definition.md` |
 | Design token or screen layout change | `mockups/` (affected screens) |
 | DDR updated in shared repo | Re-run DDR compilation, update Component Examples + CLAUDE.md Design Patterns |
+| Feature tasks completed | `docs/work-items/FEAT-*.md` — update Status to "Completed" |
+| Bug resolved | `docs/work-items/BUG-*.md` — update Status to "Resolved" |
+| Improvement completed | `docs/work-items/IMP-*.md` — update Status to "Completed" |
 
 **Changelog rule:** Every update to `data-model.md`, `api-spec.md`, `ARCHITECTURE.md`, or `ui-specification.md` must include a changelog entry at the bottom of the document. See `.ai-framework/guides/maintenance.md` for format.
 

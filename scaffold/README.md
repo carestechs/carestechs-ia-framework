@@ -8,13 +8,15 @@ This scaffold provides a ready-to-copy project documentation structure for the A
 
 1. Copy the entire `scaffold/` contents into your project root
 2. Follow [`.ai-framework/guides/getting-started.md`](.ai-framework/guides/getting-started.md) — start with the **New Project** path
-3. Fill templates in order: Persona → Stakeholder → CLAUDE.md → Architecture → Data Model → API Spec → UI Spec
+3. Fill system templates in order: Persona → Stakeholder → CLAUDE.md → Architecture → Data Model → API Spec → UI Spec
+4. Write work items in `docs/work-items/` as needed (Feature Briefs, Bug Reports, Improvement Proposals)
 
 ### Option B: Existing Codebase
 
 1. Copy the entire `scaffold/` contents into your project root
 2. Follow [`.ai-framework/guides/getting-started.md`](.ai-framework/guides/getting-started.md) — start with the **Existing Codebase** path
-3. Fill templates in order: CLAUDE.md → Stakeholder → Architecture → Data Model → API Spec → UI Spec → Persona
+3. Fill system templates in order: CLAUDE.md → Stakeholder → Architecture → Data Model → API Spec → UI Spec → Persona
+4. Write work items in `docs/work-items/` as needed
 
 ## What You Get
 
@@ -34,7 +36,11 @@ your-project/
     ├── ARCHITECTURE.md                # System structure & technical decisions
     ├── data-model.md                  # Domain entities, fields & relationships
     ├── api-spec.md                    # REST API endpoints & contracts
-    └── ui-specification.md            # Screen layouts, components & interactions
+    ├── ui-specification.md            # Screen layouts, components & interactions
+    └── work-items/                    # Work item documents
+        ├── FEAT-001-example.md        # Feature brief template
+        ├── BUG-001-example.md         # Bug report template
+        └── IMP-001-example.md         # Improvement proposal template
 ```
 
 ## Scaffold vs Full Templates

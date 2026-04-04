@@ -2,7 +2,7 @@
 
 > **Purpose**: Read selected Design Decision Records (DDRs) — their Decision, Rationale, and Constraints sections — and derive template content using derivation rules. Output pre-filled template sections that can be pasted into project docs, so the Design System, component patterns, and state handling are consistent before you write a single line of UI code.
 >
-> **When to use**: When bootstrapping a new project with a desired visual identity and shared design decisions from the `carestechs-ui-design` DDR repo. Run this between applying ADRs (Step 0.5) and filling in templates (Phase 2) in `getting-started.md`.
+> **When to use**: When bootstrapping a new project with a desired visual identity and shared design decisions from a shared DDR repo. Run this between applying ADRs (Step 0.5) and filling in templates (Phase 2) in `getting-started.md`.
 
 ---
 

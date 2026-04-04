@@ -1,8 +1,8 @@
-# Refactoring Task Generation Prompt (v1)
+# Refactoring Task Generation Prompt (v2)
 
 > **Purpose**: Generate tasks for refactoring code while maintaining functionality. Use this when improving code quality, architecture, or preparing for new features.
 >
-> **v1 Note**: This version uses the 4 core templates. Domain model context and testing strategy are described inline rather than as separate templates.
+> **v2 Note**: This version uses 10 core templates (7 system templates + 3 work item templates). Improvements should be described in an **Improvement Proposal** (`docs/work-items/IMP-*.md`) before task generation. The inline `<refactoring-scope>` is still supported as a fallback for quick/ad-hoc usage.
 
 ---
 
@@ -10,11 +10,11 @@
 
 **AI agents (Claude Code, etc.):** Skip the XML context assembly below — you have direct file access. Instead:
 1. Read the files listed in CLAUDE.md's routing table for "Refactoring"
-2. Gather the refactoring scope from the user (target area, current vs desired state, problems)
+2. Read the Improvement Proposal from `docs/work-items/IMP-*.md` for the target improvement. If no Improvement Proposal exists, gather the refactoring scope from the user and use the inline `<refactoring-scope>` fallback
 3. Use the **Output Format** section below (four-phase structure: Preparation, Parallel Implementation, Migration, Cleanup, Verification) as your deliverable structure
 4. Apply the **Constraints** and **Safety Checklist** to shape your output
 
-**Chat workflows (manual copy-paste):** Copy the XML template below, paste your documentation into the `<context>` sections, fill in the `<refactoring-scope>`, and submit to Claude.
+**Chat workflows (manual copy-paste):** Copy the XML template below, paste your documentation into the `<context>` sections, fill in the `<improvement-proposal>` (or `<refactoring-scope>` fallback), and submit to Claude.
 
 ---
 
@@ -44,9 +44,18 @@
 
 <task-type>Refactoring</task-type>
 
-<refactoring-scope>
-<!-- Define what is being refactored and why -->
+<improvement-proposal>
+<!-- PREFERRED: Paste the full Improvement Proposal document (from docs/work-items/IMP-XXX-name.md) -->
+<!-- The Improvement Proposal template provides structured fields for current/desired state,
+     risk assessment, success criteria, test coverage, and traceability.
+     See .ai-framework/templates/improvement-proposal.md for the full template. -->
+[Paste full Improvement Proposal content]
+</improvement-proposal>
 
+<!-- FALLBACK: If no Improvement Proposal exists, use this inline scope instead.
+     Remove the <improvement-proposal> block above and uncomment this block. -->
+<!--
+<refactoring-scope>
 **Refactoring Type:** [Code Quality | Architecture | Performance | Testability | Maintainability]
 
 **Target Area:**
@@ -72,15 +81,14 @@
 [Why now? e.g., "Preparing for new feature X" or "Tech debt sprint"]
 
 **Affected Entities/Data:**
-<!-- In v1, describe domain context inline instead of referencing a Domain Model template -->
 - [Entity 1]: [What changes about how this entity is handled]
 - [Entity 2]: [What changes]
 
 **Current Test Coverage:**
-<!-- In v1, describe testing context inline instead of referencing a Testing Strategy template -->
 - [Current coverage status for affected area]
 - [Known gaps or concerns]
 </refactoring-scope>
+-->
 
 <request>
 Generate tasks to refactor the identified area.
@@ -301,27 +309,29 @@ When generating refactoring tasks, Claude should consider these safe patterns:
 
 ---
 
-## Context Selection Guide (v1)
+## Context Selection Guide (v2)
 
 ### What to Include
 
 | Document | When to Include | Why |
 |----------|-----------------|-----|
+| Improvement Proposal | Always (preferred) | Full `docs/work-items/IMP-*.md` for target improvement |
 | CLAUDE.md | Always | Target patterns and conventions |
 | Architecture | Always | Understand component relationships, current vs target |
+| Data Model | Data layer refactoring | Understand entity definitions and relationships |
 | Stakeholder Definition | Large-scale refactoring | Ensure refactoring aligns with product direction |
 | Persona | Rarely | Only if refactoring affects user-visible behavior |
 
-### v1 vs Full Framework
+### Improvement Proposal vs Inline Scope
 
-In the full framework, you would also include:
-- **Domain Model** → In v1, describe affected entities inline in refactoring scope
-- **Testing Strategy** → In v1, describe test coverage inline in refactoring scope
-- **Feature Specs** → In v1, mention affected features in constraints
+- **Improvement Proposal** (preferred): Use `docs/work-items/IMP-*.md`. Provides structured risk assessment, success criteria, test coverage baseline, and traceability. Generates safer, better-phased refactoring tasks.
+- **Inline `<refactoring-scope>`** (fallback): Use for quick/ad-hoc refactoring when a full Improvement Proposal hasn't been written yet. Faster but less structured.
 
 ---
 
 ## Example: Service Extraction
+
+> **Note:** This example uses the inline `<refactoring-scope>` fallback for brevity. For safer, better-phased refactoring tasks, use a full Improvement Proposal document via `<improvement-proposal>` as described in the Prompt Template above.
 
 ```xml
 <task-generation-request>

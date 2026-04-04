@@ -1,6 +1,6 @@
-# Context Compilation Guide (v1)
+# Context Compilation Guide (v2)
 
-> **Purpose**: This guide explains how to assemble the right documentation context for AI task generation using the 7 core templates: Persona, Stakeholder Definition, Architecture, CLAUDE.md, Data Model, API Specification, and UI Specification.
+> **Purpose**: This guide explains how to assemble the right documentation context for AI task generation using the 10 core templates: 7 system templates (Persona, Stakeholder Definition, Architecture, CLAUDE.md, Data Model, API Specification, UI Specification) and 3 work item templates (Feature Brief, Bug Report, Improvement Proposal).
 
 ---
 
@@ -38,6 +38,13 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
+│                   WORK ITEMS CONTEXT                            │
+│  Feature Brief, Bug Report, Improvement Proposal                │
+│  "What specific work to do? What features/bugs/improvements?"   │
+└─────────────────────────────┬───────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
 │                 IMPLEMENTATION CONTEXT                          │
 │  CLAUDE.md                                                      │
 │  "How do we build things? What are the conventions?"            │
@@ -56,6 +63,7 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 
 | Priority | Document | Include When | What to Include |
 |----------|----------|--------------|-----------------|
+| Required | Feature Brief | Always (preferred) | Full `docs/work-items/FEAT-*.md` — scope, ACs, impact |
 | Required | Stakeholder Definition | Always | Philosophy, principles, scope lock |
 | Required | CLAUDE.md | Always | Full document |
 | Recommended | Data Model | Features involving entities | Relevant entity definitions, relationships |
@@ -67,6 +75,10 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 **Example Assembly**:
 ```xml
 <context>
+  <feature-brief>
+    [Full Feature Brief document from docs/work-items/FEAT-XXX-name.md]
+  </feature-brief>
+
   <stakeholder-definition>
     [Sections: Philosophy, Principles, Scope Lock, Success Metrics]
   </stakeholder-definition>
@@ -105,6 +117,7 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 
 | Priority | Document | Include When | What to Include |
 |----------|----------|--------------|-----------------|
+| Required | Bug Report | Always (preferred) | Full `docs/work-items/BUG-*.md` — reproduction, evidence, impact |
 | Required | CLAUDE.md | Always | Full document |
 | Optional | Architecture | Multi-component bug | Affected components |
 | Optional | Data Model | Data-related bugs | Affected entity definitions |
@@ -114,6 +127,10 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 **Example Assembly**:
 ```xml
 <context>
+  <bug-report-doc>
+    [Full Bug Report document from docs/work-items/BUG-XXX-name.md]
+  </bug-report-doc>
+
   <code-conventions>
     [Full CLAUDE.md]
   </code-conventions>
@@ -137,13 +154,19 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 
 | Priority | Document | Include When | What to Include |
 |----------|----------|--------------|-----------------|
+| Required | Improvement Proposal | Always (preferred) | Full `docs/work-items/IMP-*.md` — current/desired state, risks, criteria |
 | Required | CLAUDE.md | Always | Full document |
 | Required | Architecture | Always | Current + target state |
+| Optional | Data Model | Data layer refactoring | Affected entity definitions |
 | Optional | Stakeholder Definition | Large-scale refactoring | Principles, scope |
 
 **Example Assembly**:
 ```xml
 <context>
+  <improvement-proposal>
+    [Full Improvement Proposal document from docs/work-items/IMP-XXX-name.md]
+  </improvement-proposal>
+
   <code-conventions>
     [Full CLAUDE.md]
   </code-conventions>
@@ -224,10 +247,11 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 
 ### 6. Prioritization & Roadmap Planning
 
-**Goal**: Evaluate feature proposals based on product strategy.
+**Goal**: Evaluate and prioritize work items based on product strategy.
 
 | Priority | Document | Include When | What to Include |
 |----------|----------|--------------|-----------------|
+| Required | Work Items | Always | All `docs/work-items/FEAT-*.md`, `BUG-*.md`, `IMP-*.md` to compare |
 | Required | Stakeholder Definition | Always | Success metrics, scope, philosophy |
 | Required | Persona | Always | User priorities and pain points |
 | Optional | Architecture | Technical feasibility | Complexity factors |
@@ -235,6 +259,10 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 **Example Assembly**:
 ```xml
 <context>
+  <work-items>
+    [All Feature Briefs, Bug Reports, and Improvement Proposals to prioritize]
+  </work-items>
+
   <stakeholder-definition>
     ## Success Metrics
     [What we're optimizing for]
@@ -253,12 +281,12 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 </context>
 
 <request>
-Evaluate these feature proposals and recommend prioritization:
-1. [Feature A]
-2. [Feature B]
-3. [Feature C]
+Evaluate these work items and recommend prioritization:
+1. FEAT-001: [Feature name]
+2. BUG-003: [Bug summary]
+3. IMP-002: [Improvement name]
 
-Consider: user impact, development cost, strategic alignment.
+Consider: user impact, severity, development cost, strategic alignment, dependencies.
 </request>
 ```
 
@@ -370,7 +398,7 @@ Consider: user impact, development cost, strategic alignment.
 
 ### Guideline: Quality Over Quantity
 
-With 7 templates, be mindful of total context size. Use section extraction for data-model, api-spec, and ui-specification — include only the entities, endpoints, and screens relevant to your task, not the full documents.
+With 10 templates, be mindful of total context size. Use section extraction for data-model, api-spec, and ui-specification — include only the entities, endpoints, and screens relevant to your task, not the full documents. Work item documents (Feature Brief, Bug Report, Improvement Proposal) should generally be included in full since they are scoped to a single work item.
 
 ### Strategies for Large Documents
 
@@ -469,14 +497,15 @@ Include the specific request, constraints, and output format requirements.
 ┌───────────────┬──────────────────────────────────────────────────────────┐
 │ Task Type     │ Must Include                        │ Recommended        │
 ├───────────────┼─────────────────────────────────────┼────────────────────┤
-│ New Feature   │ Stakeholder + CLAUDE.md             │ Data Model, API Spec,      │
-│               │                                     │ UI Spec                    │
-│ Bug Fix       │ CLAUDE.md                           │ Data Model, UI Spec        │
-│ Refactoring   │ CLAUDE.md + Architecture            │ Data Model                 │
+│ New Feature   │ Feature Brief + Stakeholder +       │ Data Model, API Spec,      │
+│               │ CLAUDE.md                           │ UI Spec                    │
+│ Bug Fix       │ Bug Report + CLAUDE.md              │ Architecture, Data Model   │
+│ Refactoring   │ Improvement Proposal + CLAUDE.md +  │ Data Model                 │
+│               │ Architecture                        │                            │
 │ Testing       │ CLAUDE.md                           │ API Spec, UI Spec          │
 │ Integration   │ Architecture + CLAUDE.md +          │                            │
 │               │ Data Model + API Spec               │                            │
-│ Prioritization│ Stakeholder + Persona               │                            │
+│ Prioritization│ Work Items + Stakeholder + Persona  │ Architecture               │
 │ UI Mockup     │ UI Spec + CLAUDE.md                 │ API Spec, Persona          │
 │ Release       │ Stakeholder + CLAUDE.md             │ Architecture,              │
 │ Transition    │                                     │ release-lifecycle.md       │

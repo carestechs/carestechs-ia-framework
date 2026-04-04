@@ -45,14 +45,18 @@ your-project/
     ├── personas/
     │   └── primary-user.md
     ├── stakeholder-definition.md
-    └── ARCHITECTURE.md
+    ├── ARCHITECTURE.md
+    └── work-items/               # Feature briefs, bug reports, improvements
+        ├── FEAT-001-example.md
+        ├── BUG-001-example.md
+        └── IMP-001-example.md
 ```
 
 Each file has section headers with `<!-- TODO -->` prompts telling you exactly what to fill in.
 
 ### Step 0.5: Apply Architecture Decisions (Optional)
 
-If you have a set of Architecture Decision Records (ADRs) from a shared repo (e.g., `carestechs-software-architecture`):
+If you have a set of Architecture Decision Records (ADRs) from a shared repo (e.g., `your-architecture-decisions`):
 
 1. Select the ADRs relevant to your project's tech stack (e.g., the `profiles/dotnet-angular-modular-monolith.md` manifest lists which ADRs to use together)
 2. Use the [`.ai-framework/prompts/compile-adrs.md`](../prompts/compile-adrs.md) prompt to compile them into pre-filled template sections
@@ -62,7 +66,7 @@ This pre-fills conventions, patterns, and decision tables so you only need to ad
 
 ### Step 0.6: Apply Design Decisions (Optional)
 
-If you have a set of Design Decision Records (DDRs) from a shared repo (e.g., `carestechs-ui-design`):
+If you have a set of Design Decision Records (DDRs) from a shared repo (e.g., `your-ui-design-decisions`):
 
 1. **Select a profile** that matches your project type (e.g., `profiles/corporate-clean.md` for B2B/enterprise, `profiles/modern-minimal.md` for content apps, `profiles/bold-startup.md` for consumer products, `profiles/arauco-forest.md` for B2B corporate portals) — or select individual DDRs
 2. Use the [`.ai-framework/prompts/compile-ddrs.md`](../prompts/compile-ddrs.md) prompt to compile them into pre-filled template sections
@@ -314,9 +318,42 @@ If you've been building for a while, you likely already know your user. Document
 
 ---
 
+## Phase 2.5: Write Work Items
+
+Before generating tasks, describe **what specific work to do** using work item templates. Work items bridge the gap between your system documentation (what the product is) and task generation (how to build it).
+
+### Feature Brief (`docs/work-items/FEAT-XXX-name.md`)
+
+**When:** You want to build a new feature.
+**What to fill:** User story, feature-level scope (in/out), acceptance criteria, entity/API/UI impact, edge cases, constraints, traceability.
+**Template reference:** `.ai-framework/templates/feature-brief.md`
+
+### Bug Report (`docs/work-items/BUG-XXX-name.md`)
+
+**When:** You need to fix a bug.
+**What to fill:** Reproduction steps, expected vs actual behavior, error evidence, environment, impact assessment, traceability.
+**Template reference:** `.ai-framework/templates/bug-report.md`
+
+### Improvement Proposal (`docs/work-items/IMP-XXX-name.md`)
+
+**When:** You want to refactor, optimize, or improve code quality.
+**What to fill:** Current state + problems, desired state + benefits, risk assessment, success criteria, test coverage baseline, traceability.
+**Template reference:** `.ai-framework/templates/improvement-proposal.md`
+
+### ID Convention
+
+- Features: `FEAT-001`, `FEAT-002`, ...
+- Bugs: `BUG-001`, `BUG-002`, ...
+- Improvements: `IMP-001`, `IMP-002`, ...
+- File naming: `docs/work-items/FEAT-001-short-title.md`
+
+> **Tip:** You don't need work items for every small task. For quick, ad-hoc work, the task generation prompts still support inline descriptions as a fallback. But for anything non-trivial, a work item document produces significantly better task breakdowns.
+
+---
+
 ## Phase 3: Generate Your First AI Tasks
 
-You've got documentation. Now put it to work.
+You've got documentation and work items. Now put them to work.
 
 ### Pick a Task Type
 
@@ -336,12 +373,12 @@ Follow [`.ai-framework/guides/context-compilation.md`](context-compilation.md) t
 
 | Task Type | Always Include | Include If Relevant |
 |-----------|---------------|---------------------|
-| New Feature | Stakeholder + CLAUDE.md | Data Model, API Spec, UI Spec, Persona, Architecture |
-| Bug Fix | CLAUDE.md | Architecture, Data Model, API Spec |
-| Refactoring | CLAUDE.md + Architecture | Data Model, Stakeholder |
+| New Feature | Feature Brief + Stakeholder + CLAUDE.md | Data Model, API Spec, UI Spec, Persona, Architecture |
+| Bug Fix | Bug Report + CLAUDE.md | Architecture, Data Model, API Spec |
+| Refactoring | Improvement Proposal + CLAUDE.md + Architecture | Data Model, Stakeholder |
 | Testing | CLAUDE.md | Architecture, API Spec, UI Spec |
 | Integration | Architecture + CLAUDE.md + Data Model + API Spec | Stakeholder |
-| Prioritization | Stakeholder + Persona | Architecture |
+| Prioritization | Work Items + Stakeholder + Persona | Architecture |
 | UI Mockup | UI Spec + CLAUDE.md | API Spec, Persona, Component Examples |
 | ADR Compilation | ADR files + `.ai-framework/templates/` | — |
 | DDR Compilation | DDR files (+ optional profile) | `.ai-framework/templates/` |
@@ -409,6 +446,7 @@ Documentation drifts. Keep it alive.
 | **Persona** | Quarterly, or after significant user feedback |
 | **UI Specification** | After adding/changing screens, components, or design tokens |
 | **HTML Mockups** | After design token changes, screen layout changes, or stakeholder feedback |
+| **Work Items** | Update status when tasks are generated, in progress, or completed |
 
 **Key rule:** If a task touches a document's area of concern, update the document in the same PR.
 
@@ -419,16 +457,17 @@ For full maintenance guidance, see [`.ai-framework/guides/maintenance.md`](maint
 ## Quick Reference
 
 ```
-1. Copy scaffold into project                        →  Phase 1
+1.  Copy scaffold into project                        →  Phase 1
 1.5 (Optional) Compile ADRs → pre-fill conventions   →  Phase 1 (Step 0.5)
 1.6 (Optional) Compile DDRs → pre-fill design system →  Phase 1 (Step 0.6)
-2. Fill core templates (30-60 min)                    →  Phase 2 (Steps 1-4)
-3. Generate data model + API spec (40 min)            →  Phase 2 (Steps 5-6)
-4. Generate UI specification (20 min)                 →  Phase 2 (Step 7)
-4.5. (Optional) Create HTML mockups for key screens   →  Phase 2 (Step 7.5)
-5. Pick prompt template + add context                 →  Phase 3
-6. Generate tasks with AI                             →  Phase 3
-7. Keep docs updated                                  →  Phase 4
+2.  Fill core templates (30-60 min)                   →  Phase 2 (Steps 1-4)
+3.  Generate data model + API spec (40 min)           →  Phase 2 (Steps 5-6)
+4.  Generate UI specification (20 min)                →  Phase 2 (Step 7)
+4.5 (Optional) Create HTML mockups for key screens    →  Phase 2 (Step 7.5)
+5.  Write work items (Feature/Bug/Improvement)        →  Phase 2.5
+6.  Pick prompt template + add context                →  Phase 3
+7.  Generate tasks with AI                            →  Phase 3
+8.  Keep docs updated                                 →  Phase 4
 ```
 
 **Stuck?** Check the full templates in `.ai-framework/templates/` for detailed guidance on any section. Each scaffold file is a simplified version of its corresponding template.
