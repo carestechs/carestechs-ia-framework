@@ -206,6 +206,8 @@ After Claude generates tasks, verify:
 - [ ] Run `python .ai-framework/tools/validate-tasks.py tasks/BUG-XXX-tasks.md` and fix every error
 - [ ] Investigation tasks come before fix tasks
 - [ ] Root cause is identified, not just symptoms treated
+- [ ] For cross-system / contract bugs: the investigation includes an explicit "verify the contract against the producer's authoritative source" step (schema, OpenAPI, producer-side tests, or a captured real payload) — not just an inspection of the consumer side
+- [ ] If the bug involves a test harness or fake/mock of an external system: the investigation verifies the harness matches the real producer's output shape, not just the consumer's expected input shape
 - [ ] Fix addresses root cause, not workaround
 - [ ] Test would catch this bug if it regressed
 - [ ] Boundary conditions are tested
