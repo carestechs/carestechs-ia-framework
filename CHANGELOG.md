@@ -2,6 +2,21 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.2.0] — 2026-07-14
+
+Context-efficiency and precision release: load less, trust fresher, verify outputs.
+
+### Changed
+- **Spec documents are now sharded.** `docs/data-model.md`, `docs/api-spec.md`, and `docs/ui-specification.md` become directories: a lean `index.md` for cross-cutting content (conventions, envelope/error catalog, design system) plus one shard per entity (`entities/<entity>.md`), resource (`endpoints/<resource>.md`), and screen (`screens/<screen>.md`, plus `components.md`). Names map mechanically (kebab-case) so shard paths are derivable.
+- **Work-item impact tables are retrieval keys.** Task generation reads each spec's `index.md` plus only the shards named by the work item's impact tables — never whole spec directories. Routing table, prompts, and the canonical context matrix updated accordingly.
+- **Contract/rationale split.** Spec and architecture docs stay contract-style (tables, schemas, rules, one example each); narrative and history move to `docs/rationale/`, which is never loaded as AI context. All templates carry a context-budget callout.
+
+### Added
+- **Freshness stamps**: every spec shard, spec index, and ARCHITECTURE.md carries `> **Last verified against code:** YYYY-MM-DD (commit ...)`. New CLAUDE.md pre-work rule: verify shards with missing/stale (>30 days) stamps against the source before relying on them; maintenance guide defines the stamp lifecycle.
+- **`tools/validate-tasks.py`** (shipped into `.ai-framework/tools/`): machine-checkable gate for generated task lists — required fields and enum values, unique/sequential task IDs, dependency DAG (dangling refs, cycles), file-path existence with a `(new)` marker convention, per-task acceptance-criteria checkboxes, and `--work-item` cross-checking of the new Acceptance Criteria Coverage table. `--strict` promotes warnings to failures for CI.
+- **Acceptance Criteria Coverage table** required in feature task lists (recommended for bugfix/refactor): maps each work-item AC to the tasks covering it.
+- Validation step added to the Development Pipeline and to every task prompt's Post-Generation Checklist; sync script now also syncs `tools/`.
+
 ## [2.1.0] — 2026-07-14
 
 ### Fixed

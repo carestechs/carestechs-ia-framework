@@ -76,7 +76,7 @@ Not Planned → Under Consideration → Current Work → Released (in Release Hi
 | From | To | Trigger | Docs to Update | Who Decides |
 |------|----|---------|----------------|-------------|
 | Not Planned | Under Consideration | Team discussion, user feedback, or strategic shift | Stakeholder definition (move item between sections) | Product owner / team lead |
-| Under Consideration | Current Work | Decision to build — scope and priority confirmed | Stakeholder definition + spec docs (data model, API, UI as needed) | Product owner / team lead |
+| Under Consideration | Current Work | Decision to build — scope and priority confirmed | Stakeholder definition + affected spec shards and indexes (`docs/data-model/`, `docs/api-spec/`, `docs/ui-specification/` as needed) | Product owner / team lead |
 | Current Work | Released | Feature shipped to production | Stakeholder definition (move to Release History with date) | Developer / team confirms deployment |
 | (new idea) | Under Consideration | New feature idea surfaces | Stakeholder definition (add to Under Consideration) | Anyone on team |
 | Under Consideration | Not Planned | Decision not to build (for now) | Stakeholder definition (move to Not Planned) | Product owner / team lead |
@@ -129,12 +129,12 @@ Use this checklist when a version ships and the team decides to switch to contin
    - Remove all "v2" / "next version" language
 
 4. **Update spec document headers**
-   - Drop "(vX)" from document titles
+   - Drop "(vX)" from document titles — these headers live in each spec's `index.md` (`docs/data-model/index.md`, `docs/api-spec/index.md`, `docs/ui-specification/index.md`)
    - Change status lines from "Active — authoritative for vX development" to "Active — living document, continuously updated"
    - Update references to the Scope Lock / Under Consideration / Not Planned sections to remove version-gated language
 
 5. **Update Usage Notes for AI Task Generation**
-   - Change references from "Scope Lock" to the new section names (Current Work, Not Planned, Under Consideration)
+   - Change references from "Scope Lock" to the new section names (Current Work, Not Planned, Under Consideration) — these notes live in each spec's `index.md`
    - Ensure the notes reference the continuous model structure
 
 ---
@@ -186,10 +186,14 @@ See `.ai-framework/guides/release-lifecycle.md` for details.
 
 ## 5. Spec Document Headers per Model
 
+These header blocks live in each spec's `index.md` — the API examples below show the top of `docs/api-spec/index.md`. Individual shards (`entities/*.md`, `endpoints/*.md`, `screens/*.md`) carry no version headers, only the freshness stamp under their H1.
+
 ### Versioned Model
 
 ```markdown
 # API Specification (v1)
+
+> **Last verified against code:** YYYY-MM-DD (commit `abc1234`)
 
 > **Version**: v1 — Derived from the v1 scope lock in `stakeholder-definition.md`.
 > **Date**: 2025-06-01
@@ -201,8 +205,10 @@ See `.ai-framework/guides/release-lifecycle.md` for details.
 ```markdown
 # API Specification
 
+> **Last verified against code:** YYYY-MM-DD (commit `abc1234`)
+
 > **Continuously updated** — derived from the stakeholder definition.
 > **Status**: Active — living document, continuously updated.
 ```
 
-The same pattern applies to Data Model and UI Specification documents.
+The same pattern applies to `docs/data-model/index.md` and `docs/ui-specification/index.md`.

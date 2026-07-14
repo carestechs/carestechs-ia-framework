@@ -10,7 +10,7 @@ Generate a UI Specification document from existing strategic, architectural, and
 
 ## How to Use
 
-- **AI agents (Claude Code, etc.):** Read the context files listed in the project CLAUDE.md routing table for "UI spec generation", follow the **Guidance**, **Output Format**, and **Constraints** sections below, and **write the output file**: `docs/ui-specification.md`.
+- **AI agents (Claude Code, etc.):** Read the context files listed in the project CLAUDE.md routing table for "UI spec generation", follow the **Guidance**, **Output Format**, and **Constraints** sections below, and **write the output files** (sharded): `docs/ui-specification/index.md`, one `docs/ui-specification/screens/<screen>.md` per screen, and `docs/ui-specification/components.md`.
 - **Chat workflows (manual copy-paste):** Use the XML skeleton in the **Chat Workflow Template (XML)** appendix — paste your documentation into the `<context>` sections and include the Guidance, Output Format, and Constraints sections of this prompt alongside it.
 
 ---
@@ -107,22 +107,32 @@ After generating, validate against the source docs:
 
 ## Output Format
 
-Write the generated document to the canonical location: **`docs/ui-specification.md`**.
+Write the generated spec as a **sharded document set** at the canonical location **`docs/ui-specification/`**, following the template structure from `.ai-framework/templates/ui-specification.md`:
 
-Generate a complete document following the template structure from `.ai-framework/templates/ui-specification.md`:
-
+**`docs/ui-specification/index.md`** (cross-cutting content only):
 1. **Overview** — UI summary + Key UI Decisions table
-2. **Design System** — Colors, typography, spacing, component library usage
-3. **Screen Inventory** — Table of all screens with routes, auth, layouts
-4. **Shared Layouts** — App shell structure, public layout
-5. **Screen Specifications** — Per-screen blocks with:
-   - Layout sketch (ASCII)
-   - Component hierarchy (tree)
-   - Component → API mapping (table)
-   - States: default, loading, empty, error
-   - User interactions: action → result → API call
-6. **Shared Components** — Reusable components with inputs/outputs/variants
-7. **Usage Notes** — Rules for AI task generation
+2. **Design System** — 2.1 Brand Colors, 2.2 Typography Scale, 2.3 Spacing Scale, 2.4 Component Library, 2.5 State Patterns, 2.6 Responsive Breakpoints
+3. **Screen Inventory** — table of all screens with routes, auth, layouts
+4. **Shared Layouts** — app shell structure, public layout
+5. **Usage Notes for AI Task Generation**
+6. **Changelog**
+
+**`docs/ui-specification/screens/<screen>.md`** — **one screen per file**, each with:
+- Layout sketch (ASCII)
+- Component hierarchy (tree)
+- Component → API mapping (table)
+- States: default, loading, empty, error
+- User interactions: action → result → API call
+
+**`docs/ui-specification/components.md`** — the shared components inventory (single file): reusable components with inputs/outputs/variants.
+
+**Shard naming (mechanical, kebab-case):** screen "Project Board" → `screens/project-board.md`.
+
+**Freshness stamp:** every generated file (index, every screen shard, and components.md) starts with this line directly under its H1 — fill in today's date and the current commit hash:
+
+```
+> **Last verified against code:** YYYY-MM-DD (commit `abc1234`)
+```
 
 Derive all content from the context documents provided:
 - Screens from stakeholder user flows and scope lock
@@ -148,10 +158,11 @@ Derive all content from the context documents provided:
 
 ## Post-Generation Checklist
 
-After the AI generates a UI spec document, verify:
+After the AI generates a UI spec document set, verify:
 
+- [ ] Every generated file (index.md, every screen shard, components.md) starts with the freshness stamp directly under its H1, filled with today's date and the current commit
 - [ ] Every user flow phase from the stakeholder definition has at least one screen
-- [ ] Every screen in the Screen Inventory has a full specification in Section 5
+- [ ] Every screen in the Screen Inventory (index.md) has its own shard in `screens/` (kebab-case filename)
 - [ ] Every screen specification includes all 4 states (default, loading, empty, error)
 - [ ] Every screen has a component hierarchy tree
 - [ ] Every screen and component maps to at least one API endpoint from the API spec
@@ -159,12 +170,12 @@ After the AI generates a UI spec document, verify:
 - [ ] Every interaction is specific (not vague) — each maps to a UI element, result, and API call
 - [ ] Component hierarchy uses the conventions declared in CLAUDE.md [e.g., Angular standalone components, no NgModules]
 - [ ] All UI uses the component library and styling system declared in CLAUDE.md (no custom primitives or ad-hoc styles)
-- [ ] Shared components used in 2+ screens are documented in Section 6
+- [ ] Shared components used in 2+ screens are documented in `components.md`
 - [ ] Design tokens (colors, typography, spacing) are fully defined
 - [ ] All component-library components used are listed with customization notes
 - [ ] Routes follow a consistent pattern and match the screen inventory
 - [ ] No screens exist for features outside the scope lock
-- [ ] Layout sketches match the shared layout definitions in Section 4
+- [ ] Layout sketches match the shared layout definitions in index.md's Shared Layouts section (Section 4)
 
 ---
 
@@ -192,13 +203,13 @@ Copy this skeleton, paste your documentation into the `<context>` sections, and 
 <api-spec>
 <!-- REQUIRED: Endpoints map directly to component data needs.
      DTOs inform what fields each component displays. -->
-[Paste full api-spec.md content]
+[Paste docs/api-spec/index.md + all endpoint shards (docs/api-spec/endpoints/)]
 </api-spec>
 
 <data-model>
 <!-- RECOMMENDED: Entity definitions inform display fields, relationships inform
      navigation patterns, enums inform dropdown/filter options. -->
-[Paste relevant sections from data-model.md]
+[Paste docs/data-model/index.md + relevant entity shards (docs/data-model/entities/)]
 </data-model>
 
 <code-conventions>
@@ -312,4 +323,4 @@ Map each screen to the appropriate API endpoints.
 </ui-spec-generation-request>
 ```
 
-**Output:** `docs/ui-specification.md` — a complete UI specification following the `ui-specification.md` template structure.
+**Output:** `docs/ui-specification/index.md` + one `screens/<screen>.md` per screen (e.g., `screens/login.md`, `screens/project-board.md`) + `components.md` — a complete sharded UI specification following the `ui-specification.md` template structure, every file stamped `> **Last verified against code:** ...` directly under its H1.

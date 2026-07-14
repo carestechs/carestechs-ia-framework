@@ -2,6 +2,8 @@
 
 > A one-line archetype. Example: "The overwhelmed small-business owner who needs invoicing to just work."
 
+> **Context budget note:** This document is loaded into AI context — keep it contract-style (tables, schemas, rules); move narrative and history to `docs/rationale/` and link it (rationale files are never loaded by default).
+
 ## 1. Who [Name] Is
 
 <!-- TODO: Describe your primary user in 2-3 sentences -->

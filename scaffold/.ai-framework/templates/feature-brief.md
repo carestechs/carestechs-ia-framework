@@ -3,6 +3,10 @@
 > **Purpose**: Describe a feature at a high level before breaking it down into implementation tasks. This document bridges the gap between strategic documentation (Stakeholder Definition, Specs) and tactical task generation, ensuring every feature is scoped, justified, and traceable before work begins.
 > **When to use**: Before running the feature task generation prompt. One Feature Brief per feature.
 
+> **Context budget note:** This document is loaded into AI context. Keep it contract-style —
+> tables, schemas, rules, one example each. Move narrative and history to `docs/rationale/`
+> and link it; rationale files are never loaded by default.
+
 ---
 
 ## 1. Identity
@@ -77,44 +81,50 @@
 
 ## 6. Key Entities and Business Rules
 
-> *Which data model entities does this feature touch? What business rules govern behavior? Reference `docs/data-model.md` for full entity definitions.*
+> *Which data model entities does this feature touch? What business rules govern behavior? Reference `docs/data-model/` (index + entity shards) for full entity definitions.*
 
 | Entity | Role in Feature | Key Business Rules |
 |--------|----------------|--------------------|
 | [Entity 1] | [How this feature uses/creates/modifies it] | [Rules that apply — validation, constraints, state transitions] |
 | [Entity 2] | [How this feature uses/creates/modifies it] | [Rules that apply] |
 
-<!-- TODO: Repeat rows for each entity involved. If the feature requires a NEW entity not yet in data-model.md, note it here and flag that data-model.md needs updating. -->
+> **Retrieval key:** Entity names in this table map mechanically to spec shards — entity `TaskLabel` → `docs/data-model/entities/task-label.md` (kebab-case, singular). Task generation reads `docs/data-model/index.md` plus ONLY the entity shards named here, so list every entity the feature touches.
 
-**New entities required:** [None · List new entities that must be added to data-model.md]
+<!-- TODO: Repeat rows for each entity involved. If the feature requires a NEW entity without a shard under docs/data-model/entities/, note it here and flag that a new entity shard is needed. -->
+
+**New entities required:** [None · List new entities that need shards created under `docs/data-model/entities/`]
 
 ---
 
 ## 7. API Impact
 
-> *Which API endpoints does this feature require? Reference `docs/api-spec.md` for full endpoint definitions.*
+> *Which API endpoints does this feature require? Reference `docs/api-spec/` (index + endpoint shards) for full endpoint definitions.*
 
 | Endpoint | Method | Status | Notes |
 |----------|--------|--------|-------|
 | [/api/v1/resource] | [GET · POST · PUT · DELETE] | [Existing · New · Modified] | [Brief description of what changes or what it does] |
 
-<!-- TODO: If the feature requires NEW endpoints not yet in api-spec.md, note them here and flag that api-spec.md needs updating. -->
+> **Retrieval key:** Endpoint paths in this table map mechanically to spec shards — resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md` (matches the route segment, plural). Task generation reads `docs/api-spec/index.md` plus ONLY the endpoint shards named here, so list every resource the feature touches.
 
-**New endpoints required:** [None · List new endpoints that must be added to api-spec.md]
+<!-- TODO: If the feature requires NEW endpoints without a shard under docs/api-spec/endpoints/, note them here and flag that a new resource shard is needed. -->
+
+**New endpoints required:** [None · List new endpoints that need shards created or extended under `docs/api-spec/endpoints/`]
 
 ---
 
 ## 8. UI Impact
 
-> *Which screens and components does this feature affect? Reference `docs/ui-specification.md` for full screen definitions.*
+> *Which screens and components does this feature affect? Reference `docs/ui-specification/` (index + screen shards + `components.md`) for full screen definitions.*
 
 | Screen / Component | Status | Description |
 |--------------------|--------|-------------|
 | [Screen or component name] | [Existing · New · Modified] | [What changes or what it shows] |
 
-<!-- TODO: If the feature requires NEW screens not yet in ui-specification.md, note them here. New screens will likely trigger `mockup-first` workflow on related tasks. -->
+> **Retrieval key:** Screen names in this table map mechanically to spec shards — screen "Project Board" → `docs/ui-specification/screens/project-board.md` (kebab-case). Task generation reads `docs/ui-specification/index.md` plus ONLY the screen shards named here (and `components.md` when shared components are listed), so name every screen and shared component the feature touches.
 
-**New screens required:** [None · List new screens that must be added to ui-specification.md]
+<!-- TODO: If the feature requires NEW screens without a shard under docs/ui-specification/screens/, note them here. New screens will likely trigger `mockup-first` workflow on related tasks. -->
+
+**New screens required:** [None · List new screens that need shards created under `docs/ui-specification/screens/`]
 
 ---
 

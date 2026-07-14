@@ -115,10 +115,12 @@ Screenshot attached to the pilot team's report (board showing "Overdue (1)" at 6
 
 | Entity / Component | How Affected | Reference |
 |--------------------|-------------|-----------|
-| Task (`due_date` field) | Semantics — stored as date-only, intended to mean "end of that day in the owner's timezone"; comparison ignores this | `docs/data-model.md` §3 (Task entity), §1.2 timestamp decision |
-| GET /api/v1/projects/{id}/tasks (`filter=overdue`) | Returns incorrect result set | `docs/api-spec.md` §3 (Tasks module) |
+| Task (`due_date` field) | Semantics — stored as date-only, intended to mean "end of that day in the owner's timezone"; comparison ignores this | `docs/data-model/entities/task.md` (fields); `docs/data-model/index.md` §1.2 (timestamp decision) |
+| GET /api/v1/projects/{id}/tasks (`filter=overdue`) | Returns incorrect result set | `docs/api-spec/endpoints/tasks.md` |
 | TaskQueryService (backend) | Builds the overdue predicate using UTC `CURRENT_DATE` | `docs/ARCHITECTURE.md` §3.2 (backend services) |
-| Project Board — filter dropdown (frontend) | Displays the wrong set; no frontend defect itself | `docs/ui-specification.md` §5 (Project Board) |
+| Project Board — filter dropdown (frontend) | Displays the wrong set; no frontend defect itself | `docs/ui-specification/screens/project-board.md` |
+
+> **Retrieval key:** shards to load — `docs/data-model/entities/task.md`, `docs/api-spec/endpoints/tasks.md`, `docs/ui-specification/screens/project-board.md` (plus each spec's `index.md`).
 
 ---
 
@@ -139,7 +141,7 @@ Screenshot attached to the pilot team's report (board showing "Overdue (1)" at 6
 |-----------|------|
 | **Related Feature** | FEAT-003 (Board filters) |
 | **Violated AC** | FEAT-003 AC-2 — "a task appears in Overdue only after its due date has passed in the viewing user's timezone" |
-| **Spec Reference** | `docs/data-model.md` §1.2 ("Timestamps: TIMESTAMPTZ, always UTC; date-only fields interpreted in user profile timezone"); `docs/api-spec.md` Tasks module, `filter` parameter |
+| **Spec Reference** | `docs/data-model/index.md` §1.2 ("Timestamps: TIMESTAMPTZ, always UTC; date-only fields interpreted in user profile timezone"); `docs/api-spec/endpoints/tasks.md`, `filter` parameter |
 | **Related Work Items** | None |
 
 ---

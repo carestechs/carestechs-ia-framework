@@ -10,7 +10,7 @@ Read selected Design Decision Records (DDRs) — their Decision, Rationale, and 
 
 ## How to Use
 
-- **AI agents (Claude Code, etc.):** Read each DDR file the user specifies (from your organization's DDR repo or local paths) — and the profile file first, if one is specified, to get the DDR list and override values. Follow the **Guidance**, **Output Format**, and **Constraints** sections below, read the target templates from `.ai-framework/templates/` for the correct heading structure, and output the compiled sections. **Write the Component Examples Appendix to `docs/component-examples.md`**; paste the other sections into the project docs (or write them directly into the target docs when asked).
+- **AI agents (Claude Code, etc.):** Read each DDR file the user specifies (from your organization's DDR repo or local paths) — and the profile file first, if one is specified, to get the DDR list and override values. Follow the **Guidance**, **Output Format**, and **Constraints** sections below, read the target templates from `.ai-framework/templates/` for the correct heading structure, and output the compiled sections. **Write the Component Examples Appendix to `docs/component-examples.md`**; paste the other sections into the project docs — ui-specification sections target `docs/ui-specification/index.md` — (or write them directly into the target docs when asked).
 - **Chat workflows (manual copy-paste):** Use the XML skeleton in the **Chat Workflow Template (XML)** appendix — paste your DDR files into the `<ddrs>` block and include the Guidance, Output Format, and Constraints sections of this prompt alongside it.
 
 ---
@@ -40,10 +40,10 @@ What NOT to include:
 
 These rules teach the AI how to transform generic DDR content (Decision, Rationale, Constraints, Examples) into template sections. The rules derive everything from the standard DDR format — no extra metadata is needed in the DDRs.
 
-#### Rule 1: Every DDR → ui-specification.md Key UI Decisions
+#### Rule 1: Every DDR → `docs/ui-specification/index.md` Key UI Decisions
 
 **Input:** DDR title + Decision + first Rationale bullet
-**Output:** One row in the Key UI Decisions table (Section 1.2)
+**Output:** One row in the Key UI Decisions table (Section 1.2 of `docs/ui-specification/index.md`)
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -57,13 +57,13 @@ The DDR's **Category** field determines which additional template sections it ta
 
 | Category | Target Documents | Target Sections |
 |----------|-----------------|-----------------|
-| `design-tokens` | ui-specification.md | Brand Colors (2.1), Typography Scale (2.2), Spacing Scale (2.3) |
-| `components` | ui-specification.md, CLAUDE.md | Component Library (2.4); Design Patterns to Follow |
-| `layout` | ui-specification.md | Shared Layouts (Section 4) constraints |
+| `design-tokens` | docs/ui-specification/index.md | Brand Colors (2.1), Typography Scale (2.2), Spacing Scale (2.3) |
+| `components` | docs/ui-specification/index.md, CLAUDE.md | Component Library (2.4); Design Patterns to Follow |
+| `layout` | docs/ui-specification/index.md | Shared Layouts (Section 4) constraints |
 | `interactions` | CLAUDE.md | Design Patterns to Follow, Design Anti-Patterns to Avoid |
-| `states` | ui-specification.md | State Patterns (2.5) |
+| `states` | docs/ui-specification/index.md | State Patterns (2.5) |
 | `accessibility` | CLAUDE.md | Design Patterns to Follow, Design Anti-Patterns to Avoid |
-| `responsive` | ui-specification.md | Responsive Breakpoints (2.6) |
+| `responsive` | docs/ui-specification/index.md | Responsive Breakpoints (2.6) |
 
 The CLAUDE.md target headings are exactly `#### Design Patterns to Follow` and `#### Design Anti-Patterns to Avoid` — match them verbatim when merging.
 
@@ -79,7 +79,7 @@ Format each derived entry as: `- **[Short label]:** [constraint text] <!-- from:
 
 When a constraint contains both a positive and negative aspect, split it into one Pattern entry and one Anti-Pattern entry.
 
-#### Rule 4: design-tokens DDRs → ui-specification.md Design System
+#### Rule 4: design-tokens DDRs → `docs/ui-specification/index.md` Design System
 
 **Input:** DDRs with `Category: design-tokens`
 **Output:**
@@ -89,7 +89,7 @@ When a constraint contains both a positive and negative aspect, split it into on
 - **Spacing Scale** (2.3) — Populate spacing token table from spacing-scale DDR.
 - Additional design-tokens DDRs (shadows, border-radius, opacity, transitions) → add rows to an **Additional Tokens** table below 2.3, or incorporate into existing tables where natural.
 
-#### Rule 5: components DDRs → ui-specification.md Component Library + CLAUDE.md Design Patterns
+#### Rule 5: components DDRs → `docs/ui-specification/index.md` Component Library + CLAUDE.md Design Patterns
 
 **Input:** DDRs with `Category: components`
 **Output:**
@@ -99,7 +99,7 @@ When a constraint contains both a positive and negative aspect, split it into on
 - **CLAUDE.md Design Anti-Patterns to Avoid** — Negative constraints from each component DDR
 - **Component Examples Appendix** — Collect all Examples sections from component DDRs into a reference appendix (for use by the mockup prompt) — see Rule 9
 
-#### Rule 6: states DDRs → ui-specification.md State Patterns (Section 2.5)
+#### Rule 6: states DDRs → `docs/ui-specification/index.md` State Patterns (Section 2.5)
 
 **Input:** DDRs with `Category: states`
 **Output:**
@@ -113,19 +113,19 @@ When a constraint contains both a positive and negative aspect, split it into on
 | *Empty* | *Centered heading + description + CTA* | *From empty-state DDR constraints* | *See Component Examples Appendix* |
 | *Error* | *Inline banner with retry / full-page error* | *From error-state DDR constraints* | *See Component Examples Appendix* |
 
-#### Rule 7: layout DDRs → ui-specification.md Shared Layouts
+#### Rule 7: layout DDRs → `docs/ui-specification/index.md` Shared Layouts
 
 **Input:** DDRs with `Category: layout`
 **Output:**
 
-- **Shared Layouts** (Section 4) — Add constraint annotations to the existing layout section:
+- **Shared Layouts** (Section 4 of `docs/ui-specification/index.md`, if that section exists) — Add constraint annotations to the existing layout section:
   - Sidebar width, collapse behavior, persistence from sidebar-navigation DDR
   - Content max-width and centering from content-width DDR
   - Page-level padding values from page-padding DDR
 
 Format as constraint comments within the layout descriptions.
 
-#### Rule 8: responsive DDRs → ui-specification.md Responsive Breakpoints (Section 2.6)
+#### Rule 8: responsive DDRs → `docs/ui-specification/index.md` Responsive Breakpoints (Section 2.6)
 
 **Input:** DDRs with `Category: responsive`
 **Output:**
@@ -171,7 +171,7 @@ Read all provided DDR files and apply the Derivation Rules to generate pre-fille
 
 For each target document:
 1. Use the exact heading structure from the corresponding template in `.ai-framework/templates/`
-2. Apply Rule 1 (every DDR → ui-specification.md Key UI Decisions row)
+2. Apply Rule 1 (every DDR → `docs/ui-specification/index.md` Key UI Decisions row)
 3. Apply Rule 2 (category targeting) to determine additional target sections
 4. Apply Rules 3-9 to derive Design System tables, Patterns, Anti-Patterns, State Patterns, Responsive Breakpoints, and Component Examples
 5. Merge content from all DDRs that target the same section (e.g., combine all design-tokens into the Design System section)
@@ -240,9 +240,9 @@ Generate one block per target document. Each block contains merged sections from
 
 Output ONLY the sections that derivation rules fill, plus TODO scaffolds for the rest. Do not generate project-specific content (screen inventory, screen specifications, shared components).
 
-### Output: ui-specification.md sections
+### Output: `docs/ui-specification/index.md` sections
 
-Merge into these sections from the `ui-specification.md` template:
+Merge into these sections from the `ui-specification.md` template (all live in the spec's `index.md`):
 - **Key UI Decisions** (1.2) — one row per DDR (Rule 1)
 - **Brand Colors** (2.1) — from design-tokens/color-palette DDR (Rule 4), with profile overrides
 - **Typography Scale** (2.2) — from design-tokens/typography-scale DDR (Rule 4), with profile overrides
@@ -250,9 +250,9 @@ Merge into these sections from the `ui-specification.md` template:
 - **Component Library** (2.4) — one row per components-category DDR (Rule 5)
 - **State Patterns** (2.5) — from states-category DDRs (Rule 6)
 - **Responsive Breakpoints** (2.6) — from responsive-category DDRs (Rule 8)
-- **Shared Layouts** (4) — layout constraints from layout-category DDRs (Rule 7)
+- **Shared Layouts** (4) — layout constraints from layout-category DDRs (Rule 7), if the section exists in index.md
 
-Leave all other sections (Screen Inventory, Screen Specifications, Shared Components) as TODO scaffolds.
+Leave the remaining index.md sections (Screen Inventory) as TODO scaffolds. Screen shards (`docs/ui-specification/screens/*.md`) and `docs/ui-specification/components.md` are project-specific — DDR compilation does not touch them.
 
 ### Output: CLAUDE.md sections
 
@@ -288,7 +288,7 @@ This appendix is referenced by the mockup generation prompt for visual consisten
 
 After the AI generates compiled template sections:
 
-- [ ] Every DDR has a row in ui-specification.md Key UI Decisions (Rule 1)
+- [ ] Every DDR has a row in `docs/ui-specification/index.md` Key UI Decisions (Rule 1)
 - [ ] design-tokens DDRs populate the Design System tables — colors, typography, spacing (Rule 4)
 - [ ] components DDRs populate Component Library table (Rule 5)
 - [ ] states DDRs populate the State Patterns table (Section 2.5) with 4 columns (Rule 6)
@@ -411,7 +411,7 @@ Compile these DDRs with the corporate-clean profile overrides.
 
 ### Derived Output (excerpt)
 
-**ui-specification.md — Key UI Decisions** *(Rule 1: every DDR → one row)*
+**docs/ui-specification/index.md — Key UI Decisions** *(Rule 1: every DDR → one row)*
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -419,7 +419,7 @@ Compile these DDRs with the corporate-clean profile overrides.
 | Button variants | Primary/secondary/ghost/destructive × 3 sizes | All interaction contexts covered <!-- from: buttons.md --> |
 | ... | *(one row per remaining DDR)* | ... |
 
-**ui-specification.md — Brand Colors** *(Rule 4: design-tokens, with profile overrides)*
+**docs/ui-specification/index.md — Brand Colors** *(Rule 4: design-tokens, with profile overrides)*
 
 | Token | Hex | Usage |
 |-------|-----|-------|

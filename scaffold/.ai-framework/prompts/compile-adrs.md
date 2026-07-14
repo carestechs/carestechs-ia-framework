@@ -60,8 +60,8 @@ The ADR's **Category** field determines which additional template documents it t
 | `python` | CLAUDE.md | Patterns to Follow, Anti-Patterns to Avoid |
 | `angular` | CLAUDE.md | Patterns to Follow, Anti-Patterns to Avoid |
 | `react` | CLAUDE.md | Patterns to Follow, Anti-Patterns to Avoid |
-| `database` | CLAUDE.md, data-model.md | Patterns to Follow; Key Modeling Decisions, Database Conventions |
-| `api` | CLAUDE.md, api-spec.md | Patterns to Follow; Key API Decisions, Common Conventions |
+| `database` | CLAUDE.md, docs/data-model/index.md | Patterns to Follow; Key Modeling Decisions, Database Conventions |
+| `api` | CLAUDE.md, docs/api-spec/index.md | Patterns to Follow; Key API Decisions, Common Conventions |
 | `ai` | CLAUDE.md, ARCHITECTURE.md | Patterns to Follow, Anti-Patterns to Avoid; Key Architectural Decisions |
 | *(unknown)* | CLAUDE.md | Patterns to Follow, Anti-Patterns to Avoid *(fallback)* |
 
@@ -90,14 +90,14 @@ When a constraint contains both a positive and negative aspect, split it into on
 
 Only produce rows when the ADR explicitly describes naming rules. Do not invent naming conventions.
 
-#### Rule 5: database-category ADRs → data-model.md
+#### Rule 5: database-category ADRs → `docs/data-model/index.md`
 
 **Input:** ADRs with `Category: database`
 **Output:**
 - **Key Modeling Decisions** table — one row per ADR (same format as Rule 1: title, decision, rationale)
 - **Database Conventions** — positive-phrased constraints become convention entries
 
-#### Rule 6: api-category ADRs → api-spec.md
+#### Rule 6: api-category ADRs → `docs/api-spec/index.md`
 
 **Input:** ADRs with `Category: api`
 **Output:**
@@ -204,21 +204,21 @@ Merge into:
 
 Leave all other sections (System Overview, Component Diagram, Data Flow, etc.) as TODO scaffolds.
 
-### Output: data-model.md sections
+### Output: `docs/data-model/index.md` sections
 
 Merge into (only for database-category ADRs, Rule 5):
 - **Key Modeling Decisions** table — one row per database-category ADR
 - **Database Conventions** — derived from positive-phrased Constraints
 
-Leave all other sections (Entity definitions, Relationships, Enums, etc.) as TODO scaffolds.
+Leave the remaining index.md sections (Relationships Overview, shared Enums, etc.) as TODO scaffolds. Entity shards (`docs/data-model/entities/*.md`) are project-specific — ADR compilation does not touch them.
 
-### Output: api-spec.md sections
+### Output: `docs/api-spec/index.md` sections
 
 Merge into (only for api-category ADRs, Rule 6):
 - **Key API Decisions** table — one row per api-category ADR
 - **Common Conventions** — derived from Constraints about envelope, auth, pagination, errors
 
-Leave all other sections (Endpoint definitions, DTOs, etc.) as TODO scaffolds.
+Leave the remaining index.md sections (shared DTOs, endpoint summary, etc.) as TODO scaffolds. Endpoint shards (`docs/api-spec/endpoints/*.md`) are project-specific — ADR compilation does not touch them.
 
 ---
 
@@ -238,8 +238,8 @@ After the AI generates compiled template sections:
 
 - [ ] Every ADR has a row in ARCHITECTURE.md Key Architectural Decisions (Rule 1)
 - [ ] Every ADR's Constraints appear as Patterns or Anti-Patterns in CLAUDE.md (Rule 3)
-- [ ] database-category ADRs have entries in data-model.md (Rule 5)
-- [ ] api-category ADRs have entries in api-spec.md (Rule 6)
+- [ ] database-category ADRs have entries in `docs/data-model/index.md` (Rule 5)
+- [ ] api-category ADRs have entries in `docs/api-spec/index.md` (Rule 6)
 - [ ] No duplicate rows in merged tables
 - [ ] TODO scaffolds exist for all project-specific sections (not invented content)
 - [ ] Output heading structure matches `.ai-framework/templates/`
@@ -384,23 +384,23 @@ Compile these ADRs into pre-filled template sections.
 - **No integer IDs:** NEVER use auto-increment integer IDs <!-- from: uuid-primary-keys.md -->
 - **No raw responses:** NEVER return raw objects without the envelope wrapper <!-- from: rest-envelope.md -->
 
-**data-model.md — Key Modeling Decisions** *(Rule 5: database-category ADR)*
+**docs/data-model/index.md — Key Modeling Decisions** *(Rule 5: database-category ADR)*
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Primary keys | UUID (server-generated) | No sequential ID leaks, safe for distributed systems |
 
-**data-model.md — Database Conventions** *(Rule 5: database-category constraints)*
+**docs/data-model/index.md — Database Conventions** *(Rule 5: database-category constraints)*
 
 - All entities use `Guid` for primary keys, generated server-side <!-- from: uuid-primary-keys.md -->
 
-**api-spec.md — Key API Decisions** *(Rule 6: api-category ADR)*
+**docs/api-spec/index.md — Key API Decisions** *(Rule 6: api-category ADR)*
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
 | Response format | Standard envelope `{ data, errors, metadata }` | Consistent contract for frontend consumers |
 
-**api-spec.md — Common Conventions** *(Rule 6: api-category constraints)*
+**docs/api-spec/index.md — Common Conventions** *(Rule 6: api-category constraints)*
 
 - All responses use the `{ data, errors, metadata }` envelope <!-- from: rest-envelope.md -->
 - Errors use the array format `[{ code, message, field? }]` <!-- from: rest-envelope.md -->

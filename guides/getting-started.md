@@ -44,7 +44,8 @@ your-project/
 │   ├── README.md
 │   ├── templates/
 │   ├── prompts/
-│   └── guides/
+│   ├── guides/
+│   └── tools/                    # validate-tasks.py (task-list validator)
 ├── .claude/
 │   └── commands/                 # Claude Code slash commands (/feature-tasks, /plan-generation, ...)
 ├── docs/
@@ -52,9 +53,17 @@ your-project/
 │   │   └── primary-user.md
 │   ├── stakeholder-definition.md
 │   ├── ARCHITECTURE.md
-│   ├── data-model.md
-│   ├── api-spec.md
-│   ├── ui-specification.md
+│   ├── data-model/
+│   │   ├── index.md              # Conventions, module ownership, relationships overview, shared enums
+│   │   └── entities/             # One shard per entity (TEMPLATE-entity.md starter)
+│   ├── api-spec/
+│   │   ├── index.md              # API decisions, response envelope, error catalog, auth, pagination
+│   │   └── endpoints/            # One shard per resource group (TEMPLATE-resource.md starter)
+│   ├── ui-specification/
+│   │   ├── index.md              # UI decisions + Design System
+│   │   ├── screens/              # One shard per screen (TEMPLATE-screen.md starter)
+│   │   └── components.md         # Shared components inventory
+│   ├── rationale/                # Narrative & history — never loaded as AI context
 │   └── work-items/               # Feature briefs, bug reports, improvements
 │       ├── TEMPLATE-feature-brief.md
 │       ├── TEMPLATE-bug-report.md
@@ -65,6 +74,10 @@ your-project/
 ```
 
 Each file has section headers with `<!-- TODO -->` prompts telling you exactly what to fill in.
+
+> **Spec docs are sharded.** `docs/data-model/`, `docs/api-spec/`, and `docs/ui-specification/` are directories, not single files: cross-cutting content lives in each `index.md`, and every entity, resource, and screen gets its own shard. Naming is mechanical (kebab-case): entity `TaskLabel` → `entities/task-label.md` (singular), resource `/api/task-labels` → `endpoints/task-labels.md` (matches the route segment, plural), screen "Project Board" → `screens/project-board.md`.
+>
+> **Keep spec docs contract-style.** Narrative, history, and decision background go to `docs/rationale/<topic>.md`, linked from the spec as `Why: see docs/rationale/<topic>.md`. Rationale files are never loaded as AI context.
 
 ### Step 1.1: Apply Architecture Decisions (Optional)
 
@@ -83,7 +96,7 @@ If you have a set of Design Decision Records (DDRs) from a shared repo (e.g., `y
 1. **Select a profile** that matches your project type (e.g., `profiles/corporate-clean.md` for B2B/enterprise, `profiles/modern-minimal.md` for content apps, `profiles/bold-startup.md` for consumer products) — or select individual DDRs
 2. Use the [`.ai-framework/prompts/compile-ddrs.md`](../prompts/compile-ddrs.md) prompt to compile them into pre-filled template sections
 3. Paste the compiled sections into your project docs:
-   - **Design System** (colors, typography, spacing, component library, state patterns, responsive breakpoints) → `docs/ui-specification.md`
+   - **Design System** (colors, typography, spacing, component library, state patterns, responsive breakpoints) → `docs/ui-specification/index.md`
    - **Design Patterns to Follow / Avoid** → `CLAUDE.md`
    - **Component Examples Appendix** → save as reference for mockup generation
 
@@ -185,9 +198,9 @@ Work through the templates in this order. Each step builds on the previous one.
 
 ---
 
-### Step 5: Data Model (`docs/data-model.md`)
+### Step 5: Data Model (`docs/data-model/`)
 
-**Goal:** Define every entity, its fields, relationships, and module ownership.
+**Goal:** Define every entity, its fields, relationships, and module ownership — as `index.md` (key modeling decisions, module ownership, database conventions, relationships overview, shared enums) plus one shard per entity in `entities/`.
 
 **Key questions to answer:**
 - What entities does each module own?
@@ -198,20 +211,20 @@ Work through the templates in this order. Each step builds on the previous one.
 
 **"Good enough" checklist:**
 - [ ] Every in-scope feature maps to at least one entity
-- [ ] Each entity has a field table with types and constraints
-- [ ] Relationships are defined with cascade behaviors
+- [ ] Each entity has its own shard `entities/<entity>.md` (kebab-case, singular — `TaskLabel` → `task-label.md`) with a field table (types, constraints)
+- [ ] Relationships are defined with cascade behaviors; the relationships overview (ER diagram) in `index.md` covers them
 - [ ] Cross-module references are ID-only
 - [ ] Standard audit fields (id, created_at, updated_at) are on every entity
 
 **Time:** ~20 minutes
 
-> **Tip:** Use the `spec-generation.md` prompt to generate this from your existing stakeholder + architecture + CLAUDE.md docs. Review and refine the output rather than writing from scratch.
+> **Tip:** Use the `spec-generation.md` prompt to generate this from your existing stakeholder + architecture + CLAUDE.md docs — it writes `index.md` plus one shard per entity. Review and refine the output rather than writing from scratch.
 
 ---
 
-### Step 6: API Specification (`docs/api-spec.md`)
+### Step 6: API Specification (`docs/api-spec/`)
 
-**Goal:** Define every REST endpoint with routes, request/response shapes, and status codes.
+**Goal:** Define every REST endpoint with routes, request/response shapes, and status codes — as `index.md` (key API decisions, response envelope, error catalog, authentication endpoints, pagination) plus one shard per resource group in `endpoints/`.
 
 **Key questions to answer:**
 - What CRUD endpoints does each entity need?
@@ -222,20 +235,21 @@ Work through the templates in this order. Each step builds on the previous one.
 
 **"Good enough" checklist:**
 - [ ] Every entity has appropriate CRUD endpoints
+- [ ] Each resource group has its own shard `endpoints/<resource>.md`, named after the route segment (plural — `/api/task-labels` → `task-labels.md`), holding all endpoint blocks for that resource
 - [ ] Request/response DTOs are fully defined
 - [ ] Auth requirements are specified per endpoint
-- [ ] List endpoints support pagination
-- [ ] Error status codes are listed for each endpoint
+- [ ] List endpoints support pagination (convention defined once in `index.md`)
+- [ ] Error status codes are listed for each endpoint and map to the Error Catalog in `index.md`
 
 **Time:** ~20 minutes
 
-> **Tip:** Generate the data model first, then use it as additional context when generating the API spec — endpoints map naturally from entities.
+> **Tip:** Generate the data model first, then use it as additional context when generating the API spec — endpoints map naturally from entities. The `spec-generation.md` prompt writes `index.md` plus the endpoint shards.
 
 ---
 
-### Step 7: UI Specification (`docs/ui-specification.md`)
+### Step 7: UI Specification (`docs/ui-specification/`)
 
-**Goal:** Define every screen's layout, component hierarchy, design tokens, interaction patterns, and state handling (loading, empty, error).
+**Goal:** Define every screen's layout, component hierarchy, design tokens, interaction patterns, and state handling (loading, empty, error) — as `index.md` (key UI decisions + Design System), one shard per screen in `screens/`, and a shared `components.md` inventory.
 
 **Key questions to answer:**
 - What screens does each user flow step require?
@@ -246,17 +260,17 @@ Work through the templates in this order. Each step builds on the previous one.
 - What are the design tokens (colors, typography, spacing)?
 
 **"Good enough" checklist:**
-- [ ] Every user flow step has a corresponding screen
+- [ ] Every user flow step has a corresponding screen shard `screens/<screen>.md` (kebab-case — "Project Board" → `project-board.md`)
 - [ ] Every screen maps to at least one API endpoint
 - [ ] Every screen has all 4 states defined (default, loading, empty, error)
-- [ ] Component hierarchy is defined for each screen
-- [ ] Shared components are identified (used in 2+ screens)
-- [ ] Design tokens (colors, typography, spacing) are defined
+- [ ] Component hierarchy is defined in each screen shard
+- [ ] Shared components (used in 2+ screens) are inventoried in `components.md`
+- [ ] Design tokens (colors, typography, spacing) are defined in the `index.md` Design System
 - [ ] Interactions are specific — each maps to a UI element, result, and API call
 
 **Time:** ~20 minutes
 
-> **Tip:** Generate the API spec first, then use it as additional context when generating the UI spec — endpoints map directly to component data needs. Use the `ui-spec-generation.md` prompt to auto-generate from your existing docs.
+> **Tip:** Generate the API spec first, then use it as additional context when generating the UI spec — endpoints map directly to component data needs. Use the `ui-spec-generation.md` prompt to auto-generate from your existing docs — it writes `index.md`, the screen shards, and `components.md`.
 
 ---
 
@@ -275,9 +289,9 @@ Work through the templates in this order. Each step builds on the previous one.
 - Backend-only features with no UI
 
 **Process:**
-1. Pick a screen from the UI Specification screen inventory
+1. Pick a screen from `docs/ui-specification/screens/`
 2. Use the [`mockup-generation.md`](../prompts/mockup-generation.md) prompt template
-3. Assemble context: target screen spec block + Design System + CLAUDE.md
+3. Assemble context: the screen's shard (`docs/ui-specification/screens/<screen>.md`) + Design System from `docs/ui-specification/index.md` + CLAUDE.md
 4. Generate the HTML mockup file and save it as `mockups/T-XXX-screen-name.html`
 5. Open in a browser and review visually
 6. Share with stakeholders for approval
@@ -329,6 +343,7 @@ Describe the system as it is today, not as you wish it were.
 Document the entities as they exist in your persistence layer today.
 
 - Use the [`spec-generation.md`](../prompts/spec-generation.md) prompt with your entity classes/schema files, CLAUDE.md, and architecture doc as context
+- Write one shard per entity under `docs/data-model/entities/`; conventions, module ownership, and the relationships overview go in `docs/data-model/index.md`
 - Capture fields, types, constraints, relationships, and module ownership as implemented — not as planned
 - Note any known modeling debt (missing indexes, cross-module navigation) as TODO items
 
@@ -337,6 +352,7 @@ Document the entities as they exist in your persistence layer today.
 Document the endpoints your backend actually exposes.
 
 - Use the [`spec-generation.md`](../prompts/spec-generation.md) prompt with your controllers/route handlers and the fresh data model as context
+- Write one shard per resource group under `docs/api-spec/endpoints/`; the response envelope, error catalog, auth, and pagination conventions go in `docs/api-spec/index.md`
 - Record routes, methods, request/response DTO shapes, auth requirements, and status codes as implemented
 - Flag inconsistencies (e.g., unpaginated list endpoints) rather than papering over them
 
@@ -345,7 +361,8 @@ Document the endpoints your backend actually exposes.
 Document the screens and components your frontend already has.
 
 - Use the [`ui-spec-generation.md`](../prompts/ui-spec-generation.md) prompt with your existing routes/components, the API spec, and CLAUDE.md as context
-- Capture the screen inventory, component hierarchies, component → API mappings, and existing design tokens
+- Write one shard per screen under `docs/ui-specification/screens/`, shared components in `docs/ui-specification/components.md`, and design tokens in `docs/ui-specification/index.md`
+- Capture component hierarchies, component → API mappings, and existing design tokens
 - Note screens missing loading/empty/error states as gaps to close
 
 ### Step A7: Persona (If Not Already Clear)
@@ -414,8 +431,9 @@ You've got documentation and work items. Now put them to work.
 Task generation is not just chat output — it produces files that feed the next stage:
 
 1. **Generate the task list.** The feature/bugfix/refactor prompts write a task list to `tasks/` — `tasks/FEAT-XXX-tasks.md`, `tasks/BUG-XXX-tasks.md`, or `tasks/IMP-XXX-tasks.md` (for ad-hoc work without a work item: `tasks/adhoc-short-title-tasks.md`).
-2. **Plan each task before implementing.** For each task `T-XXX` in the list, run [`plan-generation.md`](../prompts/plan-generation.md) to produce `plans/plan-T-XXX-short-title.md` — a concrete implementation plan an agent can execute.
-3. **Execute under Workflow Enforcement.** The **Workflow Enforcement** section in your project's CLAUDE.md defines how agents move through the pipeline (which workflow each task follows, when mockups or investigation come first, and how status gets updated).
+2. **Validate the task list.** Run `python .ai-framework/tools/validate-tasks.py tasks/<file>.md` and fix every error before planning or implementation. Add `--work-item docs/work-items/<id>-short-title.md` to cross-check the Acceptance Criteria Coverage table (other optional flags: `--root`, `--strict`).
+3. **Plan each task before implementing.** For each task `T-XXX` in the list, run [`plan-generation.md`](../prompts/plan-generation.md) to produce `plans/plan-T-XXX-short-title.md` — a concrete implementation plan an agent can execute.
+4. **Execute under Workflow Enforcement.** The **Workflow Enforcement** section in your project's CLAUDE.md defines how agents move through the pipeline (which workflow each task follows, when mockups or investigation come first, and how status gets updated).
 
 ### Assemble Context
 
@@ -426,6 +444,8 @@ Follow [`.ai-framework/guides/context-compilation.md`](context-compilation.md) �
 | New Feature | Feature Brief + Stakeholder + CLAUDE.md | Data Model, API Spec, UI Spec, Persona, Architecture |
 | Bug Fix | Bug Report + CLAUDE.md | Architecture, Data Model, API Spec, UI Spec |
 | Refactoring | Improvement Proposal + CLAUDE.md + Architecture | Data Model, Stakeholder |
+
+Spec documents are sharded — wherever a recipe lists Data Model, API Spec, or UI Spec, read that spec's `index.md` plus only the shards named by the work item's impact tables (see the **Retrieval Keys** section of [`context-compilation.md`](context-compilation.md)). `docs/rationale/` files are never included as context.
 
 For the full matrix — including Testing, Integration, Prioritization, UI Mockup, Release Transition, and ADR/DDR Compilation — see [`context-compilation.md`](context-compilation.md).
 
@@ -461,10 +481,10 @@ For the full matrix — including Testing, Integration, Prioritization, UI Mocku
       [Paste from CLAUDE.md]
     </code-conventions>
     <data-model>
-      [Paste relevant entities from docs/data-model.md]
+      [Paste docs/data-model/index.md + the entity shards named by the work item's impact table]
     </data-model>
     <api-spec>
-      [Paste relevant endpoints from docs/api-spec.md]
+      [Paste docs/api-spec/index.md + the endpoint shards named by the impact table]
     </api-spec>
   </context>
 
@@ -477,7 +497,7 @@ For the full matrix — including Testing, Integration, Prioritization, UI Mocku
 
 </details>
 
-The AI will return structured tasks with IDs, descriptions, acceptance criteria, complexity estimates, and file lists. Save the result to `tasks/` (e.g., `tasks/FEAT-XXX-tasks.md`) so it can feed the planning stage.
+The AI will return structured tasks with IDs, descriptions, acceptance criteria, complexity estimates, and file lists. Save the result to `tasks/` (e.g., `tasks/FEAT-XXX-tasks.md`) so it can feed the planning stage, then validate it (Task Pipeline step 2) before generating plans.
 
 ---
 
@@ -493,7 +513,11 @@ Every generated artifact has a fixed home. Agents write to these locations; huma
 | Implementation plans | `plans/` | `plan-T-XXX-short-title.md` |
 | HTML mockups | `mockups/` | `T-XXX-screen-name.html` |
 | Component Examples (DDR output) | `docs/` | `component-examples.md` |
-| System docs | `docs/` | `stakeholder-definition.md`, `ARCHITECTURE.md`, `data-model.md`, `api-spec.md`, `ui-specification.md`, `personas/primary-user.md` |
+| Data model | `docs/data-model/` | `index.md` + `entities/<entity>.md` (kebab-case, singular) |
+| API spec | `docs/api-spec/` | `index.md` + `endpoints/<resource>.md` (matches route segment, plural) |
+| UI spec | `docs/ui-specification/` | `index.md` + `screens/<screen>.md` + `components.md` |
+| Rationale | `docs/rationale/` | `<topic>.md` — narrative/history linked from spec docs; **never loaded as AI context** |
+| System docs | `docs/` | `stakeholder-definition.md`, `ARCHITECTURE.md`, `personas/primary-user.md` |
 | Code conventions | project root | `CLAUDE.md` |
 
 ---
@@ -518,6 +542,8 @@ Documentation drifts. Keep it alive.
 
 **Key rule:** If a task touches a document's area of concern, update the document in the same PR.
 
+**Freshness stamps:** every spec shard, every spec `index.md`, and `ARCHITECTURE.md` carries a "Last verified against code" stamp directly under its H1. Update it whenever you edit a file or verify it against the code — stale stamps (missing or older than 30 days) force agents to re-verify the shard before trusting it. See the maintenance guide for the stamp rules.
+
 For full maintenance guidance, see [`.ai-framework/guides/maintenance.md`](maintenance.md).
 
 ---
@@ -534,7 +560,7 @@ For full maintenance guidance, see [`.ai-framework/guides/maintenance.md`](maint
 4.5  (Optional) Create HTML mockups for key screens    →  Phase 2 (Step 7.5)
 5.   Write work items (Feature/Bug/Improvement)        →  Phase 2.5
 6.   Pick prompt template + add context                →  Phase 3
-7.   Generate tasks with AI → tasks/, then plans/      →  Phase 3
+7.   Generate tasks with AI → tasks/, validate, plans/ →  Phase 3
 8.   Keep docs updated                                 →  Phase 4
 ```
 

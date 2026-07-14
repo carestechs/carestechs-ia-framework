@@ -2,6 +2,10 @@
 
 > **Purpose**: Define what we are building, why we are building it, and what the first version will and will not do. This document serves as the product north star for AI task generation.
 
+> **Context budget note:** This document is loaded into AI context. Keep it contract-style —
+> tables, schemas, rules, one example each. Move narrative and history to `docs/rationale/`
+> and link it; rationale files are never loaded by default.
+
 ---
 
 ## 1. Executive Summary

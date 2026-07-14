@@ -84,12 +84,14 @@ A single `NotificationService` in `backend/src/notifications/` owns recipient re
 
 | Entity / Component | What Changes | Spec Reference |
 |--------------------|-------------|----------------|
-| TasksController | Inline dispatch replaced by `NotificationService.notify()` call | `docs/api-spec.md` §3 Tasks (no contract change) |
-| CommentsController | Same extraction; mention logic moves to the service | `docs/api-spec.md` §3 Comments (no contract change) |
-| ProjectMembersController | Same extraction; invite/role-change logic moves | `docs/api-spec.md` §3 Projects (no contract change) |
+| TasksController | Inline dispatch replaced by `NotificationService.notify()` call | `docs/api-spec/endpoints/tasks.md` (no contract change) |
+| CommentsController | Same extraction; mention logic moves to the service | `docs/api-spec/endpoints/comments.md` (no contract change) |
+| ProjectMembersController | Same extraction; invite/role-change logic moves | `docs/api-spec/endpoints/project-members.md` (no contract change) |
 | NotificationService (new) | New backend component owning resolution, preferences, channels, dispatch | `docs/ARCHITECTURE.md` §3.2 — new component entry required |
-| Notification entity | Unchanged schema; writes move from controllers to the service | `docs/data-model.md` §3 (Notification) |
-| NotificationOutbox (new) | New table backing post-response delivery | `docs/data-model.md` — new entity required |
+| Notification entity | Unchanged schema; writes move from controllers to the service | `docs/data-model/entities/notification.md` |
+| NotificationOutbox (new) | New table backing post-response delivery | `docs/data-model/entities/notification-outbox.md` — new entity shard required |
+
+> **Retrieval key:** shards to load — `docs/data-model/entities/notification.md`, `docs/data-model/entities/notification-outbox.md` (new), `docs/api-spec/endpoints/tasks.md`, `docs/api-spec/endpoints/comments.md`, `docs/api-spec/endpoints/project-members.md` (plus each spec's `index.md`). No UI shards — API contracts and screens are unchanged.
 
 ---
 
@@ -126,7 +128,7 @@ Per-controller migration behind a config flag (`notifications.useService`, per e
 - Task-assignment endpoint P95 ≤ 300ms (from 850ms) with SMTP out of the request path
 - Characterization tests confirm identical recipients and channels for all six event types before vs after
 - The 14 duplicated SMTP mock setups in controller tests are removed
-- `docs/ARCHITECTURE.md` and `docs/data-model.md` updated (NotificationService component, NotificationOutbox entity) in the same PRs
+- `docs/ARCHITECTURE.md` updated (NotificationService component) and `docs/data-model/entities/notification-outbox.md` created (+ Module Ownership row in `docs/data-model/index.md`) in the same PRs
 
 ---
 

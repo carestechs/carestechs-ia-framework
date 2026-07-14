@@ -28,14 +28,14 @@ Plan generation has its own context recipe (it operates on a single task, not a 
 | Task Origin | Required Context | Conditional Context |
 |-------------|-----------------|---------------------|
 | All tasks | `CLAUDE.md`, task definition (from `tasks/<WORK-ITEM-ID>-tasks.md`), files listed in "Files to Modify/Create" | — |
-| Feature tasks | — | `docs/data-model.md`, `docs/api-spec.md`, `docs/ui-specification.md` (based on which layers the task touches) |
+| Feature tasks | — | The entity/endpoint/screen shards referenced by the task — `docs/data-model/entities/<entity>.md`, `docs/api-spec/endpoints/<resource>.md`, `docs/ui-specification/screens/<screen>.md` — plus each loaded spec's `index.md` for conventions (based on which layers the task touches) |
 | Bugfix tasks | — | `docs/ARCHITECTURE.md` (for understanding system structure) |
 | Refactoring tasks | — | `docs/ARCHITECTURE.md` (for understanding module boundaries) |
-| Frontend tasks | — | `docs/ui-specification.md` (target screen + Design System) |
+| Frontend tasks | — | `docs/ui-specification/screens/<screen>.md` (target screen shard) + the Design System sections from `docs/ui-specification/index.md` |
 
 ### What NOT to Include
 
-- Full documents — extract only the sections relevant to the task's files and domain
+- Whole spec directories or full documents — load only the shards the task references and the sections relevant to the task's files and domain
 - Stakeholder definition — plans are implementation-level, not strategic
 - Persona documents — plans deal with code, not user experience
 - Other task definitions — each plan addresses one task only
@@ -177,19 +177,22 @@ After the AI generates a plan file, verify:
 <data-model>
 <!-- CONDITIONAL: Include for tasks that touch entities, database, or data flow.
      Provides entity shapes, relationships, and constraints. -->
-[Paste relevant entity sections from docs/data-model.md]
+[Paste the entity shards the task references (docs/data-model/entities/<entity>.md)
+ + conventions from docs/data-model/index.md]
 </data-model>
 
 <api-spec>
 <!-- CONDITIONAL: Include for tasks that touch API endpoints or DTOs.
      Provides endpoint contracts and response shapes. -->
-[Paste relevant endpoint sections from docs/api-spec.md]
+[Paste the endpoint shards the task references (docs/api-spec/endpoints/<resource>.md)
+ + conventions from docs/api-spec/index.md]
 </api-spec>
 
 <ui-specification>
 <!-- CONDITIONAL: Include for frontend tasks that touch screens or components.
      Provides component hierarchy, states, and layout. -->
-[Paste relevant screen sections from docs/ui-specification.md]
+[Paste the target screen shard (docs/ui-specification/screens/<screen>.md)
+ + the Design System sections from docs/ui-specification/index.md]
 </ui-specification>
 
 <architecture>

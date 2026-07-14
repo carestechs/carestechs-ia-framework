@@ -25,6 +25,8 @@ Context selection lives in the **canonical matrix**: `guides/context-compilation
 
 For bug fixes: **required** = Bug Report + CLAUDE.md; **optional** = Architecture, Data Model, API Spec, UI Specification (per bug type — e.g., data-model for data integrity/calculation bugs, api-spec for API response bugs, ui-specification for display bugs).
 
+Spec docs are **sharded**: when a spec is needed, read that spec's index (`docs/data-model/index.md`, `docs/api-spec/index.md`, `docs/ui-specification/index.md`) plus **only** the shards named by the Bug Report's Affected Entities / impact tables, mapped via the kebab-case naming rule (entity `TaskLabel` → `docs/data-model/entities/task-label.md`; resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md`; screen "Project Board" → `docs/ui-specification/screens/project-board.md`). Do not read whole spec directories.
+
 Prompt-specific notes:
 
 - **Bug Report** (preferred): `docs/work-items/BUG-XXX-short-title.md` provides structured impact assessment, traceability, entity mapping, and severity justification. Generates more targeted investigation tasks.
@@ -65,7 +67,7 @@ Organize tasks into three phases. The `Workflow` field is pre-set by phase:
 
 **Output file:** `tasks/BUG-XXX-tasks.md` (matching the Bug Report's ID; `tasks/adhoc-short-title-tasks.md` for inline requests). AI agents write this file — the task list is not just chat output.
 
-**Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` enum delta: adds `Investigation`. Every task block in every phase includes Description and Acceptance Criteria.
+**Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` enum delta: adds `Investigation`. Every task block in every phase includes Description and Acceptance Criteria. In **Files to Modify/Create**, suffix files that don't exist yet with `(new)` — example: `- src/services/label-service.ts (new) - label CRUD logic`.
 
 Phase presets:
 
@@ -170,6 +172,18 @@ After all tasks, provide:
 - Monitoring recommendations post-fix
 - Related areas to audit for similar issues
 
+### Acceptance Criteria Coverage (recommended)
+
+When the Bug Report defines acceptance criteria, end the task list with:
+
+```markdown
+## Acceptance Criteria Coverage
+
+| Work Item AC | Covered By |
+|--------------|------------|
+| AC-1: [text] | T-003, T-007 |
+```
+
 ---
 
 ## Constraints
@@ -187,6 +201,7 @@ After all tasks, provide:
 
 After Claude generates tasks, verify:
 
+- [ ] Run `python .ai-framework/tools/validate-tasks.py tasks/BUG-XXX-tasks.md` and fix every error
 - [ ] Investigation tasks come before fix tasks
 - [ ] Root cause is identified, not just symptoms treated
 - [ ] Fix addresses root cause, not workaround

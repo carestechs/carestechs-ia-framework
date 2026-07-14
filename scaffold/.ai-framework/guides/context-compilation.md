@@ -59,6 +59,22 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 
 ## Context Selection by Task Type
 
+### Retrieval Keys: How Spec Context Gets Selected
+
+The three spec documents are sharded directories, not single files: `docs/data-model/` (`index.md` + `entities/`), `docs/api-spec/` (`index.md` + `endpoints/`), and `docs/ui-specification/` (`index.md` + `screens/` + `components.md`). Each `index.md` holds only cross-cutting content (conventions, decisions, shared definitions); every entity, resource, and screen lives in its own shard.
+
+The work item's impact tables (Entities / API / UI) are **retrieval keys**: the names they list map mechanically (kebab-case) to shard paths —
+
+- Entity `TaskLabel` → `docs/data-model/entities/task-label.md` (singular)
+- Resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md` (matches the route segment, plural)
+- Screen "Project Board" → `docs/ui-specification/screens/project-board.md`
+
+**The rule:** wherever a table below (or the CLAUDE.md routing table) lists Data Model, API Specification, or UI Specification, read that spec's `index.md` plus ONLY the shards named by the work item's impact tables — never whole spec directories.
+
+**Never include `docs/rationale/`:** narrative, history, and decision background live in `docs/rationale/<topic>.md`, linked from contract docs as `Why: see docs/rationale/<topic>.md`. Rationale files are never loaded as context — no recipe or routing-table row lists them.
+
+---
+
 ### 1. New Feature Implementation
 
 **Goal**: Generate tasks that implement a feature aligned with product vision.
@@ -68,9 +84,9 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 | Required | Feature Brief | Always (preferred) | Full `docs/work-items/FEAT-*.md` — scope, ACs, impact |
 | Required | Stakeholder Definition | Always | Philosophy, principles, scope lock |
 | Required | CLAUDE.md | Always | Full document |
-| Recommended | Data Model | Features involving entities | Relevant entity definitions, relationships |
-| Recommended | API Specification | Features with API endpoints | Relevant endpoint definitions, DTOs |
-| Recommended | UI Specification | User-facing features | Relevant screen specs, component hierarchy, interactions |
+| Recommended | Data Model | Features involving entities | `docs/data-model/index.md` + entity shards named by the impact table (`entities/<entity>.md`) |
+| Recommended | API Specification | Features with API endpoints | `docs/api-spec/index.md` + endpoint shards for the resources named by the impact table (`endpoints/<resource>.md`) |
+| Recommended | UI Specification | User-facing features | `docs/ui-specification/index.md` + screen shards named by the impact table (`screens/<screen>.md`); add `components.md` when shared components are affected |
 | Optional | Persona | User-facing features | Relevant persona |
 | Optional | Architecture | Multi-component features | Affected components |
 
@@ -90,15 +106,15 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
   </code-conventions>
 
   <data-model>
-    [Relevant entity definitions, fields, relationships]
+    [docs/data-model/index.md + the entity shards named by the impact table]
   </data-model>
 
   <api-spec>
-    [Relevant endpoint definitions, DTOs, status codes]
+    [docs/api-spec/index.md + the endpoint shards named by the impact table]
   </api-spec>
 
   <ui-specification>
-    [If user-facing: relevant screen specs, component hierarchy, interactions, states]
+    [If user-facing: docs/ui-specification/index.md (Design System) + the screen shards named by the impact table]
   </ui-specification>
 
   <persona>
@@ -122,9 +138,9 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 | Required | Bug Report | Always (preferred) | Full `docs/work-items/BUG-*.md` — reproduction, evidence, impact |
 | Required | CLAUDE.md | Always | Full document |
 | Optional | Architecture | Multi-component bug | Affected components |
-| Optional | Data Model | Data-related bugs | Affected entity definitions |
-| Optional | API Specification | API-related bugs | Affected endpoint definitions |
-| Optional | UI Specification | UI-related bugs | Affected screen specs, states, interactions |
+| Optional | Data Model | Data-related bugs | `docs/data-model/index.md` + affected entity shards (`entities/<entity>.md`) |
+| Optional | API Specification | API-related bugs | `docs/api-spec/index.md` + affected endpoint shards (`endpoints/<resource>.md`) |
+| Optional | UI Specification | UI-related bugs | `docs/ui-specification/index.md` + affected screen shards (`screens/<screen>.md`) |
 | Optional | Stakeholder Definition | Scope clarification needed | Scope lock, principles |
 
 **Example Assembly**:
@@ -144,7 +160,7 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
   </architecture>
 
   <data-model>
-    [If data-related: affected entity definitions]
+    [If data-related: docs/data-model/index.md + affected entity shards]
   </data-model>
 </context>
 ```
@@ -160,7 +176,7 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 | Required | Improvement Proposal | Always (preferred) | Full `docs/work-items/IMP-*.md` — current/desired state, risks, criteria |
 | Required | CLAUDE.md | Always | Full document |
 | Required | Architecture | Always | Current + target state |
-| Optional | Data Model | Data layer refactoring | Affected entity definitions |
+| Optional | Data Model | Data layer refactoring | `docs/data-model/index.md` + entity shards in the affected area |
 | Optional | Stakeholder Definition | Large-scale refactoring | Principles, scope |
 
 **Example Assembly**:
@@ -222,8 +238,8 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 |----------|----------|--------------|-----------------|
 | Required | Architecture | Always | Integration points, data flow |
 | Required | CLAUDE.md | Always | Error handling patterns |
-| Required | Data Model | Always | Entities involved in the integration |
-| Required | API Specification | Always | Endpoints that connect to or expose the integration |
+| Required | Data Model | Always | `docs/data-model/index.md` + entity shards involved in the integration |
+| Required | API Specification | Always | `docs/api-spec/index.md` + endpoint shards that connect to or expose the integration |
 | Optional | Stakeholder Definition | Scope check | What integrations are in scope |
 
 **Example Assembly**:
@@ -241,11 +257,11 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
   </code-conventions>
 
   <data-model>
-    [Entities involved in the integration]
+    [docs/data-model/index.md + entity shards involved in the integration]
   </data-model>
 
   <api-spec>
-    [Endpoints that expose or connect to the integration]
+    [docs/api-spec/index.md + endpoint shards that expose or connect to the integration]
   </api-spec>
 </context>
 ```
@@ -307,9 +323,9 @@ Consider: user impact, severity, development cost, strategic alignment, dependen
 
 | Priority | Document | Include When | What to Include |
 |----------|----------|--------------|-----------------|
-| Required | UI Specification | Always | Target screen's spec block (layout, hierarchy, states) + Design System section (colors, typography, spacing) |
+| Required | UI Specification | Always | Target screen's shard (`docs/ui-specification/screens/<screen>.md`: layout, hierarchy, states) + Design System from `docs/ui-specification/index.md`; `components.md` for shared components used |
 | Required | CLAUDE.md | Always | Design tokens, CSS conventions [e.g., Tailwind], frontend patterns |
-| Recommended | API Specification | When screen displays data | Response DTO shapes for realistic placeholder content |
+| Recommended | API Specification | When screen displays data | Endpoint shards the screen calls (`docs/api-spec/endpoints/<resource>.md`) — response DTO shapes for realistic placeholder content |
 | Optional | Persona | User-facing screens | Content tone for placeholder text |
 | Optional | Stakeholder Definition | Branding needed | Product name, philosophy |
 
@@ -317,8 +333,8 @@ Consider: user impact, severity, development cost, strategic alignment, dependen
 ```xml
 <context>
   <ui-specification>
-    [Target screen spec block: layout sketch, component hierarchy, states]
-    [Design System section: colors, typography, spacing tokens]
+    [Target screen shard docs/ui-specification/screens/<screen>.md: layout sketch, component hierarchy, states]
+    [Design System from docs/ui-specification/index.md: colors, typography, spacing tokens]
   </ui-specification>
 
   <code-conventions>
@@ -326,7 +342,7 @@ Consider: user impact, severity, development cost, strategic alignment, dependen
   </code-conventions>
 
   <api-spec>
-    [If data-driven screen: response DTO shapes for placeholder content]
+    [If data-driven screen: endpoint shards the screen calls — response DTO shapes for placeholder content]
   </api-spec>
 </context>
 ```
@@ -407,9 +423,11 @@ Consider: user impact, severity, development cost, strategic alignment, dependen
 
 ### Guideline: Quality Over Quantity
 
-With 10 templates, be mindful of total context size. Use section extraction for data-model, api-spec, and ui-specification — include only the entities, endpoints, and screens relevant to your task, not the full documents. Work item documents (Feature Brief, Bug Report, Improvement Proposal) should generally be included in full since they are scoped to a single work item.
+With 10 templates, be mindful of total context size. For the sharded spec documents (data-model, api-spec, ui-specification), size control is built in: read each spec's `index.md` plus only the shards named by the work item's impact tables (see **Retrieval Keys** above) — never whole spec directories. Work item documents (Feature Brief, Bug Report, Improvement Proposal) should generally be included in full since they are scoped to a single work item. `docs/rationale/` files are never loaded — the contract docs stay lean and link out to them.
 
-### Strategies for Large Documents
+### Strategies for Large Single-File Documents
+
+For the documents that remain single files (ARCHITECTURE.md, stakeholder definition, CLAUDE.md):
 
 #### 1. Section Extraction
 Instead of full document, extract only relevant sections:
@@ -450,7 +468,7 @@ Agents have direct file access and don't need XML assembly. Follow these steps:
 
 1. **Identify the task type** from the user's request — one of the 10 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation)
 2. **Read the files** listed in the CLAUDE.md routing table for that task type
-3. **For large documents**, read only the sections relevant to the task — e.g., for a task about labels, read only the Label entity from `data-model.md` and label endpoints from `api-spec.md`
+3. **For the sharded spec docs**, read each spec's `index.md` plus only the shards named by the work item's impact tables — e.g., for a task about the `TaskLabel` entity and the `/api/task-labels` resource, read `docs/data-model/index.md` + `docs/data-model/entities/task-label.md` and `docs/api-spec/index.md` + `docs/api-spec/endpoints/task-labels.md`. Never read whole spec directories, and never read `docs/rationale/`
 4. **Read the prompt template** from `.ai-framework/prompts/` — use the **Output Format** section as your deliverable structure, and apply the **Guidance**, **Constraints**, and **Post-Generation Checklist**
 5. **Generate the deliverable** directly — no XML wrapping needed — and write it to its canonical location (task lists to `tasks/FEAT-XXX-tasks.md` etc., plans to `plans/plan-T-XXX-short-title.md`, mockups to `mockups/T-XXX-screen-name.html`)
 
@@ -470,7 +488,7 @@ Consult the task-type tables above for your task type. Gather required documents
 - **Complex task**: 4+ documents (extract only the relevant sections of each)
 
 #### Step 4: Extract Relevant Sections
-Don't include entire documents if only portions are relevant.
+Don't include entire documents if only portions are relevant. For the sharded spec docs, paste each spec's `index.md` plus only the shards named by the work item's impact tables.
 
 #### Step 5: Structure with XML Tags
 Use clear XML tags to separate context sections. This helps Claude parse and reference specific sections.
@@ -498,24 +516,30 @@ Include the specific request, constraints, and output format requirements.
 **Wrong**: Assuming Claude knows project constraints
 **Right**: Explicitly state technology, timeline, and compatibility constraints
 
+### 5. Loading Whole Spec Directories
+**Wrong**: Reading every file under `docs/data-model/`, `docs/api-spec/`, or `docs/ui-specification/` — or pulling in `docs/rationale/` files
+**Right**: Read each spec's `index.md` plus only the shards named by the work item's impact tables (see Retrieval Keys); never load rationale files
+
 ---
 
 ## Quick Reference Card
 
 | Task Type | Must Include | Recommended / Optional |
 |-----------|--------------|------------------------|
-| New Feature | Feature Brief + Stakeholder + CLAUDE.md | Data Model, API Spec, UI Spec, Persona, Architecture |
-| Bug Fix | Bug Report + CLAUDE.md | Architecture, Data Model, API Spec, UI Spec, Stakeholder |
-| Refactoring | Improvement Proposal + CLAUDE.md + Architecture | Data Model, Stakeholder |
+| New Feature | Feature Brief + Stakeholder + CLAUDE.md | Data Model†, API Spec†, UI Spec†, Persona, Architecture |
+| Bug Fix | Bug Report + CLAUDE.md | Architecture, Data Model†, API Spec†, UI Spec†, Stakeholder |
+| Refactoring | Improvement Proposal + CLAUDE.md + Architecture | Data Model†, Stakeholder |
 | Testing* | CLAUDE.md | Architecture, Stakeholder |
-| Integration* | Architecture + CLAUDE.md + Data Model + API Spec | Stakeholder |
+| Integration* | Architecture + CLAUDE.md + Data Model† + API Spec† | Stakeholder |
 | Prioritization* | Work Items + Stakeholder + Persona | Architecture |
-| UI Mockup | UI Spec + CLAUDE.md | API Spec, Persona, Stakeholder |
+| UI Mockup | UI Spec† (screen shard + Design System) + CLAUDE.md | API Spec†, Persona, Stakeholder |
 | Release Transition | Stakeholder + CLAUDE.md | Architecture, `guides/release-lifecycle.md` |
 | ADR Compilation | ADR files | `.ai-framework/templates/` |
 | DDR Compilation | DDR files (+ optional profile) | `.ai-framework/templates/` |
 
 \* No dedicated prompt — use `prompts/base-template.md` with this context recipe.
+
+† Sharded spec — include the spec's `index.md` plus ONLY the shards named by the work item's impact tables (see Retrieval Keys). Never load the whole directory; never load `docs/rationale/`.
 
 ---
 
@@ -556,6 +580,8 @@ Excluded: Discounts, User accounts, Loyalty programs, In-chat payments
 </architecture>
 
 <!-- Layer 3: Specification -->
+<!-- Pasted from docs/data-model/entities/order.md and order-item.md
+     (shards named by the work item's entity impact table) -->
 <data-model>
 ## Order Entity (Orders Module)
 | Field | Type | Constraints |
@@ -575,6 +601,7 @@ Excluded: Discounts, User accounts, Loyalty programs, In-chat payments
 | quantity | int | Required, Min: 1 |
 </data-model>
 
+<!-- Pasted from docs/api-spec/endpoints/orders.md -->
 <api-spec>
 ## GET /api/orders?phone={phone}&limit=10
 Auth: Public (phone-based)
@@ -587,6 +614,7 @@ Response: { data: Order }
 </api-spec>
 
 <!-- Layer 4: UI -->
+<!-- Pasted from docs/ui-specification/screens/order-history.md -->
 <ui-specification>
 ## Order History Screen
 Route: /orders/history

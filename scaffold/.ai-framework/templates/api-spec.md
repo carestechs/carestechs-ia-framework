@@ -3,7 +3,41 @@
 > **Purpose**: Document all REST API endpoints with their routes, methods, request/response shapes, authentication requirements, and status codes. This provides AI with the contract definitions needed to generate consistent backend controllers, frontend services, and integration tests.
 > **Applicability**: If applicable — skip this document for CLI tools, libraries, and headless services with no HTTP API. The framework assumes a web app + REST API shape; if your product exposes a different contract surface (e.g., a CLI command set or a public library API), document that contract elsewhere instead.
 
+> **Context budget note:** This document is loaded into AI context. Keep it contract-style —
+> tables, schemas, rules, one example each. Move narrative and history to `docs/rationale/`
+> and link it; rationale files are never loaded by default.
+
 ---
+
+## Directory Layout
+
+The API specification is a **sharded document set**, not a single file. Cross-cutting contracts (envelope, errors, auth, pagination, shared DTOs) live in `index.md`; every resource group lives in its own shard. Work items name endpoints in their impact tables, and task generation loads `index.md` plus only the named resource shards — shard boundaries are retrieval boundaries.
+
+```
+docs/api-spec/
+  index.md                  # Key API Decisions, response envelope, Error Catalog,
+                            # Authentication Endpoints, Pagination, Usage Notes, Changelog
+  endpoints/<resource>.md   # ONE resource group per file: all endpoint blocks for that resource
+                            # (route, method, auth, request/response DTOs, status codes)
+```
+
+Rules:
+
+- **One resource group per shard.** All endpoints operating on the same resource (e.g., every `/api/task-labels*` endpoint) live together in one file. Never split a resource across shards, and never put endpoint blocks in `index.md`.
+- **Shards are self-sufficient with the index.** A shard does not restate the envelope/error/pagination conventions — it relies on `index.md` for those — but it contains every endpoint block for its resource in full.
+- **Cross-cutting only in the index.** Shared DTOs, error catalog rows, and auth conventions go in `index.md`; DTOs used by a single resource stay in that resource's shard.
+
+---
+
+## Index File (`docs/api-spec/index.md`)
+
+Everything from here down to "Resource Shard" defines the contents of `index.md`. Start the file with its own H1 and the freshness stamp directly beneath it:
+
+```
+# API Specification — [Product Name]
+
+> **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->
+```
 
 ## 1. Overview
 
@@ -90,24 +124,87 @@
 
 ### 2.6 Authentication Endpoints
 
-> *Model authentication endpoints (login, token refresh, logout, password reset) like any other endpoints — full endpoint blocks in Section 3 with request/response shapes and status codes. Do not leave auth as prose-only.*
+> *Model authentication endpoints (login, token refresh, logout, password reset) like any other endpoints — full endpoint blocks in their own resource shard with request/response shapes and status codes. Do not leave auth as prose-only.*
 
 Guidance:
 
-- Give auth endpoints their own module section (e.g., "3.1 Auth") so controller/service tasks are generated for them like any other module.
+- Give auth endpoints their own resource shard (`docs/api-spec/endpoints/auth.md`) so controller/service tasks are generated for them like any other resource.
 - Document token lifetimes, refresh semantics, and where tokens are stored/sent as part of the endpoint blocks or Section 2.3.
 - Mark which auth endpoints are public (login, refresh) vs authenticated (logout, change password) in the **Auth** attribute.
 - Failed authentication uses the same error format as everything else — reference the Error Catalog (Section 2.5) entries [unauthorized] / [validation-error] rather than a custom shape.
 
 ---
 
-## 3. Endpoints by Module
+## 3. Shared DTOs
 
-### 3.1 [Module Name]
+> *DTOs referenced by multiple resources or modules. DTOs used by a single resource live in that resource's shard.*
 
-#### [Resource Name]
+### 3.1 [DTOName]
 
-##### [METHOD] [/api/path/{param}]
+| Field | Type | Nullable | Description |
+|-------|------|----------|-------------|
+| [field_1] | [string] | [No] | [Description] |
+| [field_2] | [int] | [Yes] | [Description] |
+
+<!-- TODO: Define shared DTOs used across modules — e.g., PaginationMeta, UserSummaryDto -->
+
+---
+
+## 4. Endpoint Summary
+
+> *Quick reference table of ALL endpoints across all shards — this doubles as the shard directory. Add a row here whenever a resource shard gains an endpoint.*
+
+| Method | Path | Module | Auth | Shard | Description |
+|--------|------|--------|------|-------|-------------|
+| [GET] | [/api/resources] | [Module A] | [Required] | [`endpoints/resources.md`] | [List resources] |
+| [POST] | [/api/resources] | [Module A] | [Required] | [`endpoints/resources.md`] | [Create resource] |
+| [GET] | [/api/resources/{id}] | [Module A] | [Required] | [`endpoints/resources.md`] | [Get resource by ID] |
+| [PUT] | [/api/resources/{id}] | [Module A] | [Required] | [`endpoints/resources.md`] | [Update resource] |
+| [DELETE] | [/api/resources/{id}] | [Module A] | [Required] | [`endpoints/resources.md`] | [Delete resource] |
+
+<!-- TODO: Add all endpoints here for a complete at-a-glance reference -->
+
+---
+
+## Usage Notes for AI Task Generation
+
+When generating tasks from this document set:
+
+1. **Shard loading**: Read `index.md` plus ONLY the resource shards named by the work item's impact tables (mapped via the Naming Rule) — do not read the whole `endpoints/` directory
+2. **Controller structure**: Each resource shard maps to a controller / route group — generate controller tasks per resource, not per endpoint
+3. **DTO generation**: Request and response JSON shapes map directly to DTO classes — generate DTOs in the owning module
+4. **Status codes**: Every endpoint must handle all listed status codes — include error-path tasks
+5. **Auth requirements**: Respect the auth/roles attributes — generate middleware or attribute decorations accordingly
+6. **Response envelope**: All responses must use the shared envelope format (Section 2.1) — never return raw entities
+7. **Pagination**: Endpoints returning lists must support pagination parameters and return meta with totals
+8. **Frontend alignment**: Frontend service tasks should mirror the endpoint signatures defined in the resource shards — same paths, same request/response shapes
+9. **Error catalog discipline**: Error responses must use identifiers from the Error Catalog (Section 2.5) — add a new catalog row before introducing a new error condition
+10. **New resources**: Create a new shard at `endpoints/<resource>.md`, add its endpoints to the Endpoint Summary (Section 4), and record the change in the Changelog
+
+---
+
+## Changelog
+
+> *Lives at the very bottom of `index.md` and records changes across the whole `docs/api-spec/` set — shard edits included. Every edited or verified file also gets its freshness stamp updated.*
+
+| Date | Author | Change Description | Reason |
+|------|--------|-------------------|--------|
+| YYYY-MM-DD | [name] | Initial version | — |
+
+---
+
+## Resource Shard (`docs/api-spec/endpoints/<resource>.md`)
+
+One file per resource group, containing ALL endpoint blocks for that resource. Every shard follows this skeleton — reuse it verbatim when adding a new resource:
+
+````markdown
+# Resource: [Resource Name] (`/api/[resource]`)
+
+> **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->
+
+> *Module: [Owning Module] — [One-sentence description of this resource group]. Conventions (envelope, errors, auth, pagination): see `docs/api-spec/index.md`.*
+
+## [METHOD] [/api/path/{param}]
 
 > *[One-sentence description of what this endpoint does]*
 
@@ -153,23 +250,13 @@ Guidance:
 | Code | Condition |
 |------|-----------|
 | [200] | [Success] |
-| [400] | [Validation error — see error response] |
+| [400] | [Validation error — see Error Catalog] |
 | [401] | [Missing or invalid auth token] |
 | [404] | [Resource not found] |
 
 ---
 
-<!-- TODO: Repeat the endpoint block for each endpoint in this module -->
-
----
-
-### 3.2 [Module Name]
-
-<!-- TODO: Repeat the module section for each module that exposes API endpoints -->
-
-#### [Resource Name]
-
-##### [METHOD] [/api/path]
+## [METHOD] [/api/path]
 
 > *[Description]*
 
@@ -207,54 +294,21 @@ Guidance:
 
 ---
 
-## 4. Shared DTOs
-
-> *DTOs referenced by multiple endpoints or modules.*
-
-### 4.1 [DTOName]
-
-| Field | Type | Nullable | Description |
-|-------|------|----------|-------------|
-| [field_1] | [string] | [No] | [Description] |
-| [field_2] | [int] | [Yes] | [Description] |
-
-<!-- TODO: Define shared DTOs used across modules — e.g., PaginationMeta, UserSummaryDto -->
+<!-- TODO: Repeat one ## endpoint block per endpoint in this resource group -->
+````
 
 ---
 
-## 5. Endpoint Summary
+## Naming Rule
 
-> *Quick reference table of all endpoints.*
+Shard names derive **mechanically** from the resource route segment — kebab-case, **plural**, matching the route:
 
-| Method | Path | Module | Auth | Description |
-|--------|------|--------|------|-------------|
-| [GET] | [/api/resources] | [Module A] | [Required] | [List resources] |
-| [POST] | [/api/resources] | [Module A] | [Required] | [Create resource] |
-| [GET] | [/api/resources/{id}] | [Module A] | [Required] | [Get resource by ID] |
-| [PUT] | [/api/resources/{id}] | [Module A] | [Required] | [Update resource] |
-| [DELETE] | [/api/resources/{id}] | [Module A] | [Required] | [Delete resource] |
+| Resource / Route | Shard Path |
+|------------------|-----------|
+| `/api/tasks` | `docs/api-spec/endpoints/tasks.md` |
+| `/api/task-labels` | `docs/api-spec/endpoints/task-labels.md` |
+| Auth endpoints (login, refresh, logout) | `docs/api-spec/endpoints/auth.md` |
 
-<!-- TODO: Add all endpoints here for a complete at-a-glance reference -->
+Nested routes group under the resource being operated on: `/api/projects/{id}/labels` operates on labels → `docs/api-spec/endpoints/labels.md`.
 
----
-
-## Usage Notes for AI Task Generation
-
-When generating tasks from this document:
-
-1. **Controller structure**: Each module section maps to a controller — generate controller tasks per module, not per endpoint
-2. **DTO generation**: Request and response JSON shapes map directly to DTO classes — generate DTOs in the owning module
-3. **Status codes**: Every endpoint must handle all listed status codes — include error-path tasks
-4. **Auth requirements**: Respect the auth/roles column — generate middleware or attribute decorations accordingly
-5. **Response envelope**: All responses must use the shared envelope format — never return raw entities
-6. **Pagination**: Endpoints returning lists must support pagination parameters and return meta with totals
-7. **Frontend alignment**: Frontend service tasks should mirror the endpoint signatures defined here — same paths, same request/response shapes
-8. **Error catalog discipline**: Error responses must use identifiers from the Error Catalog (Section 2.5) — add a new catalog row before introducing a new error condition
-
----
-
-## Changelog
-
-| Date | Author | Change Description | Reason |
-|------|--------|-------------------|--------|
-| YYYY-MM-DD | [name] | Initial version | — |
+Never deviate from this mapping: work-item impact tables use endpoint paths as retrieval keys, and task generation resolves `route → shard path` without guessing.

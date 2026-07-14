@@ -5,6 +5,8 @@
 > **Purpose**: Describe a feature at a high level before breaking it down into implementation tasks.
 > **Template reference**: `.ai-framework/templates/feature-brief.md`
 
+> **Context budget note:** This document is loaded into AI context — keep it contract-style (tables, schemas, rules); move narrative and history to `docs/rationale/` and link it (rationale files are never loaded by default).
+
 ---
 
 ## 1. Identity
@@ -61,37 +63,43 @@
 
 ## 6. Key Entities and Business Rules
 
-<!-- TODO: Which data model entities does this feature touch? Reference docs/data-model.md -->
+<!-- TODO: Which data model entities does this feature touch? Reference docs/data-model/ (index + entity shards) -->
 
 | Entity | Role in Feature | Key Business Rules |
 |--------|----------------|--------------------|
 | <!-- TODO --> | | |
 
-**New entities required:** <!-- TODO: None, or list new entities needed in data-model.md -->
+> **Retrieval key:** Entity names in this table map mechanically to spec shards — entity `TaskLabel` → `docs/data-model/entities/task-label.md` (kebab-case, singular). Task generation reads `docs/data-model/index.md` plus ONLY the entity shards named here, so list every entity the feature touches.
+
+**New entities required:** <!-- TODO: None, or list new entities needing shards under docs/data-model/entities/ -->
 
 ---
 
 ## 7. API Impact
 
-<!-- TODO: Which API endpoints are involved? Reference docs/api-spec.md -->
+<!-- TODO: Which API endpoints are involved? Reference docs/api-spec/ (index + endpoint shards) -->
 
 | Endpoint | Method | Status | Notes |
 |----------|--------|--------|-------|
 | <!-- TODO --> | | | |
 
-**New endpoints required:** <!-- TODO: None, or list new endpoints needed in api-spec.md -->
+> **Retrieval key:** Endpoint paths in this table map mechanically to spec shards — resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md` (matches the route segment, plural). Task generation reads `docs/api-spec/index.md` plus ONLY the endpoint shards named here, so list every resource the feature touches.
+
+**New endpoints required:** <!-- TODO: None, or list new endpoints needing shards created or extended under docs/api-spec/endpoints/ -->
 
 ---
 
 ## 8. UI Impact
 
-<!-- TODO: Which screens/components are affected? Reference docs/ui-specification.md -->
+<!-- TODO: Which screens/components are affected? Reference docs/ui-specification/ (index + screen shards + components.md) -->
 
 | Screen / Component | Status | Description |
 |--------------------|--------|-------------|
 | <!-- TODO --> | | |
 
-**New screens required:** <!-- TODO: None, or list new screens needed in ui-specification.md -->
+> **Retrieval key:** Screen names in this table map mechanically to spec shards — screen "Project Board" → `docs/ui-specification/screens/project-board.md` (kebab-case). Task generation reads `docs/ui-specification/index.md` plus ONLY the screen shards named here (and `components.md` when shared components are listed), so name every screen and shared component the feature touches.
+
+**New screens required:** <!-- TODO: None, or list new screens needing shards under docs/ui-specification/screens/ -->
 
 ---
 

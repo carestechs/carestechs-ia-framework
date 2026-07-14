@@ -2,6 +2,10 @@
 
 > **Purpose**: Define the target user this product serves. A well-defined persona helps AI understand user needs, pain points, and priorities when generating tasks.
 
+> **Context budget note:** This document is loaded into AI context. Keep it contract-style —
+> tables, schemas, rules, one example each. Move narrative and history to `docs/rationale/`
+> and link it; rationale files are never loaded by default.
+
 ---
 
 ## 1. Who [Name] Is

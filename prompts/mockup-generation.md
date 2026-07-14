@@ -14,7 +14,7 @@ Generate a self-contained HTML mockup file for stakeholder visual approval befor
 
 ## How to Use
 
-- **AI agents (Claude Code, etc.):** Read the context files listed in the project CLAUDE.md routing table for "UI mockup" (in particular the target screen's spec block and Design System section from `docs/ui-specification.md`), follow the **Guidance**, **Output Format**, and **Constraints** sections below, and **write the output file**: `mockups/T-XXX-screen-name.html`.
+- **AI agents (Claude Code, etc.):** Read the context files listed in the project CLAUDE.md routing table for "UI mockup" (in particular the target screen's shard `docs/ui-specification/screens/<screen>.md` and the Design System sections from `docs/ui-specification/index.md`), follow the **Guidance**, **Output Format**, and **Constraints** sections below, and **write the output file**: `mockups/T-XXX-screen-name.html`.
 - **Chat workflows (manual copy-paste):** Use the XML skeleton in the **Chat Workflow Template (XML)** appendix — paste your documentation into the `<context>` sections, fill in the `<mockup-scope>`, and include the Guidance, Output Format, and Constraints sections of this prompt alongside it.
 
 ---
@@ -25,7 +25,7 @@ Context selection follows the canonical matrix — see `guides/context-compilati
 
 Prompt-specific notes:
 
-- **UI Specification** (required): only the target screen's spec block plus the Design System section (colors, typography, spacing) — not the full document.
+- **UI Specification** (required): the target screen's shard `docs/ui-specification/screens/<screen>.md` plus the Design System sections (2.1–2.6: colors, typography, spacing, components, states, breakpoints) from `docs/ui-specification/index.md` — not the whole spec directory.
 - **CLAUDE.md** (required): design tokens, styling conventions, and frontend patterns — ensures mockup colors, fonts, and spacing match the implementation target.
 - **API Specification** (recommended): response DTO shapes for the target screen's endpoints, for realistic placeholder content.
 - **Component Examples Appendix** (recommended): if DDRs were compiled, include `docs/component-examples.md` — pre-approved HTML patterns for buttons, cards, forms, and states take precedence over AI invention.
@@ -43,7 +43,7 @@ What NOT to include:
 ### Technical Conventions
 
 1. **Single self-contained HTML file** — all states shown side-by-side in a responsive grid.
-2. **Fully self-contained by default (true offline):** all CSS is plain, embedded in a `<style>` block, with the design tokens from the UI Specification Design System (Section 2) declared as CSS custom properties. No external requests — no CDNs, no web-font links, no icon-font links. If DDR-compiled token values exist, use those exactly.
+2. **Fully self-contained by default (true offline):** all CSS is plain, embedded in a `<style>` block, with the design tokens from the UI Specification Design System (Section 2 of `docs/ui-specification/index.md`) declared as CSS custom properties. No external requests — no CDNs, no web-font links, no icon-font links. If DDR-compiled token values exist, use those exactly.
 3. **Optional CSS framework CDN:** if CLAUDE.md declares a CSS framework, the mockup MAY load that framework's official CDN build instead of hand-writing component CSS [e.g., for Tailwind CSS, the v4 browser build: `<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>`, defining tokens with `@theme` in a `<style type="text/tailwindcss">` block]. Do NOT use the deprecated Tailwind v3 Play CDN (`cdn.tailwindcss.com`) with an inline `tailwind.config` JS object. Note: a CDN-based mockup requires network access on first open.
 4. **Fonts:** use a system font stack unless the Design System declares specific fonts [e.g., Inter + Roboto via Google Fonts]. **Icons:** use inline SVG or Unicode glyphs unless the Design System declares an icon set [e.g., Material Icons].
 5. **DDR component examples take precedence** — if a Component Examples Appendix (`docs/component-examples.md`) is provided, use those HTML patterns for buttons, cards, forms, states, etc. instead of inventing new patterns.
@@ -55,8 +55,8 @@ What NOT to include:
 
 ### Workflow
 
-1. **Pick a screen** from the UI Specification screen inventory. Prioritize user-facing screens with novel layouts (not standard CRUD), screens with multiple states that stakeholders need to approve, and screens where the ASCII layout sketch needs visual validation.
-2. **Assemble context**: the target screen's spec block, the Design System section, and relevant API response DTOs.
+1. **Pick a screen** from the UI Specification screen inventory (`docs/ui-specification/index.md`). Prioritize user-facing screens with novel layouts (not standard CRUD), screens with multiple states that stakeholders need to approve, and screens where the ASCII layout sketch needs visual validation.
+2. **Assemble context**: the target screen's shard (`docs/ui-specification/screens/<screen>.md`), the Design System sections from `index.md`, and relevant API response DTOs.
 3. **Generate the mockup** — a single HTML file at `mockups/T-XXX-screen-name.html`.
 4. **Review in browser**: open the file by double-clicking. Verify all states render correctly.
 5. **Share for approval**: send the HTML file to stakeholders for visual feedback. Iterate if needed.
@@ -80,7 +80,7 @@ Generate a single HTML file with this structure (default: fully self-contained, 
   <!-- All styles embedded — no external requests -->
   <style>
     :root {
-      /* Design tokens from ui-specification.md Design System (Section 2).
+      /* Design tokens from the docs/ui-specification/index.md Design System (Section 2).
          Use DDR-compiled values exactly if they exist. */
       --color-primary: #...;
       --color-on-primary: #...;
@@ -179,11 +179,12 @@ Copy this skeleton, paste your documentation into the `<context>` sections, fill
 <context>
 
 <ui-specification>
-<!-- REQUIRED: The target screen's specification block from ui-specification.md,
+<!-- REQUIRED: The target screen's shard from docs/ui-specification/screens/,
      including the ASCII layout sketch, component hierarchy, states, and interactions.
-     Also include the Design System section (colors, typography, spacing) for token accuracy. -->
-[Paste the target screen's spec block from docs/ui-specification.md]
-[Paste the Design System section (Section 2) from docs/ui-specification.md]
+     Also include the Design System sections (colors, typography, spacing) from
+     docs/ui-specification/index.md for token accuracy. -->
+[Paste the target screen's shard: docs/ui-specification/screens/<screen>.md]
+[Paste the Design System sections (Section 2) from docs/ui-specification/index.md]
 </ui-specification>
 
 <code-conventions>
@@ -195,7 +196,7 @@ Copy this skeleton, paste your documentation into the `<context>` sections, fill
 <api-spec>
 <!-- RECOMMENDED: Response DTO shapes for the target screen's endpoints.
      Enables realistic placeholder content in the mockup. -->
-[Paste relevant endpoint response DTOs from docs/api-spec.md]
+[Paste relevant endpoint response DTOs from docs/api-spec/endpoints/<resource>.md]
 </api-spec>
 
 <persona>
@@ -251,7 +252,7 @@ Login page mockup (this example project's Design System declares Inter/Roboto fo
 - Error: #ba1a1a
 - Font: Inter (headings), Roboto (body)
 
-## 5.1 Login Screen
+## Login Screen (from docs/ui-specification/screens/login.md)
 Route: /login
 Auth: Public
 

@@ -13,6 +13,23 @@ Treat documentation with the same rigor as code:
 
 ---
 
+## Freshness Stamps
+
+Every spec shard (`docs/data-model/entities/*.md`, `docs/api-spec/endpoints/*.md`, `docs/ui-specification/screens/*.md`, `docs/ui-specification/components.md`), every spec `index.md`, and `ARCHITECTURE.md` carries a stamp directly under its H1, in exactly this format:
+
+```markdown
+> **Last verified against code:** YYYY-MM-DD (commit `abc1234`)
+```
+
+**Rules:**
+
+- **Update the stamp whenever a shard is edited** — set the date and the current commit.
+- **Update the stamp whenever a shard is verified against code**, even if no edit was needed. A fresh stamp means "this file matched the code on this date", not "this file was last written on this date".
+- **Verify untouched shards per release.** Re-verifying shards that no code change touched is part of the Sprint/Release Verification below — otherwise accurate shards accumulate stale stamps and force needless re-verification.
+- **Agents must verify before trusting.** Before relying on a shard whose stamp is missing or older than 30 days, verify its claims against the source (grep/read the relevant code). If it drifted: fix the shard, add a changelog entry to the spec's `index.md`, and update the stamp. This mirrors the "Trust code over docs" item in the CLAUDE.md Pre-Work Checklist.
+
+---
+
 ## Document Lifecycle Matrix
 
 | Document | Created | Updated | Reviewed | Retired |
@@ -138,85 +155,93 @@ Treat documentation with the same rigor as code:
 
 ---
 
-### 5. Data Model (`docs/data-model.md`)
+### 5. Data Model (`docs/data-model/`)
 
-**Update When:**
-- New entity added to a module
-- Field added, removed, or type-changed on an existing entity
-- Index added, removed, or modified
-- Enum value added or renamed
-- Relationship or cascade behavior changed
-- Business rule added or corrected based on implementation learnings
-- Constraint added for performance reasons discovered during development
+**Update When → Where:**
+
+| Trigger | Update |
+|---------|--------|
+| New entity added to a module | New shard `docs/data-model/entities/<entity>.md` (kebab-case, singular) + `index.md` if module ownership, conventions, or the relationships overview change |
+| Field added, removed, or type-changed | Affected `entities/<entity>.md` shard |
+| Index added, removed, or modified | Affected `entities/<entity>.md` shard |
+| Enum value added or renamed | Entity shard (entity-specific enums) or `index.md` (shared enums/value types) |
+| Relationship or cascade behavior changed | Affected entity shard(s) + `index.md` relationships overview (ER diagram) |
+| Database convention or business rule added/corrected | `index.md` (cross-cutting) or the affected entity shard (entity-specific) |
 
 **Update Process:**
-1. Edit `data-model.md` first — add/modify the entity, field, index, or relationship
+1. Edit the affected shard(s) first — `entities/<entity>.md` for entity-level changes, `index.md` for conventions, ownership, and relationships
 2. Implement the change in code (EF Core entity, migration, service logic)
 3. Include both the doc update and code change in the same PR
-4. Verify the ER diagram in Section 7 still reflects the change (update if needed)
+4. Update the freshness stamp on every file you edited; add a changelog entry to `index.md`
+5. Verify the relationships overview (ER diagram) in `index.md` still reflects the change (update if needed)
 
 **Review Checklist:**
-- [ ] All entities match EF Core entity classes?
+- [ ] Every persisted entity has a shard, and each shard matches its EF Core entity class?
 - [ ] Field types and constraints match migration code?
 - [ ] Indexes listed match actual migration indexes?
 - [ ] Enum values match C# enum definitions?
 - [ ] Cross-module references are ID-only (no navigation properties)?
-- [ ] ER diagram reflects current entity structure?
+- [ ] Relationships overview (ER diagram) in `index.md` reflects current entity structure?
 - [ ] Business rules are accurate and complete?
 
 ---
 
-### 6. API Specification (`docs/api-spec.md`)
+### 6. API Specification (`docs/api-spec/`)
 
-**Update When:**
-- New endpoint added to any module
-- Endpoint route, method, or auth requirement changed
-- Request or response DTO shape changed (field added, renamed, type changed)
-- New query parameter or filter added to a list endpoint
-- Status code or error condition added or corrected
-- Shared DTO (e.g., `UserSummaryDto`, `PaginationMeta`) modified
+**Update When → Where:**
+
+| Trigger | Update |
+|---------|--------|
+| New or changed endpoint (route, method, auth) | `docs/api-spec/endpoints/<resource>.md` (shard named after the route segment, plural) |
+| Request or response DTO shape changed (field added, renamed, type changed) | Affected `endpoints/<resource>.md` shard |
+| New query parameter or filter added to a list endpoint | Affected `endpoints/<resource>.md` shard |
+| Status code or error condition added/corrected | Affected endpoint shard; `index.md` Error Catalog if a new error type/code is introduced |
+| Response envelope, pagination, or auth convention changed | `index.md` |
+| Shared DTO (e.g., `UserSummaryDto`, `PaginationMeta`) modified | `index.md` (+ endpoint shards that reference it, if shapes shown there change) |
 
 **Update Process:**
-1. Edit `api-spec.md` first — add/modify the endpoint, DTO, or status code
+1. Edit the affected shard first — `endpoints/<resource>.md` for endpoint/DTO changes, `index.md` for envelope, error catalog, auth, and pagination conventions
 2. Implement the change in code (controller, service, DTO class)
 3. Include both the doc update and code change in the same PR
-4. Verify the Endpoint Summary table in Section 5 is updated
+4. Update the freshness stamp on every file you edited; add a changelog entry to `index.md`
 
 **Review Checklist:**
-- [ ] All endpoints match controller actions?
+- [ ] All endpoints match controller actions, and each resource shard contains all endpoint blocks for that resource?
 - [ ] Request/response JSON shapes match DTO classes?
-- [ ] Status codes match actual controller responses?
+- [ ] Status codes match actual controller responses and map to the Error Catalog in `index.md`?
 - [ ] Auth requirements match `[Authorize]` attributes?
 - [ ] Pagination parameters match list endpoint implementations?
-- [ ] Endpoint Summary table is complete and accurate?
-- [ ] Shared DTOs match actual C# DTO classes?
+- [ ] Shared DTOs in `index.md` match actual C# DTO classes?
 
 ---
 
-### 7. UI Specification (`docs/ui-specification.md`)
+### 7. UI Specification (`docs/ui-specification/`)
 
-**Update When:**
-- New screen or page added to the application
-- Screen layout or component hierarchy changed
-- Design token changed (color, typography, spacing)
-- New shared component added or existing one modified
-- Interaction pattern added or changed (new user action, new drag-drop behavior)
-- Component → API mapping changed (component now calls a different endpoint)
-- Screen state handling changed (new loading skeleton, different empty state)
+**Update When → Where:**
+
+| Trigger | Update |
+|---------|--------|
+| New screen or page added | New shard `docs/ui-specification/screens/<screen>.md` (kebab-case — "Project Board" → `project-board.md`) |
+| Screen layout or component hierarchy changed | Affected `screens/<screen>.md` shard |
+| Design token changed (color, typography, spacing) | `docs/ui-specification/index.md` (Design System) + affected HTML mockups |
+| New shared component added or existing one modified | `components.md` (+ screen shards whose hierarchies change) |
+| Interaction pattern added or changed (new user action, new drag-drop behavior) | Affected `screens/<screen>.md` shard |
+| Component → API mapping changed (component now calls a different endpoint) | Affected `screens/<screen>.md` shard |
+| Screen state handling changed (new loading skeleton, different empty state) | Affected `screens/<screen>.md` shard (or `index.md` if a cross-screen state pattern changed) |
 
 **Update Process:**
-1. Edit `ui-specification.md` first — add/modify the screen spec, component, or design token
+1. Edit the affected shard first — `screens/<screen>.md` for screen changes, `components.md` for shared components, `index.md` for design tokens and cross-screen patterns
 2. Implement the change in code (Angular component, template, styles)
 3. Include both the doc update and code change in the same PR
-4. Verify the Screen Inventory table in Section 3 is updated if a new screen was added
+4. Update the freshness stamp on every file you edited; add a changelog entry to `index.md`
 
 **Review Checklist:**
-- [ ] All screens in the inventory have matching specifications in Section 5?
+- [ ] Every implemented screen has a shard in `screens/`, and no shard describes a removed screen?
 - [ ] Component hierarchies match actual Angular component trees?
 - [ ] Component → API mappings match actual service calls in components?
 - [ ] All 4 states (default, loading, empty, error) are defined for every screen?
-- [ ] Shared components in Section 6 match actual reusable components?
-- [ ] Design tokens match actual Tailwind config / Angular Material theme?
+- [ ] `components.md` matches actual reusable components?
+- [ ] Design tokens in `index.md` match actual Tailwind config / Angular Material theme?
 - [ ] User interactions match actual event bindings in templates?
 - [ ] Routes match actual Angular router configuration?
 
@@ -225,8 +250,8 @@ Treat documentation with the same rigor as code:
 ### 8. HTML Mockups
 
 **Update When:**
-- Design tokens change (colors, typography, spacing in UI Specification)
-- Screen layout changes (component hierarchy or ASCII sketch modified)
+- Design tokens change (Design System in `docs/ui-specification/index.md`)
+- Screen layout changes (component hierarchy or ASCII sketch modified in the screen's shard)
 - Stakeholder feedback requires visual revisions
 - Angular Material theme reconfigured
 
@@ -247,7 +272,7 @@ Treat documentation with the same rigor as code:
 ### 9. Component Examples (`docs/component-examples.md`, from DDR Compilation)
 
 **Update When:**
-- Design tokens change in the UI Specification (colors, typography, spacing)
+- Design tokens change in `docs/ui-specification/index.md` (colors, typography, spacing)
 - A component DDR is updated in the shared DDR repo (new variant, changed constraint)
 - A state pattern DDR is updated (new loading, empty, or error pattern)
 - The project switches profiles or adds/removes DDRs from the compiled set
@@ -261,7 +286,7 @@ Treat documentation with the same rigor as code:
 **Review Checklist:**
 - [ ] Component examples match current design token values (colors, fonts, spacing)?
 - [ ] Button, card, form, and state examples use the correct Tailwind classes?
-- [ ] Examples are consistent with the UI Specification Design System section?
+- [ ] Examples are consistent with the Design System in `docs/ui-specification/index.md`?
 - [ ] Any new component DDRs have been compiled and their examples added?
 - [ ] CLAUDE.md Design Patterns/Anti-Patterns are in sync with DDR constraints?
 
@@ -317,9 +342,10 @@ Use this checklist periodically to verify documentation is in sync with code.
 - [ ] Architecture diagram reflects deployments
 - [ ] Stakeholder definition reflects current state (Release History, Current Work, Not Planned)
 - [ ] CLAUDE.md conventions match team practices
-- [ ] Data Model entities match EF Core entity classes and migrations
-- [ ] API Specification endpoints match controller actions
-- [ ] UI Specification screens match Angular routes and components
+- [ ] Data model entity shards match EF Core entity classes and migrations
+- [ ] API spec endpoint shards match controller actions
+- [ ] UI spec screen shards match Angular routes and components
+- [ ] Untouched spec shards re-verified against code, and freshness stamps refreshed on every shard verified this release (see Freshness Stamps)
 
 ### Quarterly Verification
 
@@ -347,14 +373,14 @@ Add doc updates to PR when:
 | Updated dependencies | CLAUDE.md (if affects patterns) |
 | Shipped major feature | Stakeholder (update scope) |
 | User feedback received | Persona (if contradicts assumptions) |
-| Added/changed entity or field | Data Model |
-| Added/changed index or constraint | Data Model |
-| Added/changed endpoint | API Specification |
-| Changed DTO shape | API Specification |
-| Added/changed screen or page | UI Specification |
-| Changed component hierarchy | UI Specification |
-| Changed design tokens | UI Specification + HTML Mockups (affected screens) |
-| Added/changed shared component | UI Specification |
+| Added/changed entity or field | `docs/data-model/entities/<entity>.md` (+ `index.md` if conventions or relationships change) |
+| Added/changed index or constraint | `docs/data-model/entities/<entity>.md` |
+| Added/changed endpoint | `docs/api-spec/endpoints/<resource>.md` |
+| Changed DTO shape | `docs/api-spec/endpoints/<resource>.md` (shared DTOs: `index.md`) |
+| Added/changed screen or page | `docs/ui-specification/screens/<screen>.md` |
+| Changed component hierarchy | Affected `docs/ui-specification/screens/<screen>.md` |
+| Changed design tokens | `docs/ui-specification/index.md` + HTML Mockups (affected screens) |
+| Added/changed shared component | `docs/ui-specification/components.md` |
 | Changed screen layout | HTML Mockups (affected screens) |
 
 ### PR Checklist for Reviewers
@@ -366,14 +392,18 @@ Add doc updates to PR when:
 - [ ] CLAUDE.md updated if new patterns introduced
 - [ ] Stakeholder definition reflects current state
 - [ ] UI Specification updated if screens or components changed
-- [ ] Changelog entry added to each updated spec document
+- [ ] Freshness stamp updated on every spec shard edited in this PR
+- [ ] Changelog entry added to each updated spec's `index.md` (and `ARCHITECTURE.md` if it changed)
+- [ ] Task lists added/changed in this PR pass `python .ai-framework/tools/validate-tasks.py`
 ```
 
 ---
 
 ## Changelog Entries
 
-Every update to a living spec document must include a changelog entry at the bottom of that document.
+Every update to a living spec document must include a changelog entry — and changelogs live in each spec's `index.md`, not in the shards.
+
+**Where changelogs live:** `docs/data-model/index.md`, `docs/api-spec/index.md`, `docs/ui-specification/index.md`, and `ARCHITECTURE.md`. Individual shards do NOT carry changelogs — a shard's history is its freshness stamp plus git history. This is deliberate: per-shard changelog tables would bloat every shard loaded into AI context. When a shard changes, add the entry to its spec's `index.md` and name the shard in the description.
 
 **Format:**
 
@@ -386,9 +416,8 @@ Every update to a living spec document must include a changelog entry at the bot
 - Date is the date the change is made, not the date it ships
 - Reason should help someone understand *why* this changed — link a PR, name the feature, or describe the trigger
 - Changelog entries are append-only — never edit or remove previous entries
-- When multiple docs are updated in the same PR, each doc gets its own changelog entry
-
-**Documents with changelogs:** `data-model.md`, `api-spec.md`, `ARCHITECTURE.md`, `ui-specification.md`
+- When multiple specs are updated in the same PR, each spec's `index.md` gets its own changelog entry
+- Shard-level changes are recorded in the owning spec's `index.md` changelog (e.g., "Added `dueDate` field to `entities/task.md`") — never add changelog tables to shards
 
 ---
 
@@ -418,9 +447,10 @@ Signs of documentation debt:
 ### High Priority (AI Task Generation Impact)
 - [ ] Update CLAUDE.md with current patterns
 - [ ] Verify architecture matches deployed system
-- [ ] Verify data model matches EF Core entities and migrations
-- [ ] Verify API spec matches controller actions and DTOs
-- [ ] Verify UI spec matches Angular routes, components, and design tokens
+- [ ] Verify data model shards match EF Core entities and migrations
+- [ ] Verify API spec shards match controller actions and DTOs
+- [ ] Verify UI spec shards match Angular routes, components, and design tokens
+- [ ] Refresh freshness stamps on every shard verified
 
 ### Medium Priority (Team Productivity)
 - [ ] Update stakeholder definition (Current Work, Release History)
@@ -449,16 +479,23 @@ Product strategy shifted       → Stakeholder Definition
 Feature lifecycle state changed → Stakeholder Definition
 User feedback contradicts docs → Persona
 New user research insights     → Persona
-Added/changed entity or field  → Data Model
-Added/changed index/constraint → Data Model
-Added/changed API endpoint     → API Specification
-Changed DTO shape or status    → API Specification
-Added/changed screen or page   → UI Specification
-Changed component hierarchy    → UI Specification
-Changed design tokens          → UI Specification + HTML Mockups
-                                 (affected screens)
-Added/changed shared component → UI Specification
+Added/changed entity or field  → docs/data-model/entities/<entity>.md
+                                 (+ index.md if conventions or
+                                 relationships change)
+Added/changed index/constraint → docs/data-model/entities/<entity>.md
+Added/changed API endpoint     → docs/api-spec/endpoints/<resource>.md
+Changed DTO shape or status    → docs/api-spec/endpoints/<resource>.md
+                                 (shared DTOs / error catalog:
+                                 api-spec index.md)
+Added/changed screen or page   → docs/ui-specification/screens/<screen>.md
+Changed component hierarchy    → affected screens/<screen>.md shard
+Changed design tokens          → docs/ui-specification/index.md
+                                 + HTML Mockups (affected screens)
+Added/changed shared component → docs/ui-specification/components.md
 Changed screen layout          → HTML Mockups (affected screens)
+Edited or verified a shard     → update its freshness stamp
+                                 (+ changelog entry in the spec's
+                                 index.md if content changed)
 Updated DDR in shared repo     → Re-run DDR compilation, update
                                  Component Examples, CLAUDE.md
                                  Design Patterns, UI Spec Design System

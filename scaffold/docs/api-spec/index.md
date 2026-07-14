@@ -1,4 +1,10 @@
-# API Specification
+# API Specification — [Product Name]
+
+> **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->
+
+> **Context budget note:** This document is loaded into AI context — keep it contract-style (tables, schemas, rules); move narrative and history to `docs/rationale/` and link it (rationale files are never loaded by default).
+
+> *Sharded document set: cross-cutting conventions live in this index; every resource group has its own shard at `endpoints/<resource>.md` (kebab-case, **plural**, matching the route segment — e.g., `/api/task-labels` → `endpoints/task-labels.md`). Copy `endpoints/TEMPLATE-resource.md` to add one. Work items name endpoints as retrieval keys — task generation loads this index plus only the named shards.*
 
 ## 1. Overview
 
@@ -62,7 +68,7 @@
 
 ### 2.5 Error Catalog
 
-<!-- TODO: Enumerate the stable error identifiers clients can rely on — the RFC 7807 `type` values or error codes. Endpoints reference these instead of inventing ad-hoc errors. -->
+<!-- TODO: Enumerate the stable error identifiers clients can rely on — the RFC 7807 `type` values or error codes. Endpoint shards reference these instead of inventing ad-hoc errors. -->
 
 | Error Code / `type` | HTTP Status | When Used | Notes |
 |---------------------|-------------|-----------|-------|
@@ -71,84 +77,42 @@
 
 ### 2.6 Authentication Endpoints
 
-<!-- TODO: Model auth endpoints (login, refresh, logout) as full endpoint blocks in Section 3 — don't leave auth as prose-only. Mark which are public vs authenticated in the Auth attribute, and reference Error Catalog entries for failed auth. -->
+<!-- TODO: Model auth endpoints (login, refresh, logout) as full endpoint blocks in their own resource shard (endpoints/auth.md) — don't leave auth as prose-only. Mark which are public vs authenticated in the Auth attribute, and reference Error Catalog entries for failed auth. -->
 
-## 3. Endpoints by Module
+## 3. Shared DTOs
 
-<!-- TODO: Define endpoints for each module. See .ai-framework/templates/api-spec.md for the full template. -->
+<!-- TODO: Define DTOs used across modules — DTOs used by a single resource live in that resource's shard -->
 
-### 3.1 [Module Name]
-
-#### [Resource Name]
-
-##### [METHOD] [/api/path]
-
-> *[One-sentence description]*
-
-| Attribute | Value |
-|-----------|-------|
-| **Auth** | <!-- Required / Public --> |
-| **Roles** | <!-- Any / Admin / Owner --> |
-
-**Request Body:**
-
-```json
-{
-  "[field]": "[type — description]"
-}
-```
-
-**Response (200 OK):**
-
-```json
-{
-  "data": {
-    "[field]": "[type]"
-  }
-}
-```
-
-**Status Codes:**
-
-| Code | Condition |
-|------|-----------|
-| 200 | Success |
-| 400 | Validation error |
-| 401 | Unauthorized |
-| 404 | Not found |
-
----
-
-<!-- TODO: Repeat endpoint blocks for each endpoint, module sections (3.2, 3.3, ...) for each module -->
-
-## 4. Shared DTOs
-
-<!-- TODO: Define DTOs used across modules -->
-
-### 4.1 [DTOName]
+### 3.1 [DTOName]
 
 | Field | Type | Nullable | Description |
 |-------|------|----------|-------------|
 | <!-- field --> | <!-- type --> | <!-- Yes/No --> | <!-- description --> |
 
-## 5. Endpoint Summary
+## 4. Endpoint Summary
 
-| Method | Path | Module | Auth | Description |
-|--------|------|--------|------|-------------|
-| <!-- GET --> | <!-- /api/resources --> | <!-- Module --> | <!-- Required --> | <!-- List resources --> |
-| <!-- POST --> | <!-- /api/resources --> | <!-- Module --> | <!-- Required --> | <!-- Create resource --> |
+<!-- TODO: Quick reference of ALL endpoints across all shards — this doubles as the shard directory. Add a row whenever a resource shard gains an endpoint. -->
+
+| Method | Path | Module | Auth | Shard | Description |
+|--------|------|--------|------|-------|-------------|
+| <!-- GET --> | <!-- /api/resources --> | <!-- Module --> | <!-- Required --> | <!-- `endpoints/resources.md` --> | <!-- List resources --> |
+| <!-- POST --> | <!-- /api/resources --> | <!-- Module --> | <!-- Required --> | <!-- `endpoints/resources.md` --> | <!-- Create resource --> |
 
 ## Usage Notes for AI Task Generation
 
-- **Controller structure**: Each module section maps to a controller
+- **Shard loading**: Read this `index.md` plus ONLY the resource shards named by the work item's impact tables — do not read the whole `endpoints/` directory
+- **Controller structure**: Each resource shard maps to a controller / route group
 - **DTO generation**: Request and response shapes map to DTO classes
 - **Status codes**: Every endpoint must handle all listed status codes
-- **Auth requirements**: Respect the auth/roles column
-- **Response envelope**: All responses must use the shared envelope format
+- **Auth requirements**: Respect the auth/roles attributes
+- **Response envelope**: All responses must use the shared envelope format (Section 2.1)
 - **Pagination**: List endpoints must support pagination parameters
 - **Error catalog discipline**: Error responses must use identifiers from the Error Catalog (Section 2.5) — add a catalog row before introducing a new error condition
+- **New resources**: Create a new shard at `endpoints/<resource>.md` (copy `endpoints/TEMPLATE-resource.md`), add its endpoints to the Endpoint Summary (Section 4), and record the change in the Changelog
 
 ## Changelog
+
+<!-- Records changes across the whole docs/api-spec/ set — shard edits included. Update the freshness stamp on every file touched. -->
 
 | Date | Author | Change Description | Reason |
 |------|--------|-------------------|--------|

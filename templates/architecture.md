@@ -1,6 +1,12 @@
 # System Architecture Template
 
+> **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->
+
 > **Purpose**: Document the technical architecture of the system including components, data flow, and technology choices. This provides AI with structural understanding for generating technically sound tasks.
+
+> **Context budget note:** This document is loaded into AI context. Keep it contract-style —
+> tables, schemas, rules, one example each. Move narrative and history to `docs/rationale/`
+> and link it; rationale files are never loaded by default.
 
 ---
 

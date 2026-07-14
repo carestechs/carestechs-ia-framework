@@ -1,5 +1,7 @@
 # Stakeholder Definition
 
+> **Context budget note:** This document is loaded into AI context — keep it contract-style (tables, schemas, rules); move narrative and history to `docs/rationale/` and link it (rationale files are never loaded by default).
+
 ## 1. Executive Summary
 
 <!-- TODO: Fill in the three essentials -->

@@ -1,5 +1,9 @@
 # Architecture
 
+> **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->
+
+> **Context budget note:** This document is loaded into AI context — keep it contract-style (tables, schemas, rules); move narrative and history to `docs/rationale/` and link it (rationale files are never loaded by default).
+
 ## 1. Overview
 
 ### 1.1 System Summary

@@ -25,6 +25,12 @@ Context selection lives in the **canonical matrix**: `guides/context-compilation
 
 For features: **required** = Feature Brief + Stakeholder Definition + CLAUDE.md; **recommended** = Data Model, API Spec, UI Specification (include when the feature touches data/API/UI — typical), Architecture, Persona.
 
+Spec docs are **sharded** — load the index plus referenced shards only:
+
+- Read `docs/data-model/index.md`, `docs/api-spec/index.md`, and `docs/ui-specification/index.md` for cross-cutting conventions.
+- Read **only** the shards named by the Feature Brief's impact tables (Entities / API / UI), mapped via the kebab-case naming rule: entity `TaskLabel` → `docs/data-model/entities/task-label.md` (singular); resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md` (matches the route segment); screen "Project Board" → `docs/ui-specification/screens/project-board.md`.
+- Do not read whole spec directories.
+
 Prompt-specific notes:
 
 - **Feature Brief** (preferred): `docs/work-items/FEAT-XXX-short-title.md` provides structured scope, traceability, entity/API/UI impact assessment, and constraint documentation. Generates higher-quality tasks.
@@ -65,7 +71,7 @@ When a task is marked `mockup-first`, its description should note which screen n
 
 **Output file:** `tasks/FEAT-XXX-tasks.md` (matching the Feature Brief's ID; `tasks/adhoc-short-title-tasks.md` for inline requests). AI agents write this file — the task list is not just chat output.
 
-**Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` uses the base enum (Backend | Frontend | Database | Testing | DevOps | Documentation) — no deltas for features.
+**Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` uses the base enum (Backend | Frontend | Database | Testing | DevOps | Documentation) — no deltas for features. In **Files to Modify/Create**, suffix files that don't exist yet with `(new)` — example: `- src/services/label-service.ts (new) - label CRUD logic`.
 
 **Grouping:** the canonical scheme — Foundation → Backend → Frontend → Integration → Testing → Documentation & Polish (omit empty groups).
 
@@ -75,6 +81,18 @@ When a task is marked `mockup-first`, its description should note which screen n
 - Estimated complexity distribution
 - Critical path (longest dependency chain)
 - Risks or open questions discovered during analysis
+
+**Acceptance Criteria Coverage** (mandatory) — the task list ends with this section; the validator cross-checks it against the work item via `--work-item`:
+
+```markdown
+## Acceptance Criteria Coverage
+
+| Work Item AC | Covered By |
+|--------------|------------|
+| AC-1: [text] | T-003, T-007 |
+```
+
+Every acceptance criterion from the Feature Brief gets one row; `Covered By` lists the task IDs that implement and verify it.
 
 ---
 
@@ -96,7 +114,8 @@ When a task is marked `mockup-first`, its description should note which screen n
 
 After Claude generates tasks, verify:
 
-- [ ] All acceptance criteria have corresponding tasks
+- [ ] Run `python .ai-framework/tools/validate-tasks.py tasks/FEAT-XXX-tasks.md --work-item docs/work-items/FEAT-XXX-short-title.md` and fix every error
+- [ ] All acceptance criteria have corresponding tasks (the `## Acceptance Criteria Coverage` table is present and complete)
 - [ ] Database/model changes come before code that uses them
 - [ ] API endpoints are defined before frontend integration
 - [ ] Error handling tasks exist for important error scenarios
@@ -134,17 +153,20 @@ After Claude generates tasks, verify:
 
 <data-model>
 <!-- RECOMMENDED: Include relevant entity definitions for the feature -->
-[Paste entity definitions, fields, relationships from data-model.md]
+[Paste docs/data-model/index.md conventions + the entity shards
+ (docs/data-model/entities/) named in the Feature Brief's impact tables]
 </data-model>
 
 <api-spec>
 <!-- RECOMMENDED: Include relevant endpoint definitions for the feature -->
-[Paste endpoint definitions, DTOs, status codes from api-spec.md]
+[Paste docs/api-spec/index.md conventions + the endpoint shards
+ (docs/api-spec/endpoints/) named in the Feature Brief's impact tables]
 </api-spec>
 
 <ui-specification>
 <!-- RECOMMENDED: Include for user-facing features — screen specs, component hierarchy, interactions, states -->
-[Paste relevant screen specifications, component hierarchy, interactions from ui-specification.md]
+[Paste docs/ui-specification/index.md Design System + the screen shards
+ (docs/ui-specification/screens/) named in the Feature Brief's impact tables]
 </ui-specification>
 
 <persona>

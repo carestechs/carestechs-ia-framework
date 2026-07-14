@@ -4,6 +4,10 @@
 
 > This file provides guidance to Claude Code (or any AI assistant) when working with this codebase.
 
+> **Context budget note:** This document is loaded into AI context. Keep it contract-style —
+> tables, schemas, rules, one example each. Move narrative and history to `docs/rationale/`
+> and link it; rationale files are never loaded by default.
+
 ## Pre-Work Checklist
 
 Before generating specs, tasks, mockups, or implementation plans, you MUST follow these steps:
@@ -12,6 +16,7 @@ Before generating specs, tasks, mockups, or implementation plans, you MUST follo
 2. **Read the required files** listed in the routing table for your task type — read them directly, do not ask the user to paste them.
 3. **Read the prompt template** from `.ai-framework/prompts/` — this defines the required sections, structure, and quality criteria for the deliverable.
 4. **Derive structure from the prompt template, NOT from existing output files.** Specs, tasks, and plans are *outputs* — they may reflect an older version of the framework. The prompt templates in `.ai-framework/prompts/` are the authoritative source for format and structure.
+5. **Trust code over docs.** Before relying on a spec shard whose "Last verified against code" stamp is missing or older than 30 days, verify its claims against the source (grep/read the relevant code). If it drifted, fix the shard, add a changelog entry, and update the stamp.
 
 ---
 
@@ -405,11 +410,11 @@ When asked to generate tasks, identify the task type, read the required files, r
 | New feature | `.ai-framework/prompts/feature-tasks.md` | `docs/work-items/FEAT-*.md` (target feature), `docs/stakeholder-definition.md`, `CLAUDE.md` | `tasks/FEAT-XXX-tasks.md` |
 | Bug fix | `.ai-framework/prompts/bugfix-tasks.md` | `docs/work-items/BUG-*.md` (target bug), `CLAUDE.md` | `tasks/BUG-XXX-tasks.md` |
 | Refactoring | `.ai-framework/prompts/refactor-tasks.md` | `docs/work-items/IMP-*.md` (target improvement), `CLAUDE.md`, `docs/ARCHITECTURE.md` | `tasks/IMP-XXX-tasks.md` |
-| Spec generation | `.ai-framework/prompts/spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md` | `docs/data-model.md`, `docs/api-spec.md` |
-| UI spec generation | `.ai-framework/prompts/ui-spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`, `docs/api-spec.md` | `docs/ui-specification.md` |
-| UI mockup | `.ai-framework/prompts/mockup-generation.md` | `docs/ui-specification.md` (target screen + Design System), `CLAUDE.md` | `mockups/T-XXX-screen-name.html` |
+| Spec generation | `.ai-framework/prompts/spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md` | `docs/data-model/index.md` + `docs/data-model/entities/*.md`, `docs/api-spec/index.md` + `docs/api-spec/endpoints/*.md` |
+| UI spec generation | `.ai-framework/prompts/ui-spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`, `docs/api-spec/index.md` + `docs/api-spec/endpoints/*.md` | `docs/ui-specification/` (`index.md` + `screens/*.md` + `components.md`) |
+| UI mockup | `.ai-framework/prompts/mockup-generation.md` | `docs/ui-specification/screens/<screen>.md` (target screen) + Design System from `docs/ui-specification/index.md`, `CLAUDE.md` | `mockups/T-XXX-screen-name.html` |
 | ADR compilation | `.ai-framework/prompts/compile-adrs.md` | ADR files (from shared ADR repo), `.ai-framework/templates/` | Updated `CLAUDE.md` sections |
-| DDR compilation | `.ai-framework/prompts/compile-ddrs.md` | DDR files (from shared DDR repo), `.ai-framework/templates/` | `docs/component-examples.md`, updated `docs/ui-specification.md` + `CLAUDE.md` design sections |
+| DDR compilation | `.ai-framework/prompts/compile-ddrs.md` | DDR files (from shared DDR repo), `.ai-framework/templates/` | `docs/component-examples.md`, updated `docs/ui-specification/index.md` + `CLAUDE.md` design sections |
 | Release transition | `.ai-framework/guides/release-lifecycle.md` | `docs/stakeholder-definition.md`, `CLAUDE.md` | Updated `docs/stakeholder-definition.md` |
 | Task implementation plan | `.ai-framework/prompts/plan-generation.md` | `CLAUDE.md`, task definition, files listed in task's "Files to Modify/Create" | `plans/plan-T-XXX-short-title.md` |
 | Testing / Integration / Prioritization | No dedicated prompt — use `.ai-framework/prompts/base-template.md` with the context recipe from `.ai-framework/guides/context-compilation.md` | Per the context recipe for that task type | `tasks/adhoc-short-title-tasks.md` |
@@ -418,13 +423,15 @@ When asked to generate tasks, identify the task type, read the required files, r
 
 | Task Type | Optional Files | When to Include |
 |-----------|---------------|-----------------|
-| New feature | `docs/data-model.md`, `docs/api-spec.md`, `docs/ui-specification.md` | When the feature touches data, API, or UI respectively — typical for most features |
+| New feature | `docs/data-model/index.md` + entity shards referenced by the work item, `docs/api-spec/index.md` + endpoint shards referenced by the work item, `docs/ui-specification/index.md` + screen shards referenced by the work item | When the feature touches data, API, or UI respectively — typical for most features |
 | New feature | `docs/ARCHITECTURE.md`, `docs/personas/primary-user.md` | Multi-component features, user-facing features |
-| Bug fix | `docs/ARCHITECTURE.md`, `docs/data-model.md`, `docs/api-spec.md`, `docs/ui-specification.md` | Multi-component bugs; data/API/UI bugs respectively |
-| Refactoring | `docs/data-model.md`, `docs/stakeholder-definition.md` | Data refactors, scope questions |
+| Bug fix | `docs/ARCHITECTURE.md`; `docs/data-model/index.md` + entity shards, `docs/api-spec/index.md` + endpoint shards, `docs/ui-specification/index.md` + screen shards referenced by the bug report | Multi-component bugs; data/API/UI bugs respectively |
+| Refactoring | `docs/data-model/index.md` + entity shards referenced by the work item, `docs/stakeholder-definition.md` | Data refactors, scope questions |
 | Spec generation | `docs/personas/primary-user.md` | User-facing entity/endpoint decisions |
-| UI mockup | `docs/api-spec.md`, `docs/personas/primary-user.md` | Data-driven screens, content tone |
+| UI mockup | `docs/api-spec/index.md` + endpoint shards for the screen's API calls, `docs/personas/primary-user.md` | Data-driven screens, content tone |
 | Prioritization | `docs/work-items/FEAT-*.md`, `docs/work-items/BUG-*.md`, `docs/work-items/IMP-*.md`, `docs/stakeholder-definition.md`, `docs/personas/` | Comparing and prioritizing work items |
+
+> **Retrieval keys:** When generating tasks for a work item, read each spec's `index.md` plus ONLY the shards named by the work item's impact tables (mapped via the naming rule: entity `TaskLabel` → `docs/data-model/entities/task-label.md`; resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md`; screen "Project Board" → `docs/ui-specification/screens/project-board.md`). Do not read whole spec directories.
 
 **Work Items** (`docs/work-items/`): Feature Briefs, Bug Reports, and Improvement Proposals are the preferred input for task generation. Blank starters ship in the scaffold as `docs/work-items/TEMPLATE-feature-brief.md`, `TEMPLATE-bug-report.md`, and `TEMPLATE-improvement-proposal.md` — copy one to `FEAT-XXX-short-title.md` (next free ID) before filling it in. If no work item document exists for a task, the prompts support inline fallbacks — but structured work items produce higher-quality task breakdowns.
 
@@ -447,7 +454,11 @@ Each task definition (in the task-list file under `tasks/` — e.g., `tasks/FEAT
 
 ### Development Pipeline
 
-When implementing tasks from a generated task list (saved in `tasks/` per the routing table above), follow this sequence for **each task**:
+When implementing tasks from a generated task list (saved in `tasks/` per the routing table above):
+
+0. **Validate the task list** — immediately after task generation (once per task list), run `python .ai-framework/tools/validate-tasks.py tasks/<file>.md` and fix every error before implementation begins.
+
+Then follow this sequence for **each task**:
 
 1. **Pick a task** from the task-list file in `tasks/` (respect dependency order).
 2. **Check its Workflow field** and complete any prerequisites (see Workflow Enforcement above).
@@ -465,12 +476,12 @@ Read files in **Cone of Context** order — broad (strategic) to narrow (tactica
 |-------|-------|---------|
 | Strategic | `docs/stakeholder-definition.md`, `docs/personas/primary-user.md` | Why? For whom? What's in scope? |
 | Architectural | `docs/ARCHITECTURE.md` | What is the system? How is it structured? |
-| Specification | `docs/data-model.md`, `docs/api-spec.md` | What are the entities and API contracts? |
-| UI | `docs/ui-specification.md` | What do screens look like? What are the components? |
+| Specification | `docs/data-model/index.md` + entity shards referenced by the work item; `docs/api-spec/index.md` + endpoint shards referenced by the work item | What are the entities and API contracts? |
+| UI | `docs/ui-specification/index.md` + screen shards referenced by the work item (+ `components.md` when shared components are involved) | What do screens look like? What are the components? |
 | Work Items | `docs/work-items/FEAT-*.md`, `docs/work-items/BUG-*.md`, `docs/work-items/IMP-*.md` | What specific work to do? Features, bugs, improvements |
 | Implementation | `CLAUDE.md` | How do we build things? What are the conventions? |
 
-**For large documents:** Read only the sections relevant to the task (e.g., for a task about labels, read only the Label entity from `data-model.md` and label endpoints from `api-spec.md`). Quality over quantity.
+**Load only what's referenced:** Specs are sharded — read each spec's `index.md` plus only the shards named by the work item's impact tables (e.g., for a task about labels: `docs/data-model/entities/label.md` and `docs/api-spec/endpoints/labels.md`). Do not read whole spec directories. Quality over quantity.
 
 For the full context selection matrix and XML assembly examples, see `.ai-framework/guides/context-compilation.md`.
 
@@ -480,19 +491,19 @@ When code changes happen, check which docs need updating per `.ai-framework/guid
 
 | Code Change | Document to Update |
 |-------------|-------------------|
-| New entity or field | `docs/data-model.md` |
-| New/changed endpoint or DTO | `docs/api-spec.md` |
-| New/changed screen or component | `docs/ui-specification.md` |
+| New entity or field | `docs/data-model/entities/<entity>.md` (+ `docs/data-model/index.md` if conventions or the relationships overview change) |
+| New/changed endpoint or DTO | `docs/api-spec/endpoints/<resource>.md` (+ `docs/api-spec/index.md` if envelope, error catalog, shared DTOs, or the endpoint summary change) |
+| New/changed screen or component | `docs/ui-specification/screens/<screen>.md` or `docs/ui-specification/components.md` (+ `docs/ui-specification/index.md` if Design System or screen inventory change) |
 | New component or service | `docs/ARCHITECTURE.md` |
 | New pattern or convention | `CLAUDE.md` |
 | Scope or strategy change | `docs/stakeholder-definition.md` |
 | Design token or screen layout change | `mockups/` (affected screens) |
-| DDR updated in shared repo | Re-run DDR compilation, update Component Examples + CLAUDE.md Design Patterns |
+| DDR updated in shared repo | Re-run DDR compilation, update Component Examples + `docs/ui-specification/index.md` + CLAUDE.md Design Patterns |
 | Feature tasks completed | `docs/work-items/FEAT-*.md` — update Status to "Completed" |
 | Bug resolved | `docs/work-items/BUG-*.md` — update Status to "Resolved" |
 | Improvement completed | `docs/work-items/IMP-*.md` — update Status to "Completed" |
 
-**Changelog rule:** Every update to `data-model.md`, `api-spec.md`, `ARCHITECTURE.md`, or `ui-specification.md` must include a changelog entry at the bottom of the document. See `.ai-framework/guides/maintenance.md` for format.
+**Changelog rule:** Every update under `docs/data-model/`, `docs/api-spec/`, or `docs/ui-specification/` (shard edits included), and every update to `docs/ARCHITECTURE.md`, must include a changelog entry at the bottom of that spec's `index.md` (or of `ARCHITECTURE.md`) — and an updated "Last verified against code" stamp on every file touched. See `.ai-framework/guides/maintenance.md` for format.
 
 ### Framework Reference
 

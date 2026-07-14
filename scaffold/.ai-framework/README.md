@@ -2,7 +2,7 @@
 
 This folder contains a local copy of the **AI Task Generation Documentation Framework** so that everything you need — templates, prompts, and guides — lives inside your project.
 
-> **Don't edit this folder locally.** Its `templates/`, `prompts/`, and `guides/` are regenerated from the framework repo (via `scripts/sync-scaffold.sh`) — local edits will be lost on the next upgrade. Edit your project docs instead (`CLAUDE.md`, `docs/`). Only this README and `VERSION` are maintained by hand, in the framework repo.
+> **Don't edit this folder locally.** Its `templates/`, `prompts/`, `guides/`, and `tools/` are regenerated from the framework repo (via `scripts/sync-scaffold.sh`) — local edits will be lost on the next upgrade. Edit your project docs instead (`CLAUDE.md`, `docs/`). Only this README and `VERSION` are maintained by hand, in the framework repo.
 
 ## What's Inside
 
@@ -33,6 +33,8 @@ This folder contains a local copy of the **AI Task Generation Documentation Fram
 │   ├── plan-generation.md
 │   ├── compile-adrs.md
 │   └── compile-ddrs.md
+├── tools/                     # Shipped tools
+│   └── validate-tasks.py      # Task-list validator — run it after generating any task list and fix every error
 └── guides/                    # Workflow guides
     ├── getting-started.md
     ├── context-compilation.md
@@ -71,15 +73,25 @@ your-project/
 │   ├── README.md                      # What this folder is and how to use it
 │   ├── templates/                     # Full reference templates
 │   ├── prompts/                       # Prompt templates for AI task generation
+│   ├── tools/
+│   │   └── validate-tasks.py          # Task-list validator — run after generating any task list
 │   └── guides/                        # Workflow guides
 ├── docs/
 │   ├── personas/
 │   │   └── primary-user.md            # Target user definition
 │   ├── stakeholder-definition.md      # Product vision, scope & success criteria
 │   ├── ARCHITECTURE.md                # System structure & technical decisions
-│   ├── data-model.md                  # Domain entities, fields & relationships
-│   ├── api-spec.md                    # REST API endpoints & contracts
-│   ├── ui-specification.md            # Screen layouts, components & interactions
+│   ├── data-model/                    # Domain entities & relationships (sharded)
+│   │   ├── index.md                   #   Cross-cutting: decisions, conventions, relationships, shared enums
+│   │   └── entities/                  #   ONE entity per file (starter: TEMPLATE-entity.md)
+│   ├── api-spec/                      # REST API contracts (sharded)
+│   │   ├── index.md                   #   Cross-cutting: envelope, error catalog, auth, pagination
+│   │   └── endpoints/                 #   ONE resource group per file (starter: TEMPLATE-resource.md)
+│   ├── ui-specification/              # Screens & design system (sharded)
+│   │   ├── index.md                   #   Cross-cutting: UI decisions, Design System, screen inventory, layouts
+│   │   ├── screens/                   #   ONE screen per file (starter: TEMPLATE-screen.md)
+│   │   └── components.md              #   Shared components inventory
+│   ├── rationale/                     # Narrative & decision rationale — linked from contract docs, never loaded as AI context
 │   └── work-items/                    # Work item documents
 │       ├── TEMPLATE-feature-brief.md          # Blank Feature Brief starter
 │       ├── TEMPLATE-bug-report.md             # Blank Bug Report starter
@@ -97,9 +109,9 @@ your-project/
 | `stakeholder.md` | `docs/stakeholder-definition.md` |
 | `claude-md.md` | `CLAUDE.md` (project root) |
 | `architecture.md` | `docs/ARCHITECTURE.md` |
-| `data-model.md` | `docs/data-model.md` |
-| `api-spec.md` | `docs/api-spec.md` |
-| `ui-specification.md` | `docs/ui-specification.md` |
+| `data-model.md` | `docs/data-model/` (`index.md` + `entities/*.md`, starter shard: `TEMPLATE-entity.md`) |
+| `api-spec.md` | `docs/api-spec/` (`index.md` + `endpoints/*.md`, starter shard: `TEMPLATE-resource.md`) |
+| `ui-specification.md` | `docs/ui-specification/` (`index.md` + `screens/*.md` + `components.md`, starter shard: `TEMPLATE-screen.md`) |
 | `feature-brief.md` | `docs/work-items/FEAT-XXX-short-title.md` (starter: `TEMPLATE-feature-brief.md`) |
 | `bug-report.md` | `docs/work-items/BUG-XXX-short-title.md` (starter: `TEMPLATE-bug-report.md`) |
 | `improvement-proposal.md` | `docs/work-items/IMP-XXX-short-title.md` (starter: `TEMPLATE-improvement-proposal.md`) |
@@ -128,7 +140,9 @@ your-project/
 - **Don't overthink it.** A rough first pass beats a perfect blank page. You can always refine later.
 - **Use the full templates as reference.** If a scaffold section feels unclear, check the corresponding file in `.ai-framework/templates/` (see the mapping table above) for detailed guidance.
 - **CLAUDE.md is the most frequently used.** Even a minimal version helps AI generate better code immediately.
-- **Generate specs from docs.** After filling Stakeholder + Architecture + CLAUDE.md, use `.ai-framework/prompts/spec-generation.md` (or `/spec-generation`) to generate `docs/data-model.md` and `docs/api-spec.md`, then `.ai-framework/prompts/ui-spec-generation.md` (or `/ui-spec-generation`) for `docs/ui-specification.md`.
+- **Generate specs from docs.** After filling Stakeholder + Architecture + CLAUDE.md, use `.ai-framework/prompts/spec-generation.md` (or `/spec-generation`) to generate `docs/data-model/` and `docs/api-spec/` (index + shards), then `.ai-framework/prompts/ui-spec-generation.md` (or `/ui-spec-generation`) for `docs/ui-specification/` (index + screens + components).
+- **Keep freshness stamps current.** Every spec `index.md` and shard (and `docs/ARCHITECTURE.md`) carries a `> **Last verified against code:** YYYY-MM-DD (commit ...)` line directly under its H1 — update it whenever you edit a file or verify it against the code. AI agents trust code over any shard whose stamp is missing or older than 30 days.
+- **Validate task lists.** After any task generation, run `python .ai-framework/tools/validate-tasks.py tasks/<file>.md` (add `--work-item docs/work-items/<file>.md` for features) and fix every error.
 - **Update as you go.** These are living documents. Revisit them as your project evolves (see [`guides/maintenance.md`](guides/maintenance.md)).
 - **Upgrading the framework.** `VERSION` holds the installed semver (e.g., `2.1.0`). To upgrade, replace the `.ai-framework/` folder with the latest `scaffold/.ai-framework/` from the framework repo — your project docs are unaffected.
 

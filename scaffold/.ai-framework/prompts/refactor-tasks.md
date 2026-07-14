@@ -25,6 +25,8 @@ Context selection lives in the **canonical matrix**: `guides/context-compilation
 
 For refactoring: **required** = Improvement Proposal + CLAUDE.md + Architecture (current and target structure); **optional** = Data Model (data layer refactoring), Stakeholder Definition (large-scale refactoring that affects product scope).
 
+Spec docs are **sharded**: when data-layer context is needed, read `docs/data-model/index.md` plus **only** the entity shards named by the Improvement Proposal's scope (Affected Entities), mapped via the kebab-case naming rule (entity `TaskLabel` → `docs/data-model/entities/task-label.md`, singular). Do not read whole spec directories.
+
 Prompt-specific notes:
 
 - **Improvement Proposal** (preferred): `docs/work-items/IMP-XXX-short-title.md` provides structured risk assessment, success criteria, test coverage baseline, and traceability. Generates safer, better-phased refactoring tasks.
@@ -86,7 +88,7 @@ When generating refactoring tasks, consider these safe patterns:
 
 **Output file:** `tasks/IMP-XXX-tasks.md` (matching the Improvement Proposal's ID; `tasks/adhoc-short-title-tasks.md` for inline requests). AI agents write this file — the task list is not just chat output.
 
-**Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` enum delta: adds `Cleanup`. Every task block in every phase includes Description and Acceptance Criteria. No nested sub-task lists — one T-XXX block per unit of work.
+**Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` enum delta: adds `Cleanup`. Every task block in every phase includes Description and Acceptance Criteria. No nested sub-task lists — one T-XXX block per unit of work. In **Files to Modify/Create**, suffix files that don't exist yet with `(new)` — example: `- src/services/label-service.ts (new) - label CRUD logic`.
 
 Generate tasks in phases that ensure safety:
 
@@ -271,6 +273,18 @@ After all tasks, provide:
 - Recommended review points (where to pause and verify)
 - Rollback strategy summary
 
+### Acceptance Criteria Coverage (recommended)
+
+When the Improvement Proposal defines success criteria / acceptance criteria, end the task list with:
+
+```markdown
+## Acceptance Criteria Coverage
+
+| Work Item AC | Covered By |
+|--------------|------------|
+| AC-1: [text] | T-003, T-007 |
+```
+
 ---
 
 ## Constraints
@@ -288,6 +302,8 @@ After all tasks, provide:
 ---
 
 ## Post-Generation Checklist
+
+- [ ] Run `python .ai-framework/tools/validate-tasks.py tasks/IMP-XXX-tasks.md` and fix every error
 
 ### Safety Checklist
 

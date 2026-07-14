@@ -131,9 +131,10 @@ carestechs-ia-framework/
 │   │   │   └── primary-user.md  # Fill-in-ready persona
 │   │   ├── stakeholder-definition.md
 │   │   ├── ARCHITECTURE.md
-│   │   ├── data-model.md
-│   │   ├── api-spec.md
-│   │   ├── ui-specification.md
+│   │   ├── data-model/          # index.md (conventions) + entities/<entity>.md shards
+│   │   ├── api-spec/            # index.md (envelope, errors) + endpoints/<resource>.md shards
+│   │   ├── ui-specification/    # index.md (design system) + screens/<screen>.md + components.md
+│   │   ├── rationale/           # Narrative & history — never loaded as AI context
 │   │   └── work-items/          # Copy a TEMPLATE-* file to FEAT-XXX-title.md and fill it
 │   │       ├── TEMPLATE-feature-brief.md
 │   │       ├── TEMPLATE-bug-report.md
@@ -146,13 +147,15 @@ carestechs-ia-framework/
 │   ├── stakeholder.md           # → docs/stakeholder-definition.md
 │   ├── architecture.md          # → docs/ARCHITECTURE.md
 │   ├── claude-md.md             # → CLAUDE.md (project root)
-│   ├── data-model.md            # → docs/data-model.md
-│   ├── api-spec.md              # → docs/api-spec.md
-│   ├── ui-specification.md      # → docs/ui-specification.md
+│   ├── data-model.md            # → docs/data-model/ (index + entities/*.md)
+│   ├── api-spec.md              # → docs/api-spec/ (index + endpoints/*.md)
+│   ├── ui-specification.md      # → docs/ui-specification/ (index + screens/*.md + components.md)
 │   ├── feature-brief.md         # → docs/work-items/FEAT-XXX-*.md
 │   ├── bug-report.md            # → docs/work-items/BUG-XXX-*.md
 │   ├── improvement-proposal.md  # → docs/work-items/IMP-XXX-*.md
 │   └── examples/                # Genuinely filled work-item examples ("TaskFlow" sample product)
+├── tools/                       # Shipped tooling (synced into scaffold/.ai-framework/tools/)
+│   └── validate-tasks.py        # Task-list schema/DAG/coverage validator (machine gate)
 ├── prompts/                     # Claude-optimized prompt templates (agent-first, chat appendix)
 │   ├── base-template.md         # Canonical task schema + common prompt structure
 │   ├── feature-tasks.md         # Generate feature tasks   → tasks/FEAT-XXX-tasks.md
@@ -212,9 +215,11 @@ Testing, Integration, and Prioritization have context recipes in the guide but n
 ### Context Selection
 
 - **Start narrow**: Only include what's directly relevant
+- **Use retrieval keys**: A work item's impact tables name the exact entity/endpoint/screen shards to load — read each spec's `index.md` plus only those shards, never whole spec directories
 - **Add breadth for ambiguity**: When requirements are unclear, add context layers
 - **Prioritize recent changes**: Recent code/docs may not be in AI training data
-- **Use spec documents for implementation**: Data Model + API Spec + UI Spec give AI the detail it needs
+- **Keep contract and rationale separate**: Spec docs stay contract-style (tables, schemas, rules); narrative lives in `docs/rationale/` and is never loaded as AI context
+- **Trust code over stale docs**: Every spec shard carries a "Last verified against code" stamp — verify shards older than 30 days against the source before relying on them
 
 ### Prompt Engineering
 
@@ -233,4 +238,4 @@ Testing, Integration, and Prioritization have context recipes in the guide but n
 
 ## Version History
 
-See [`CHANGELOG.md`](CHANGELOG.md). Highlights of the v2 line: 10 core templates across 6 layers (v1 had 4), work-item templates and prompts with dual agent/chat usage, ADR/DDR compilation, release lifecycle guide. v2.1 adds defined output locations (`tasks/`, `plans/`, `mockups/`), a canonical task schema, Claude Code slash commands in the scaffold, stack-neutral prompts, and the scaffold sync script.
+See [`CHANGELOG.md`](CHANGELOG.md). Highlights of the v2 line: 10 core templates across 6 layers (v1 had 4), work-item templates and prompts with dual agent/chat usage, ADR/DDR compilation, release lifecycle guide. v2.1 adds defined output locations (`tasks/`, `plans/`, `mockups/`), a canonical task schema, Claude Code slash commands in the scaffold, stack-neutral prompts, and the scaffold sync script. v2.2 shards the spec docs for retrieval-key context loading, splits contract from rationale, adds freshness stamps, and ships the `validate-tasks.py` output gate.

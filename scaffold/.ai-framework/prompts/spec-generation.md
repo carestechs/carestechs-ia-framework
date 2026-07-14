@@ -10,7 +10,7 @@ Generate a Data Model or API Specification document from existing strategic docu
 
 ## How to Use
 
-- **AI agents (Claude Code, etc.):** Read the context files listed in the project CLAUDE.md routing table for "Spec generation", follow the **Guidance**, **Output Format**, and **Constraints** sections below, and **write the output file**: `docs/data-model.md` (for a Data Model) or `docs/api-spec.md` (for an API Specification).
+- **AI agents (Claude Code, etc.):** Read the context files listed in the project CLAUDE.md routing table for "Spec generation", follow the **Guidance**, **Output Format**, and **Constraints** sections below, and **write the output files** (sharded): for a Data Model, `docs/data-model/index.md` plus one `docs/data-model/entities/<entity>.md` per entity; for an API Specification, `docs/api-spec/index.md` plus one `docs/api-spec/endpoints/<resource>.md` per resource.
 - **Chat workflows (manual copy-paste):** Use the XML skeleton in the **Chat Workflow Template (XML)** appendix — paste your documentation into the `<context>` sections and include the Guidance, Output Format, and Constraints sections of this prompt alongside it.
 
 ---
@@ -23,7 +23,7 @@ Prompt-specific notes:
 
 - **All three required documents (Stakeholder Definition, Architecture, CLAUDE.md) should be included in full.** Unlike feature task generation where you excerpt relevant sections, spec generation needs the complete picture to derive a comprehensive model.
 - **Persona** is optional — include it for user-facing entity/endpoint decisions.
-- When generating the **API Specification**, also include the generated `docs/data-model.md` as context (see Guidance below).
+- When generating the **API Specification**, also include the generated Data Model as context — `docs/data-model/index.md` plus the entity shards (see Guidance below).
 - Read the output format template from `.ai-framework/templates/` for the target spec type (`data-model.md` or `api-spec.md`).
 
 ---
@@ -75,9 +75,9 @@ Endpoint grouping:
 
 ### Workflow Order
 
-**Step 1 — Generate the Data Model first.** Entities inform endpoint structure (CRUD per entity), field definitions inform request/response DTOs, and relationships inform nested routes and query parameters.
+**Step 1 — Generate the Data Model first.** Write `docs/data-model/index.md` plus one `docs/data-model/entities/<entity>.md` per entity. Entities inform endpoint structure (CRUD per entity), field definitions inform request/response DTOs, and relationships inform nested routes and query parameters.
 
-**Step 2 — Generate the API Spec second.** With the data model in hand, add `docs/data-model.md` as extra context and use it as the source of truth for entities, fields, and relationships.
+**Step 2 — Generate the API Spec second.** Write `docs/api-spec/index.md` plus one `docs/api-spec/endpoints/<resource>.md` per resource. With the data model in hand, add `docs/data-model/index.md` + the entity shards as extra context and use them as the source of truth for entities, fields, and relationships.
 
 **Step 3 — Review and validate** each generated document against the source docs:
 - Does every scope-lock item have representation?
@@ -88,12 +88,22 @@ Endpoint grouping:
 
 ## Output Format
 
-Write the generated document to the canonical location:
+Write the generated spec as a **sharded document set** at the canonical locations:
 
-- Data Model → **`docs/data-model.md`**
-- API Specification → **`docs/api-spec.md`**
+- Data Model → **`docs/data-model/index.md`** + one **`docs/data-model/entities/<entity>.md`** per entity
+- API Specification → **`docs/api-spec/index.md`** + one **`docs/api-spec/endpoints/<resource>.md`** per resource
 
-Generate a complete document following the template structure. Derive all content from the context documents provided:
+**Shard naming (mechanical, kebab-case):** entity `TaskLabel` → `entities/task-label.md` (singular); resource `/api/task-labels` → `endpoints/task-labels.md` (matches the route segment, plural).
+
+**Freshness stamp:** every generated file (index and every shard) starts with this line directly under its H1 — fill in today's date and the current commit hash:
+
+```
+> **Last verified against code:** YYYY-MM-DD (commit `abc1234`)
+```
+
+**Index files hold cross-cutting content only** — anything specific to one entity or one resource lives in its shard.
+
+Derive all content from the context documents provided:
 - Entities/endpoints from the stakeholder scope and user flows
 - Module ownership from the architecture doc
 - Naming and conventions from CLAUDE.md
@@ -101,23 +111,36 @@ Generate a complete document following the template structure. Derive all conten
 
 ### For Data Model
 
-Use the section structure from `.ai-framework/templates/data-model.md`:
-1. Overview with modeling decisions table
-2. Module ownership table
-3. Full entity definitions with field tables, indexes, and business rules
-4. Relationships (1:N, M:N, cross-module)
-5. Enums and value types
-6. Database conventions summary
-7. Entity-relationship diagram (ASCII)
+Use the section structure from `.ai-framework/templates/data-model.md` for the index and shard formats.
+
+`docs/data-model/index.md` (cross-cutting only):
+1. Overview with Key Modeling Decisions table
+2. Module Ownership table
+3. Database Conventions summary
+4. Relationships Overview — entity-relationship diagram (ASCII)
+5. Shared Enums and Value Types (used by 2+ entities)
+6. Usage Notes for AI Task Generation
+7. Changelog
+
+`docs/data-model/entities/<entity>.md` — **one entity per file**:
+- Owning module
+- Fields table (types, constraints, indexes)
+- Relationships (1:N, M:N, cross-module — with cascade behaviors)
+- Entity-specific enums and business rules
 
 ### For API Specification
 
-Use the section structure from `.ai-framework/templates/api-spec.md`:
-1. Overview with API decisions table
-2. Common conventions (envelope, errors, auth, pagination)
-3. All endpoints grouped by module with full details
-4. Shared DTOs
-5. Endpoint summary table
+Use the section structure from `.ai-framework/templates/api-spec.md` for the index and shard formats.
+
+`docs/api-spec/index.md` (cross-cutting only):
+1. Overview with Key API Decisions table
+2. Common conventions — response envelope, Error Catalog, Authentication Endpoints, Pagination
+3. Shared DTOs
+4. Endpoint summary table
+5. Usage Notes for AI Task Generation
+6. Changelog
+
+`docs/api-spec/endpoints/<resource>.md` — **one resource group per file**: all endpoint blocks for that resource, each with route, method, auth, request/response DTOs, and status codes.
 
 ---
 
@@ -134,7 +157,12 @@ Use the section structure from `.ai-framework/templates/api-spec.md`:
 
 ## Post-Generation Checklist
 
-After the AI generates a spec document, verify:
+After the AI generates a spec document set, verify:
+
+### For Both:
+- [ ] Every generated file (index and every shard) starts with the freshness stamp directly under its H1, filled with today's date and the current commit
+- [ ] Index files hold cross-cutting content only — every entity/resource lives in its own shard
+- [ ] Shard filenames follow the kebab-case naming rule (entity singular; resource matches the route segment)
 
 ### For Data Model:
 - [ ] Every feature in the scope lock maps to at least one entity
@@ -199,8 +227,8 @@ Copy this skeleton, paste your documentation into the `<context>` sections, and 
 
 <data-model>
 <!-- ONLY when generating the API Specification (Step 2):
-     paste the data-model.md generated in Step 1 -->
-[Paste docs/data-model.md content]
+     paste the Data Model generated in Step 1 -->
+[Paste docs/data-model/index.md + docs/data-model/entities/*.md content]
 </data-model>
 
 </context>
@@ -275,4 +303,4 @@ Assign each entity to the correct module per the architecture.
 </spec-generation-request>
 ```
 
-**Output:** `docs/data-model.md` — a complete data model following the `data-model.md` template structure.
+**Output:** `docs/data-model/index.md` + one `docs/data-model/entities/<entity>.md` per entity (e.g., `entities/task-item.md`, `entities/project.md`) — a complete sharded data model following the `data-model.md` template structure, every file stamped `> **Last verified against code:** ...` directly under its H1.

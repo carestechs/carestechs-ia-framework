@@ -1,4 +1,10 @@
-# UI Specification
+# UI Specification — [Product Name]
+
+> **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->
+
+> **Context budget note:** This document is loaded into AI context — keep it contract-style (tables, schemas, rules); move narrative and history to `docs/rationale/` and link it (rationale files are never loaded by default).
+
+> *Sharded document set: cross-cutting content lives in this index; every screen has its own shard at `screens/<screen>.md` (kebab-case — e.g., screen "Project Board" → `screens/project-board.md`); shared components live in `components.md`. Copy `screens/TEMPLATE-screen.md` to add a screen. Work items name screens as retrieval keys — task generation loads this index plus only the named shards.*
 
 ## 1. Overview
 
@@ -19,6 +25,8 @@
 | <!-- e.g., Icon set --> | <!-- e.g., Material Icons --> | <!-- e.g., Matches component library --> |
 
 ## 2. Design System
+
+<!-- Keep the 2.1–2.6 numbering — DDR compilation (compile-ddrs.md) writes into these numbered sections. -->
 
 ### 2.1 Brand Colors
 
@@ -87,12 +95,12 @@
 
 ## 3. Screen Inventory
 
-<!-- TODO: List all screens in the application -->
+<!-- TODO: List all screens in the application. This table doubles as the shard directory — every screen listed here must have a shard at screens/<screen>.md -->
 
-| Screen Name | Route | Auth Required | Parent Layout | Primary User Action |
-|-------------|-------|---------------|---------------|-------------------|
-| <!-- Login --> | <!-- /login --> | <!-- No --> | <!-- Public --> | <!-- Authenticate --> |
-| <!-- Dashboard --> | <!-- /dashboard --> | <!-- Yes --> | <!-- App shell --> | <!-- Navigate to content --> |
+| Screen Name | Route | Auth Required | Parent Layout | Shard | Primary User Action |
+|-------------|-------|---------------|---------------|-------|-------------------|
+| <!-- Login --> | <!-- /login --> | <!-- No --> | <!-- Public --> | <!-- `screens/login.md` --> | <!-- Authenticate --> |
+| <!-- Dashboard --> | <!-- /dashboard --> | <!-- Yes --> | <!-- App shell --> | <!-- `screens/dashboard.md` --> | <!-- Navigate to content --> |
 
 ## 4. Shared Layouts
 
@@ -120,83 +128,23 @@
 └──────────────────────────────────────────────────────────┘
 ```
 
-## 5. Screen Specifications
+## Usage Notes for AI Task Generation
 
-<!-- TODO: Define each screen. See .ai-framework/templates/ui-specification.md for the full template. -->
-
-### 5.1 [Screen Name]
-
-**Route**: [/path]
-**Auth**: [Required / Public]
-**Layout**: [App shell / Public]
-
-#### Layout Sketch
-
-```
-[ASCII diagram of the screen layout]
-```
-
-#### Component Hierarchy
-
-```
-[ScreenName]Page
-├── [ComponentA]
-│   └── [SubComponent]
-└── [ComponentB]
-```
-
-#### Component → API Mapping
-
-| Component | Data Needed | API Endpoint | Trigger |
-|-----------|-------------|-------------|---------|
-| <!-- Component --> | <!-- Data --> | <!-- GET /api/... --> | <!-- On page load --> |
-
-#### States
-
-| State | Condition | UI Behavior |
-|-------|-----------|-------------|
-| **Default** | Data loaded | Show content |
-| **Loading** | API in flight | Show spinner/skeleton |
-| **Empty** | No items | Show message + CTA |
-| **Error** | API failed | Show error + retry |
-
-#### User Interactions
-
-| Action | UI Element | Result | API Call |
-|--------|-----------|--------|----------|
-| <!-- Click create --> | <!-- Button --> | <!-- Open dialog --> | <!-- None until submit --> |
-
----
-
-<!-- TODO: Repeat screen specification blocks (5.2, 5.3, ...) for each screen -->
-
-## 6. Shared Components
-
-<!-- TODO: Document reusable components used across 2+ screens -->
-
-### 6.1 [Component Name]
-
-**Used in**: [Screen A, Screen B]
-**Description**: [One sentence]
-
-| Name | Direction | Type | Description |
-|------|-----------|------|-------------|
-| <!-- item --> | <!-- Input --> | <!-- ItemDto --> | <!-- Data to display --> |
-| <!-- clicked --> | <!-- Output --> | <!-- e.g., event<string> — EventEmitter / callback prop --> | <!-- Emitted on click --> |
-
-## 7. Usage Notes for AI Task Generation
-
-- **Derive component structure** from the Component Hierarchy for each screen
-- **Map data requirements** from Component → API Mapping
-- **Specify all states** — every component must handle loading, empty, and error
+- **Load only what's referenced**: Read this `index.md` plus ONLY the screen shards named by the work item's impact tables, plus `components.md` when a shared component is involved — do not read the whole `screens/` directory
+- **Derive component structure** from each screen shard's Component Hierarchy
+- **Map data requirements** from each screen shard's Component → API Mapping
+- **Specify all states** — every component must handle loading, empty, and error per the shard's States table
 - **Define interactions precisely** — each maps to a UI element, result, and API call
-- **Reuse shared components** (Section 6) before creating new ones
+- **Reuse shared components** (`components.md`) before creating new ones
 - **Follow the design system** (Section 2) for colors, typography, and spacing
 - **Reference State Patterns** (Section 2.5) for consistent loading, empty, error, and disabled handling across all screens
 - **Follow Responsive Breakpoints** (Section 2.6) for consistent breakpoint usage
 - **Use Component Examples Appendix** (if DDRs were compiled) as the authoritative reference for component markup patterns in mockups and implementations
+- **New screens**: Create a new shard at `screens/<screen>.md` (copy `screens/TEMPLATE-screen.md`), add a Screen Inventory row (Section 3), and record the change in the Changelog
 
 ## Changelog
+
+<!-- Records changes across the whole docs/ui-specification/ set — screen shard and components.md edits included. Update the freshness stamp on every file touched. -->
 
 | Date | Author | Change Description | Reason |
 |------|--------|-------------------|--------|

@@ -29,6 +29,7 @@ Context selection per task type lives in the **canonical matrix**: `guides/conte
 Prompt-specific notes:
 
 - **Rule of thumb:** Work item documents (Feature Brief, Bug Report, Improvement Proposal) are the primary input for task generation — they describe *what* to do. CLAUDE.md is almost always required for *how* to do it. Add Data Model + API Spec for work involving entities/endpoints, UI Spec for user-facing work, Architecture for structural work, Stakeholder for scope questions, Persona for user-facing decisions.
+- **Spec docs are sharded:** when a spec is needed, read that spec's index (`docs/data-model/index.md`, `docs/api-spec/index.md`, `docs/ui-specification/index.md`) plus **only** the shards referenced by the work item's impact tables. Do not read whole spec directories.
 - **Testing / Integration / Prioritization:** no dedicated prompt exists — use this base template with the context recipe for that task type from the canonical matrix.
 
 ---
@@ -124,6 +125,7 @@ or architectural need it addresses]
 
 **Files to Modify/Create:**
 - [file/path/example.ts] - [what changes]
+- [new/file/path.ts] (new) - [purpose — `(new)` marks files that don't exist yet]
 
 **Technical Notes:** (optional)
 [Implementation guidance, patterns to follow, or gotchas to avoid]
@@ -143,7 +145,7 @@ Field rules:
 7. **Acceptance Criteria** — a checklist of testable criteria. **Every task block in every phase gets this field** — no exceptions.
 8. **Dependencies** — comma-separated task IDs (`T-001, T-002`) or `None`. No free-text annotations.
 9. **Complexity** — `S | M | L | XL` (full scale, always)
-10. **Files to Modify/Create** — exact field name everywhere; list likely files and what changes
+10. **Files to Modify/Create** — exact field name everywhere; list likely files and what changes. Files that don't exist yet are suffixed `(new)` after the path — example: `- src/services/label-service.ts (new) - label CRUD logic`
 11. **Technical Notes** — optional
 
 **No nested sub-task lists inside a task block.** If a task needs sub-tasks, split it into separate T-XXX tasks.
@@ -175,6 +177,7 @@ Group tasks using the canonical grouping scheme, in this order (omit empty group
 
 After generating tasks, verify:
 
+- [ ] Run `python .ai-framework/tools/validate-tasks.py <task-list-file>` and fix every error
 - [ ] Every task block contains all schema fields, in the canonical order
 - [ ] Every task has Acceptance Criteria (no exceptions, in any phase)
 - [ ] Each `Type` is a single value; tasks spanning types were split
@@ -225,15 +228,18 @@ Copy this skeleton, paste your documentation into the placeholders, and submit. 
 </persona>
 
 <data-model>
-[Paste relevant entity definitions from data-model.md]
+[Paste docs/data-model/index.md conventions + the entity shards
+ (docs/data-model/entities/) referenced by the work item]
 </data-model>
 
 <api-spec>
-[Paste relevant endpoint definitions from api-spec.md]
+[Paste docs/api-spec/index.md conventions + the endpoint shards
+ (docs/api-spec/endpoints/) referenced by the work item]
 </api-spec>
 
 <ui-specification>
-[Paste relevant screen specs from ui-specification.md]
+[Paste docs/ui-specification/index.md Design System + the screen shards
+ (docs/ui-specification/screens/) referenced by the work item]
 </ui-specification>
 
 </context>

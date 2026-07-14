@@ -71,7 +71,9 @@ A team lead can create project-scoped labels, assign them to tasks, and filter t
 | Task (existing, modified) | Displays and filters by assigned labels | No changes to task fields; board query gains an optional label filter |
 | Project (existing) | Owns labels | Label list is visible to all project members; create/rename/delete restricted to members with edit rights |
 
-**New entities required:** Label, TaskLabel (join table) — `docs/data-model.md` must be updated before task generation (flagged: Labels module section missing).
+> **Retrieval key:** shards to load — `docs/data-model/entities/label.md` (new), `docs/data-model/entities/task-label.md` (new), `docs/data-model/entities/task.md`, `docs/data-model/entities/project.md`.
+
+**New entities required:** Label, TaskLabel (join table) — create `docs/data-model/entities/label.md` and `docs/data-model/entities/task-label.md` before task generation, and add the Labels module ownership row + relationships overview entries to `docs/data-model/index.md`.
 
 ---
 
@@ -86,7 +88,9 @@ A team lead can create project-scoped labels, assign them to tasks, and filter t
 | /api/v1/tasks/{id}/labels | PUT | New | Replace the set of labels on a task (array of label IDs) |
 | /api/v1/projects/{projectId}/tasks | GET | Modified | Gains optional `labelId` query parameter for board filtering |
 
-**New endpoints required:** All five label endpoints above — `docs/api-spec.md` needs a new "Labels" resource section under the Projects module.
+> **Retrieval key:** shards to load — `docs/api-spec/endpoints/labels.md` (new — all five label endpoints; nested routes group under the resource being operated on) and `docs/api-spec/endpoints/tasks.md` (modified — board list gains `labelId`).
+
+**New endpoints required:** All five label endpoints above — create `docs/api-spec/endpoints/labels.md` and add its rows to the Endpoint Summary in `docs/api-spec/index.md`.
 
 ---
 
@@ -99,7 +103,9 @@ A team lead can create project-scoped labels, assign them to tasks, and filter t
 | Label Management Dialog | New | Create/rename/recolor/delete labels; opened from board toolbar and project settings |
 | LabelChip (shared component) | New | Reusable chip rendering label name + color, used by board cards, detail panel, and picker |
 
-**New screens required:** Label Management Dialog — must be added to `docs/ui-specification.md`; related frontend tasks should be classified `mockup-first`.
+> **Retrieval key:** shards to load — `docs/ui-specification/screens/project-board.md`, `docs/ui-specification/screens/task-detail-panel.md`, `docs/ui-specification/screens/label-management-dialog.md` (new), and `docs/ui-specification/components.md` (LabelChip).
+
+**New screens required:** Label Management Dialog — create `docs/ui-specification/screens/label-management-dialog.md` and add its Screen Inventory row to `docs/ui-specification/index.md`; LabelChip goes in `docs/ui-specification/components.md`. Related frontend tasks should be classified `mockup-first`.
 
 ---
 
@@ -117,7 +123,7 @@ A team lead can create project-scoped labels, assign them to tasks, and filter t
 ## 10. Constraints
 
 - Must not slow initial board load — labels are included in the existing board tasks response, not fetched per card
-- No new external dependencies for the color picker; use the design-system palette tokens from `docs/ui-specification.md` Section 2.1
+- No new external dependencies for the color picker; use the design-system palette tokens from `docs/ui-specification/index.md` Section 2.1
 - Board filtering must remain server-side (query parameter) so results stay correct with pagination
 
 **Non-Functional Requirements (optional):** Label filter round-trip (select → filtered board rendered) under 300ms at P95 for boards up to 500 tasks; label chips must meet WCAG 2.1 AA contrast (4.5:1) for chip text on every palette color.
@@ -157,3 +163,18 @@ When generating tasks from this Feature Brief:
 6. **Edge case coverage**: Every edge case in Section 9 must be addressed — either as a dedicated task or as acceptance criteria within a related task.
 7. **Constraint respect**: All constraints in Section 10 must be respected across all generated tasks.
 8. **Traceability**: Include the Feature Brief ID (FEAT-XXX) in the task generation output summary for cross-referencing.
+
+---
+
+## Acceptance Criteria Coverage
+
+> *Reference shape — feature task generation produces this table at the end of the task list (`tasks/FEAT-001-tasks.md`), mapping every AC from Section 5 to the tasks whose acceptance criteria cover it. It is cross-checked by `python .ai-framework/tools/validate-tasks.py tasks/FEAT-001-tasks.md --work-item docs/work-items/FEAT-001-task-labels.md`.*
+
+| Work Item AC | Covered By |
+|--------------|------------|
+| AC-1: Create a label with name (1–30 chars) + palette color; appears in the project's label list | T-001, T-002, T-006 |
+| AC-2: Assign/remove labels from the task detail panel; persists and updates the board card without reload | T-004, T-007, T-008 |
+| AC-3: Board filter by a label shows only matching tasks; clearing restores the full board | T-005, T-009 |
+| AC-4: Renaming/recoloring a label updates every task card displaying it | T-003, T-008 |
+| AC-5: Deleting a label removes it from all tasks after a confirmation stating the affected count | T-003, T-010 |
+| AC-6: Duplicate label name in the same project returns a validation error with an inline UI message | T-002, T-006 |

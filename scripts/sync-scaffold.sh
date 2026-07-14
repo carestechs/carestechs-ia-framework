@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Sync the root framework sources (templates/, prompts/, guides/) into the
-# scaffold's bundled copy at scaffold/.ai-framework/.
+# Sync the root framework sources (templates/, prompts/, guides/, tools/) into
+# the scaffold's bundled copy at scaffold/.ai-framework/.
 #
 # Usage:
 #   scripts/sync-scaffold.sh           # regenerate the scaffold copy
@@ -11,7 +11,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-DIRS=(templates prompts guides)
+DIRS=(templates prompts guides tools)
 
 if [[ "${1:-}" == "--check" ]]; then
   status=0
