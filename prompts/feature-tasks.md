@@ -1,24 +1,116 @@
-# Feature Task Generation Prompt (v2)
-
-> **Purpose**: Generate implementation tasks for a new feature. Use this prompt when you have a Feature Brief (or feature idea) and need to break it down into actionable development tasks.
->
-> **v2 Note**: This version uses 10 core templates (7 system templates + 3 work item templates). Features should be described in a **Feature Brief** (`docs/work-items/FEAT-*.md`) before task generation. The inline `<feature-summary>` is still supported as a fallback for quick/ad-hoc usage.
+# Feature Task Generation Prompt
 
 ---
 
-## How to Use This Template
+## Purpose
 
-**AI agents (Claude Code, etc.):** Skip the XML context assembly below — you have direct file access. Instead:
-1. Read the files listed in CLAUDE.md's routing table for "New feature"
-2. Read the Feature Brief from `docs/work-items/FEAT-*.md` for the target feature. If no Feature Brief exists, gather the feature details from the user and use the inline `<feature-summary>` fallback
-3. Use the **Output Format** section below as your deliverable structure
-4. Apply the **Constraints** and **Post-Generation Checklist** to shape your output
+Generate implementation tasks for a new feature. Use this prompt when you have a Feature Brief (or feature idea) and need to break it down into actionable development tasks.
 
-**Chat workflows (manual copy-paste):** Copy the XML template below, paste your documentation into the `<context>` sections, and submit to Claude.
+Features should be described in a **Feature Brief** (`docs/work-items/FEAT-XXX-short-title.md`) before task generation. An inline description (`<inline-request>`) is supported as a fallback for quick/ad-hoc usage.
+
+This prompt uses the **canonical task schema defined in `prompts/base-template.md`** (field list, order, enums, grouping). Deltas declared here: none to the `Type` enum — only the workflow-classification rules and summary section below.
 
 ---
 
-## Prompt Template (Chat Workflow)
+## How to Use
+
+- **AI agents (Claude Code, etc.):** Read the context files listed in your project CLAUDE.md's routing table for "New feature", read the Feature Brief from `docs/work-items/FEAT-XXX-short-title.md` (if none exists, gather the feature details from the user as an inline request), follow the sections below, and **write** the task list to `tasks/FEAT-XXX-tasks.md` (or `tasks/adhoc-short-title-tasks.md` for inline requests with no work item).
+- **Chat workflows (manual copy-paste):** Use the XML skeleton in the [Chat Workflow Template (XML)](#chat-workflow-template-xml) appendix. Include this prompt's Output Format and Constraints sections alongside the skeleton so the assistant knows the expected schema.
+
+---
+
+## Required Context
+
+Context selection lives in the **canonical matrix**: `guides/context-compilation.md` (humans) or the CLAUDE.md routing table (agents).
+
+For features: **required** = Feature Brief + Stakeholder Definition + CLAUDE.md; **recommended** = Data Model, API Spec, UI Specification (include when the feature touches data/API/UI — typical), Architecture, Persona.
+
+Prompt-specific notes:
+
+- **Feature Brief** (preferred): `docs/work-items/FEAT-XXX-short-title.md` provides structured scope, traceability, entity/API/UI impact assessment, and constraint documentation. Generates higher-quality tasks.
+- **Inline `<inline-request>`** (fallback): use for quick/ad-hoc features when a full Feature Brief hasn't been written yet. Faster but less structured.
+
+---
+
+## Guidance
+
+Generate a complete task breakdown for the feature. Tasks should:
+
+1. Cover all acceptance criteria
+2. Include necessary database/data model changes
+3. Include API endpoints if applicable
+4. Include frontend/UI implementation
+5. Include error handling and edge cases
+6. Include testing at all levels (unit, integration, e2e)
+7. Consider monitoring/logging requirements
+
+Do not include:
+
+- Tasks outside the defined scope (see stakeholder scope lock)
+- Over-engineered solutions beyond the requirements
+
+### Workflow Classification
+
+Set the **Workflow** field on each task using these rules (all three values from the canonical schema are valid):
+
+- **`mockup-first`** — Type is Frontend AND the task adds a new user-facing screen or significantly changes an existing screen layout. **Exception:** standard CRUD screens (list/detail/form) or screens that follow an already-approved mockup pattern.
+- **`investigation-first`** — the task's requirements are ambiguous or depend on unknowns in the existing system; investigate and document findings before implementing.
+- **`standard`** — all other tasks.
+
+When a task is marked `mockup-first`, its description should note which screen needs a mockup and reference `.ai-framework/prompts/mockup-generation.md`.
+
+---
+
+## Output Format
+
+**Output file:** `tasks/FEAT-XXX-tasks.md` (matching the Feature Brief's ID; `tasks/adhoc-short-title-tasks.md` for inline requests). AI agents write this file — the task list is not just chat output.
+
+**Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` uses the base enum (Backend | Frontend | Database | Testing | DevOps | Documentation) — no deltas for features.
+
+**Grouping:** the canonical scheme — Foundation → Backend → Frontend → Integration → Testing → Documentation & Polish (omit empty groups).
+
+**Summary section** — after all tasks, provide:
+
+- Total task count by type
+- Estimated complexity distribution
+- Critical path (longest dependency chain)
+- Risks or open questions discovered during analysis
+
+---
+
+## Constraints
+
+- No tasks outside the stakeholder scope lock
+- No over-engineered solutions beyond the requirements
+- One `Type` per task — split tasks that span types
+- Dependencies are plain task ID lists (or `None`) forming a valid DAG
+- Apply the project-specific constraints supplied in the request, e.g.:
+  - Technology stack: [technologies that must be used]
+  - Timeline constraint: [if any]
+  - Dependency constraints: [external factors]
+  - Security requirements: [specific security needs]
+
+---
+
+## Post-Generation Checklist
+
+After Claude generates tasks, verify:
+
+- [ ] All acceptance criteria have corresponding tasks
+- [ ] Database/model changes come before code that uses them
+- [ ] API endpoints are defined before frontend integration
+- [ ] Error handling tasks exist for important error scenarios
+- [ ] Testing tasks cover happy path and edge cases
+- [ ] No tasks violate stakeholder scope lock
+- [ ] Complexity estimates seem reasonable (full `S | M | L | XL` scale)
+- [ ] Every task block has Acceptance Criteria and all canonical schema fields
+- [ ] Dependencies form a valid DAG (no cycles)
+- [ ] Critical path is identified and sensible
+- [ ] Task list saved to `tasks/FEAT-XXX-tasks.md` (agents)
+
+---
+
+## Chat Workflow Template (XML)
 
 ```xml
 <task-generation-request>
@@ -65,17 +157,17 @@
 <task-type>New Feature</task-type>
 
 <feature-brief>
-<!-- PREFERRED: Paste the full Feature Brief document (from docs/work-items/FEAT-XXX-name.md) -->
-<!-- The Feature Brief template provides structured fields for scope, acceptance criteria,
+<!-- PREFERRED: Paste the full Feature Brief document (from docs/work-items/FEAT-XXX-short-title.md).
+     The Feature Brief template provides structured fields for scope, acceptance criteria,
      entity/API/UI impact, edge cases, constraints, and traceability.
      See .ai-framework/templates/feature-brief.md for the full template. -->
 [Paste full Feature Brief content]
 </feature-brief>
 
-<!-- FALLBACK: If no Feature Brief exists, use this inline summary instead.
+<!-- FALLBACK: If no Feature Brief exists, use this inline request instead.
      Remove the <feature-brief> block above and uncomment this block. -->
 <!--
-<feature-summary>
+<inline-request>
 Feature Name: [Name]
 User Story: As a [persona], I want to [action], so that [benefit]
 Primary Goal: [One sentence describing success]
@@ -92,24 +184,12 @@ Key Entities Involved:
 Edge Cases:
 - [Edge case 1]
 - [Edge case 2]
-</feature-summary>
+</inline-request>
 -->
 
 <request>
 Generate a complete task breakdown for implementing this feature.
-
-Tasks should:
-1. Cover all acceptance criteria
-2. Include necessary database/data model changes
-3. Include API endpoints if applicable
-4. Include frontend/UI implementation
-5. Include error handling and edge cases
-6. Include testing at all levels (unit, integration, e2e)
-7. Consider monitoring/logging requirements
-
-Do not include:
-- Tasks outside the defined scope (see stakeholder scope lock)
-- Over-engineered solutions beyond the requirements
+[Add any feature-specific focus or emphasis here.]
 </request>
 
 <constraints>
@@ -120,96 +200,16 @@ Do not include:
 - Security requirements: [Specific security needs]
 </constraints>
 
-<output-format>
-## Task Output Format
-
-For each task, provide:
-
-```
-### T-[XXX]: [Task Title]
-
-**Type:** [Backend | Frontend | Database | Testing | DevOps | Documentation]
-**Workflow:** [standard | mockup-first]
-**Complexity:** [S | M | L | XL]
-**Dependencies:** [T-XXX, T-YYY or "None"]
-
-**Description:**
-[2-3 sentences describing what needs to be done]
-
-**Rationale:**
-[1-2 sentences: why this task exists — which requirement, business rule, or acceptance criterion it addresses]
-
-**Acceptance Criteria:**
-- [ ] [Testable criterion 1]
-- [ ] [Testable criterion 2]
-- [ ] [Testable criterion 3]
-
-**Files to Modify/Create:**
-- [file/path/example.ts] - [what changes]
-- [file/path/other.ts] - [what changes]
-
-**Technical Notes:**
-[Any implementation guidance, patterns to follow, or gotchas to avoid]
-```
-
-## Workflow Classification
-
-Set the **Workflow** field on each task using these rules:
-
-- **`mockup-first`** — Type is Frontend AND the task adds a new user-facing screen or significantly changes an existing screen layout. **Exception:** standard CRUD screens (list/detail/form) or screens that follow an already-approved mockup pattern.
-- **`standard`** — all other tasks.
-
-When a task is marked `mockup-first`, its description should note which screen needs a mockup and reference `.ai-framework/prompts/mockup-generation.md`.
-
-## Task Grouping
-
-Group tasks in this order:
-1. **Foundation** - Database, models, types
-2. **Backend** - Services, API endpoints
-3. **Frontend** - Components, pages, state
-4. **Integration** - Connecting pieces
-5. **Testing** - Unit, integration, e2e tests
-6. **Polish** - Error handling, edge cases, logging
-
-## Summary Section
-
-After all tasks, provide:
-- Total task count by type
-- Estimated complexity distribution
-- Critical path (longest dependency chain)
-- Risks or open questions discovered during analysis
-</output-format>
-
 </task-generation-request>
 ```
 
 ---
 
-## Context Selection Guide (v2)
+## Example
 
-### What to Include
+Pizza ordering feature.
 
-| Document | When to Include | What to Include |
-|----------|-----------------|-----------------|
-| Feature Brief | Always (preferred) | Full `docs/work-items/FEAT-*.md` for target feature |
-| Stakeholder Definition | Always | Philosophy, principles, scope lock, success metrics |
-| CLAUDE.md | Always | Full document |
-| Data Model | Features involving entities | Relevant entity definitions, fields, relationships |
-| API Specification | Features with API endpoints | Relevant endpoint definitions, DTOs, status codes |
-| UI Specification | User-facing features | Relevant screen specs, component hierarchy, interactions, states |
-| Architecture | Multi-component features | Affected components, data flow |
-| Persona | User-facing features | Pain points, behavior, success criteria |
-
-### Feature Brief vs Inline Summary
-
-- **Feature Brief** (preferred): Use `docs/work-items/FEAT-*.md`. Provides structured scope, traceability, entity/API/UI impact assessment, and constraint documentation. Generates higher-quality tasks.
-- **Inline `<feature-summary>`** (fallback): Use for quick/ad-hoc features when a full Feature Brief hasn't been written yet. Faster but less structured.
-
----
-
-## Example: Pizza Ordering Feature
-
-> **Note:** This example uses the inline `<feature-summary>` fallback for brevity. For higher-quality task generation, use a full Feature Brief document via `<feature-brief>` as described in the Prompt Template above.
+> **Note:** This example uses the inline `<inline-request>` fallback for brevity. For higher-quality task generation, use a full Feature Brief document via `<feature-brief>` as described above.
 
 ```xml
 <task-generation-request>
@@ -253,7 +253,7 @@ User → WhatsApp → Flow Engine → Order Service → Database
 
 <task-type>New Feature</task-type>
 
-<feature-summary>
+<inline-request>
 Feature Name: Half-and-Half Pizza Selection
 User Story: As a pizza customer, I want to select two different flavors for my pizza (half-and-half), so that I can enjoy variety in one order.
 Primary Goal: Enable two-flavor pizza orders without keyboard input
@@ -272,7 +272,7 @@ Key Entities Involved:
 Edge Cases:
 - Same flavor selected for both halves (allow, no surcharge)
 - User changes size after selecting flavors (reset selections)
-</feature-summary>
+</inline-request>
 
 <request>
 Generate implementation tasks for the half-and-half pizza feature.
@@ -287,25 +287,5 @@ WhatsApp Flows pattern used for single-flavor selection.
 - Pricing calculation must be server-side
 </constraints>
 
-<output-format>
-[Standard format as specified above]
-</output-format>
-
 </task-generation-request>
 ```
-
----
-
-## Post-Generation Checklist
-
-After Claude generates tasks, verify:
-
-- [ ] All acceptance criteria have corresponding tasks
-- [ ] Database/model changes come before code that uses them
-- [ ] API endpoints are defined before frontend integration
-- [ ] Error handling tasks exist for important error scenarios
-- [ ] Testing tasks cover happy path and edge cases
-- [ ] No tasks violate stakeholder scope lock
-- [ ] Complexity estimates seem reasonable
-- [ ] Dependencies form a valid DAG (no cycles)
-- [ ] Critical path is identified and sensible

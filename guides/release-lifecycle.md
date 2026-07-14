@@ -131,9 +131,9 @@ Use this checklist when a version ships and the team decides to switch to contin
 4. **Update spec document headers**
    - Drop "(vX)" from document titles
    - Change status lines from "Active — authoritative for vX development" to "Active — living document, continuously updated"
-   - Update Change Policy sections to remove version-gated language
+   - Update references to the Scope Lock / Under Consideration / Not Planned sections to remove version-gated language
 
-5. **Update AI Task Generation Notes**
+5. **Update Usage Notes for AI Task Generation**
    - Change references from "Scope Lock" to the new section names (Current Work, Not Planned, Under Consideration)
    - Ensure the notes reference the continuous model structure
 

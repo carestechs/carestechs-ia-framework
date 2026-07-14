@@ -1,10 +1,12 @@
 # Data Model
 
-## Overview
+## 1. Overview
+
+### 1.1 Model Summary
 
 <!-- TODO: Describe the domain at a high level — what the system models, how many modules own data, and any key modeling decisions -->
 
-### Key Modeling Decisions
+### 1.2 Key Modeling Decisions
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -12,20 +14,20 @@
 | <!-- e.g., Soft vs hard deletes --> | <!-- e.g., Soft deletes with `deleted_at` --> | <!-- e.g., Audit trail --> |
 | <!-- e.g., Timestamp handling --> | <!-- e.g., TIMESTAMPTZ, always UTC --> | <!-- e.g., Timezone consistency --> |
 
-## Module Ownership
+## 2. Module Ownership
 
 <!-- TODO: Every entity belongs to exactly one module -->
 
-| Module | Entities Owned | DbContext |
-|--------|---------------|-----------|
+| Module | Entities Owned | Persistence Unit [e.g., EF Core DbContext / Prisma schema] |
+|--------|---------------|-------------------------------------------------------------|
 | <!-- e.g., Users --> | <!-- e.g., User, Role --> | <!-- e.g., UsersDbContext --> |
 | <!-- e.g., Projects --> | <!-- e.g., Project, ProjectMember --> | <!-- e.g., ProjectsDbContext --> |
 
-## Entity Definitions
+## 3. Entity Definitions
 
 <!-- TODO: Define each entity with fields, types, and constraints. See .ai-framework/templates/data-model.md for the full template. -->
 
-### [Entity Name]
+### 3.1 [Entity Name]
 
 > *Module: [Owning Module] — [One-sentence description]*
 
@@ -44,23 +46,23 @@
 
 ---
 
-<!-- TODO: Repeat entity definition blocks for each entity -->
+<!-- TODO: Repeat entity definition blocks (3.2, 3.3, ...) for each entity -->
 
-## Relationships
+## 4. Relationships
 
-### One-to-Many
+### 4.1 One-to-Many Relationships
 
 | Parent Entity | Child Entity | Foreign Key | Cascade Behavior |
 |---------------|-------------|-------------|-----------------|
 | <!-- e.g., Project --> | <!-- e.g., Task --> | <!-- e.g., project_id on Task --> | <!-- e.g., Cascade delete --> |
 
-### Many-to-Many
+### 4.2 Many-to-Many Relationships
 
 | Entity A | Entity B | Join Table | Additional Fields |
 |----------|----------|-----------|-------------------|
 | <!-- e.g., Task --> | <!-- e.g., Label --> | <!-- e.g., task_labels --> | <!-- e.g., assigned_at --> |
 
-### Cross-Module References
+### 4.3 Cross-Module References
 
 <!-- These are ID-only references — no navigation properties across module boundaries -->
 
@@ -68,11 +70,13 @@
 |----------------------|----------------------|-------|---------|
 | <!-- e.g., Task (Tasks) --> | <!-- e.g., User (Users) --> | <!-- e.g., assignee_id --> | <!-- e.g., Task assignment --> |
 
-## Enums
+## 5. Enums and Value Types
+
+### 5.1 Enums
 
 <!-- TODO: Define enums used by entities -->
 
-### [EnumName]
+#### [EnumName]
 
 > *Used by: [Entity.field]*
 
@@ -81,7 +85,7 @@
 | <!-- e.g., Active --> | <!-- e.g., Currently active --> |
 | <!-- e.g., Archived --> | <!-- e.g., Soft-archived, hidden from default views --> |
 
-## Database Conventions
+## 6. Database Conventions
 
 | Convention | Rule | Example |
 |------------|------|---------|
@@ -90,9 +94,15 @@
 | Primary keys | <!-- e.g., UUID, column named `id` --> | <!-- e.g., id UUID PK --> |
 | Timestamps | <!-- e.g., TIMESTAMPTZ, always present --> | <!-- e.g., created_at, updated_at --> |
 
-## AI Task Generation Notes
+## Usage Notes for AI Task Generation
 
-- **Module boundaries**: Every data-access task must target the correct module's DbContext
+- **Module boundaries**: Every data-access task must target the correct module's persistence unit [e.g., DbContext / Prisma client / repository]
 - **Field completeness**: Generated entity classes must include all fields defined here
 - **Relationship integrity**: Ensure cascade behaviors and cross-module ID-only references are respected
-- **Naming conventions**: Table and column names must follow the conventions above
+- **Naming conventions**: Table and column names must follow the conventions in Section 6
+
+## Changelog
+
+| Date | Author | Change Description | Reason |
+|------|--------|-------------------|--------|
+| YYYY-MM-DD | [name] | Initial version | — |

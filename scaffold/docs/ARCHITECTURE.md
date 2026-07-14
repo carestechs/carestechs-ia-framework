@@ -1,10 +1,12 @@
 # Architecture
 
-## System Summary
+## 1. Overview
+
+### 1.1 System Summary
 
 <!-- TODO: Describe the system in 2-3 sentences -->
 
-### Key Architectural Decisions
+### 1.2 Key Architectural Decisions
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
@@ -12,7 +14,7 @@
 | <!-- e.g., Database --> | <!-- e.g., PostgreSQL --> | <!-- e.g., Relational data, strong consistency needs --> |
 | <!-- e.g., Hosting --> | <!-- e.g., Vercel --> | <!-- e.g., Zero-config deploys, edge network --> |
 
-## Technology Stack
+## 2. Technology Stack
 
 <!-- TODO: List your chosen technologies -->
 
@@ -24,7 +26,9 @@
 | **Infrastructure** | <!-- e.g., Vercel, AWS S3 --> | <!-- e.g., Hosting, file storage --> |
 | **Auth** | <!-- e.g., NextAuth, Clerk --> | <!-- e.g., User authentication --> |
 
-## Component Architecture
+## 3. Component Architecture
+
+### 3.1 High-Level Component Diagram
 
 <!-- TODO: Replace with your actual components -->
 
@@ -41,7 +45,7 @@
                      └──────────────┘
 ```
 
-### Component Descriptions
+### 3.2 Component Descriptions
 
 **[Component 1]**
 - **Purpose:** <!-- What does it do? -->
@@ -53,7 +57,7 @@
 - **Responsibilities:** <!-- What is it in charge of? -->
 - **Key Dependencies:** <!-- What does it depend on? -->
 
-## Data Flow
+## 4. Data Flow
 
 <!-- TODO: Describe the primary data flow through your system -->
 
@@ -62,7 +66,9 @@
 3. <!-- e.g., Backend validates, transforms, stores in database -->
 4. <!-- e.g., Response returned to frontend, UI updates -->
 
-## Integration Points
+## 5. Integration Points
+
+### 5.1 External Services
 
 <!-- TODO: List any external services or APIs your system talks to -->
 
@@ -73,16 +79,33 @@
 
 *If none yet, write "None planned for v1" and move on.*
 
-## Security Architecture
+## 6. Security & Observability
 
-<!-- TODO: Fill in what applies to your system -->
+### 6.1 Authentication
 
-- **Authentication:** <!-- How do users prove who they are? -->
-- **Authorization:** <!-- How do you control what users can do? -->
-- **Data Protection:** <!-- How is sensitive data handled? Encryption at rest/transit? -->
+- <!-- How do users prove who they are? -->
+
+### 6.2 Authorization
+
+- <!-- How do you control what users can do? -->
+
+### 6.3 Data Protection
+
+- <!-- How is sensitive data handled? Encryption at rest/transit? -->
 - **API Security:** <!-- Rate limiting, input validation, CORS? -->
 
-## AI Task Generation Notes
+### 6.4 Observability
+
+<!-- TODO: How is the running system watched? One row per concern is enough. -->
+
+| Concern | Tooling / Approach | Key Conventions |
+|---------|-------------------|-----------------|
+| Logging | <!-- e.g., Structured JSON logs --> | <!-- e.g., No PII in logs; include request ID --> |
+| Metrics | <!-- e.g., Prometheus + Grafana --> | <!-- e.g., RED metrics per endpoint --> |
+| Tracing | <!-- e.g., OpenTelemetry --> | <!-- e.g., Propagate trace ID --> |
+| Alerting | <!-- e.g., PagerDuty on error-rate threshold --> | <!-- e.g., Alert on symptoms, not causes --> |
+
+## Usage Notes for AI Task Generation
 
 > These notes help AI assistants generate technically correct tasks.
 
@@ -90,3 +113,10 @@
 - **Follow the defined data flow.** New features should fit the existing patterns.
 - **Use only listed technologies** unless proposing a migration (which needs its own task).
 - **Honor the security architecture.** Every new endpoint needs auth/authz consideration.
+- **Follow the Failure Strategy** declared in Section 5.1 for every external service call.
+
+## Changelog
+
+| Date | Author | Change Description | Reason |
+|------|--------|-------------------|--------|
+| YYYY-MM-DD | [name] | Initial version | — |

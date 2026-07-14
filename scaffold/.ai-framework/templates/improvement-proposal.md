@@ -16,10 +16,11 @@
 | **Type** | [Refactoring · Performance · Testability · Maintainability · Security · Accessibility · Developer Experience] |
 | **Status** | [Proposed · Approved · In Progress · Completed · Deferred · Rejected] |
 | **Priority** | [Critical · High · Medium · Low] |
+| **Estimated Effort** | [S · M · L · XL] |
 | **Proposed By** | [Who proposed this — developer, tech lead, automated analysis, incident review] |
 | **Date Created** | [YYYY-MM-DD] |
 
-<!-- TODO: Fill in all identity fields. Use a sequential ID (IMP-001, IMP-002, etc.). Choose the Type that best describes the primary motivation. -->
+<!-- TODO: Fill in all identity fields. Use a sequential ID (IMP-001, IMP-002, etc.). Choose the Type that best describes the primary motivation. Estimated Effort guide: S = hours, M = 1-2 days, L = up to a week, XL = multi-week (consider splitting into phases). -->
 
 ---
 

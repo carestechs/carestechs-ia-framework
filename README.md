@@ -1,10 +1,14 @@
-# AI Task Generation Documentation Framework (v2)
+# AI Task Generation Documentation Framework
 
 A comprehensive documentation framework that captures the essential context to enable AI-assisted task generation for software projects.
 
+Current version: see [`CHANGELOG.md`](CHANGELOG.md) and `scaffold/.ai-framework/VERSION`.
+
 ## Overview
 
-This is the **v2** version of the framework, expanding on v1's 4 foundational templates to include **10 core templates** that provide complete coverage from strategic planning through work item definition. The framework also includes 10 prompt templates for different task types and 4 workflow guides.
+The framework provides **10 core templates** that cover a project from strategic planning through work item definition, **10 prompt templates** for different task types, and **4 workflow guides**.
+
+**Applicability:** the framework assumes a web application with a REST API as its default shape (that's what the Data Model, API Spec, and UI Spec layers describe). For CLI tools, libraries, or headless services, skip or substitute the API/UI layers — the strategic, architectural, and implementation layers apply to any project.
 
 ### Why 10 Templates?
 
@@ -29,7 +33,7 @@ The framework defines 10 templates across 6 layers. Together they answer every q
 ```
 Layer 1: Strategic (WHO/WHY)
     |-- personas/               Who are we building for?
-    |-- stakeholder.md          Why are we building this? What's in scope?
+    |-- stakeholder-definition.md  Why are we building this? What's in scope?
     v
 Layer 2: Architectural (WHAT)
     |-- ARCHITECTURE.md         How is the system structured?
@@ -68,29 +72,32 @@ Persona ──────→ Stakeholder
 CLAUDE.md (independent — cross-cuts all layers)
 ```
 
-Recommended order: Persona → Stakeholder → Architecture → CLAUDE.md → Data Model → API Spec → UI Spec → Work Items.
+Recommended order: Persona → Stakeholder → CLAUDE.md → Architecture → Data Model → API Spec → UI Spec → Work Items.
 
 ---
 
 ## Quick Start
 
-**Fastest path:** Copy the scaffold, fill in the templates, start generating tasks. The scaffold includes a bundled `.ai-framework/` folder with all templates, prompts, and guides — everything is self-contained.
+**Fastest path:** Copy the scaffold, fill in the templates, start generating tasks. The scaffold includes a bundled `.ai-framework/` folder with all templates, prompts, and guides, plus ready-made Claude Code slash commands — everything is self-contained.
 
 ```bash
-# Copy the scaffold into your project (includes .ai-framework/ reference)
-cp -r path/to/ai-task-framework-v2/scaffold/* path/to/ai-task-framework-v2/scaffold/.ai-framework your-project/
+# From your project root (the /. suffix also copies dotfolders like .ai-framework/ and .claude/)
+cp -r path/to/carestechs-ia-framework/scaffold/. .
 ```
+
+> **Caution:** if your project already has a `CLAUDE.md`, the copy will overwrite it — merge the scaffold's CLAUDE.md into yours manually instead.
 
 Then follow the **[Getting Started Guide](guides/getting-started.md)** for a step-by-step walkthrough.
 
 ### The Short Version
 
 1. **Copy scaffold** — Get the fill-in-ready template structure (`scaffold/`)
-2. **Fill system templates** — Answer the guided questions in each file (~1-2 hours)
+2. **Fill system templates** — Answer the guided questions in each file
 3. **Generate specs** — Use spec-generation prompts to derive Data Model, API Spec, and UI Spec
-4. **Write work items** — Create Feature Briefs, Bug Reports, or Improvement Proposals in `docs/work-items/`
-5. **Generate tasks** — Use prompt templates from `prompts/` with your documentation + work items as context
-6. **Maintain** — Keep docs updated as your project evolves
+4. **Write work items** — Copy a `TEMPLATE-*` starter in `docs/work-items/` to `FEAT-XXX-short-title.md` and fill it
+5. **Generate tasks** — Use prompt templates from `prompts/` (or the `/feature-tasks` etc. slash commands in Claude Code); task lists are saved to `tasks/`
+6. **Plan & implement** — Generate per-task implementation plans into `plans/`, then implement
+7. **Maintain** — Keep docs updated as your project evolves
 
 **Two paths depending on where you are:**
 
@@ -104,122 +111,92 @@ Then follow the **[Getting Started Guide](guides/getting-started.md)** for a ste
 ## Directory Contents
 
 ```
-ai-task-framework-v2/
+carestechs-ia-framework/
 ├── README.md                    # This file
+├── CHANGELOG.md                 # Framework version history
+├── scripts/
+│   └── sync-scaffold.sh         # Regenerates scaffold/.ai-framework/ from root sources
 ├── scaffold/                    # Ready-to-copy project structure
-│   ├── README.md               # Scaffold usage instructions
-│   ├── CLAUDE.md               # Fill-in-ready code conventions (with AI framework section)
-│   ├── .ai-framework/          # Bundled framework reference
-│   │   ├── VERSION             # Framework version (v2)
-│   │   ├── README.md           # What this folder is
-│   │   ├── templates/          # Full reference templates (copied)
-│   │   ├── prompts/            # Prompt templates (copied)
-│   │   └── guides/             # Workflow guides (copied)
-│   └── docs/
-│       ├── personas/
-│       │   └── primary-user.md # Fill-in-ready persona
-│       ├── stakeholder-definition.md  # Fill-in-ready stakeholder def
-│       ├── ARCHITECTURE.md     # Fill-in-ready architecture doc
-│       ├── data-model.md       # Fill-in-ready data model
-│       ├── api-spec.md         # Fill-in-ready API specification
-│       ├── ui-specification.md # Fill-in-ready UI specification
-│       └── work-items/         # Work item documents
-│           ├── FEAT-001-example.md  # Fill-in-ready feature brief
-│           ├── BUG-001-example.md   # Fill-in-ready bug report
-│           └── IMP-001-example.md   # Fill-in-ready improvement proposal
-├── templates/                   # Full reference templates (10 core)
-│   ├── persona.md              # Target user definition
-│   ├── stakeholder.md          # Product philosophy & scope
-│   ├── architecture.md         # System architecture
-│   ├── claude-md.md            # Code conventions (CLAUDE.md)
-│   ├── data-model.md           # Domain entity definitions
-│   ├── api-spec.md             # REST API endpoint contracts
-│   ├── ui-specification.md     # Screen layouts & component specs
-│   ├── feature-brief.md        # Feature description before task gen
-│   ├── bug-report.md           # Bug description before investigation
-│   └── improvement-proposal.md # Improvement description before refactoring
-├── prompts/                     # Claude-optimized prompt templates
-│   ├── base-template.md        # Common prompt structure
-│   ├── feature-tasks.md        # Generate feature tasks
-│   ├── bugfix-tasks.md         # Generate bugfix tasks
-│   ├── refactor-tasks.md       # Generate refactoring tasks
-│   ├── spec-generation.md      # Generate Data Model or API Spec
-│   ├── ui-spec-generation.md   # Generate UI Specification
-│   ├── mockup-generation.md    # Generate HTML mockup prototypes
-│   ├── plan-generation.md      # Generate implementation plans for tasks
-│   ├── compile-adrs.md         # Compile ADRs into template sections
-│   └── compile-ddrs.md         # Compile DDRs into design system sections
+│   ├── CLAUDE.md                # Fill-in-ready code conventions (with AI framework routing)
+│   ├── .claude/
+│   │   └── commands/            # Claude Code slash commands (/feature-tasks, /plan-generation, ...)
+│   ├── .ai-framework/           # Bundled framework reference (GENERATED — edit root copies instead)
+│   │   ├── VERSION              # Framework version for upgrade tracking
+│   │   ├── README.md            # Scaffold usage guide + template↔doc mapping
+│   │   ├── templates/           # Full reference templates (synced copy)
+│   │   ├── prompts/             # Prompt templates (synced copy)
+│   │   └── guides/              # Workflow guides (synced copy)
+│   ├── docs/
+│   │   ├── personas/
+│   │   │   └── primary-user.md  # Fill-in-ready persona
+│   │   ├── stakeholder-definition.md
+│   │   ├── ARCHITECTURE.md
+│   │   ├── data-model.md
+│   │   ├── api-spec.md
+│   │   ├── ui-specification.md
+│   │   └── work-items/          # Copy a TEMPLATE-* file to FEAT-XXX-title.md and fill it
+│   │       ├── TEMPLATE-feature-brief.md
+│   │       ├── TEMPLATE-bug-report.md
+│   │       └── TEMPLATE-improvement-proposal.md
+│   ├── tasks/                   # Generated task lists (tasks/FEAT-XXX-tasks.md)
+│   ├── plans/                   # Implementation plans (plans/plan-T-XXX-short-title.md)
+│   └── mockups/                 # HTML mockups (mockups/T-XXX-screen-name.html)
+├── templates/                   # SOURCE OF TRUTH — 10 core templates
+│   ├── persona.md               # → docs/personas/primary-user.md
+│   ├── stakeholder.md           # → docs/stakeholder-definition.md
+│   ├── architecture.md          # → docs/ARCHITECTURE.md
+│   ├── claude-md.md             # → CLAUDE.md (project root)
+│   ├── data-model.md            # → docs/data-model.md
+│   ├── api-spec.md              # → docs/api-spec.md
+│   ├── ui-specification.md      # → docs/ui-specification.md
+│   ├── feature-brief.md         # → docs/work-items/FEAT-XXX-*.md
+│   ├── bug-report.md            # → docs/work-items/BUG-XXX-*.md
+│   ├── improvement-proposal.md  # → docs/work-items/IMP-XXX-*.md
+│   └── examples/                # Genuinely filled work-item examples ("TaskFlow" sample product)
+├── prompts/                     # Claude-optimized prompt templates (agent-first, chat appendix)
+│   ├── base-template.md         # Canonical task schema + common prompt structure
+│   ├── feature-tasks.md         # Generate feature tasks   → tasks/FEAT-XXX-tasks.md
+│   ├── bugfix-tasks.md          # Generate bugfix tasks    → tasks/BUG-XXX-tasks.md
+│   ├── refactor-tasks.md        # Generate refactor tasks  → tasks/IMP-XXX-tasks.md
+│   ├── spec-generation.md       # Generate Data Model or API Spec
+│   ├── ui-spec-generation.md    # Generate UI Specification
+│   ├── mockup-generation.md     # Generate HTML mockup prototypes
+│   ├── plan-generation.md       # Generate implementation plans → plans/plan-T-XXX-*.md
+│   ├── compile-adrs.md          # Compile ADRs into template sections
+│   └── compile-ddrs.md          # Compile DDRs into design system sections
 └── guides/
-    ├── getting-started.md      # Full workflow: idea → AI tasks
-    ├── context-compilation.md  # How to assemble context for AI
-    ├── maintenance.md          # Keeping docs in sync with code
-    └── release-lifecycle.md    # Versioned vs continuous development
+    ├── getting-started.md       # Full workflow: idea → AI tasks
+    ├── context-compilation.md   # CANONICAL context-selection matrix + assembly instructions
+    ├── maintenance.md           # Keeping docs in sync with code
+    └── release-lifecycle.md     # Versioned vs continuous development
 ```
 
-## Context Compilation by Task Type
+### Editing the framework
 
-With 10 templates, context selection is based on task type:
+Root `templates/`, `prompts/`, and `guides/` are the single source of truth. `scaffold/.ai-framework/` is a generated copy — after editing root files, run:
 
-| Task Type | Required Context | Optional Context |
-|-----------|-----------------|------------------|
-| New Feature | Feature Brief + Stakeholder + CLAUDE.md | Data Model, API Spec, UI Spec, Persona, Architecture |
-| Bug Fix | Bug Report + CLAUDE.md | Architecture, Data Model, API Spec, UI Spec |
-| Refactoring | Improvement Proposal + CLAUDE.md + Architecture | Data Model, Stakeholder |
-| Testing | CLAUDE.md | Architecture, API Spec, UI Spec |
-| Integration | Architecture + CLAUDE.md + Data Model + API Spec | Stakeholder |
-| Prioritization | Work Items + Stakeholder + Persona | Architecture |
-| UI Mockup | UI Spec + CLAUDE.md | API Spec, Persona, Component Examples |
-| DDR Compilation | DDR files (+ optional profile) | `.ai-framework/templates/` |
+```bash
+scripts/sync-scaffold.sh          # regenerate the scaffold copy
+scripts/sync-scaffold.sh --check  # verify no drift (use in CI / pre-commit)
+```
 
-**Key insight:** Work Item documents (Feature Brief, Bug Report, Improvement Proposal) are the primary input for task generation — they describe *what* to do. System templates describe *the system* and *how* to build. CLAUDE.md appears in every task type except prioritization.
-
-See `guides/context-compilation.md` for detailed instructions.
+`scaffold/.ai-framework/README.md` and `VERSION` are maintained by hand and are not overwritten by the sync.
 
 ---
 
-## What's New in v2
+## Context Compilation by Task Type
 
-### New System Templates (3)
+The **canonical context-selection matrix** lives in [`guides/context-compilation.md`](guides/context-compilation.md) (for agents: the routing table in the project's `CLAUDE.md`). Quick teaser for the three work-item flows:
 
-| Template | Purpose |
-|----------|---------|
-| **Data Model** (`data-model.md`) | Entity definitions, fields, relationships, module ownership, database conventions |
-| **API Specification** (`api-spec.md`) | REST endpoint contracts, DTOs, auth requirements, pagination, error handling |
-| **UI Specification** (`ui-specification.md`) | Screen layouts, component hierarchy, design tokens, interaction patterns, states |
+| Task Type | Required Context | Typical Additions |
+|-----------|-----------------|-------------------|
+| New Feature | Feature Brief + Stakeholder + CLAUDE.md | Data Model, API Spec, UI Spec (when the feature touches data/API/UI), Architecture, Persona |
+| Bug Fix | Bug Report + CLAUDE.md | Architecture, Data Model, API Spec, UI Spec (per bug type) |
+| Refactoring | Improvement Proposal + CLAUDE.md + Architecture | Data Model, Stakeholder |
 
-### New Work Item Templates (3)
+Testing, Integration, and Prioritization have context recipes in the guide but no dedicated prompt — use `prompts/base-template.md` with the recipe.
 
-| Template | Purpose |
-|----------|---------|
-| **Feature Brief** (`feature-brief.md`) | Structured feature description with scope, acceptance criteria, entity/API/UI impact, traceability |
-| **Bug Report** (`bug-report.md`) | Structured bug description with reproduction steps, evidence, impact assessment, traceability |
-| **Improvement Proposal** (`improvement-proposal.md`) | Structured improvement description with current/desired state, risk assessment, success criteria |
-
-### New Prompts (6)
-
-| Prompt | Purpose |
-|--------|---------|
-| **Spec Generation** (`spec-generation.md`) | Generate Data Model or API Spec from strategic docs |
-| **UI Spec Generation** (`ui-spec-generation.md`) | Generate UI Specification from strategic + spec docs |
-| **Mockup Generation** (`mockup-generation.md`) | Generate HTML mockup prototypes for stakeholder approval |
-| **Plan Generation** (`plan-generation.md`) | Generate implementation plans for individual tasks |
-| **ADR Compilation** (`compile-adrs.md`) | Compile Architecture Decision Records into pre-filled template sections |
-| **DDR Compilation** (`compile-ddrs.md`) | Compile Design Decision Records into pre-filled design system sections |
-
-### New Guide (1)
-
-| Guide | Purpose |
-|-------|---------|
-| **Release Lifecycle** (`release-lifecycle.md`) | Versioned vs continuous development models, feature lifecycle, transition process |
-
-### Updated Files
-
-- All existing templates, prompts, and guides updated to reference 10 templates, 6-layer cone of context
-- CLAUDE.md template now includes AI-Assisted Development Framework section with routing table (including work items)
-- Stakeholder template includes continuous development model note
-- All prompts include dual "AI agents" vs "Chat workflows" usage instructions
-- Feature, bugfix, and refactor prompts updated to prefer work item documents with inline fallbacks
-- Scaffold includes `docs/work-items/` directory with fill-in-ready examples
+**Key insight:** Work Item documents (Feature Brief, Bug Report, Improvement Proposal) are the primary input for task generation — they describe *what* to do. System templates describe *the system* and *how* to build. CLAUDE.md appears in every task-generation flow.
 
 ---
 
@@ -228,7 +205,7 @@ See `guides/context-compilation.md` for detailed instructions.
 ### Document Quality
 
 - **Be specific**: Vague documentation produces vague tasks
-- **Include examples**: Real examples anchor abstract concepts
+- **Include examples**: Real examples anchor abstract concepts (see `templates/examples/` for filled work items)
 - **Stay current**: Outdated docs mislead AI and waste effort
 - **Link related docs**: Cross-reference helps AI understand connections
 
@@ -251,3 +228,9 @@ See `guides/context-compilation.md` for detailed instructions.
 - **Generate in order**: Data Model → API Spec → UI Spec (each builds on the previous)
 - **Review before next step**: Validate each spec before using it as context for the next
 - **Keep specs in sync**: Update specs when code changes (see maintenance guide)
+
+---
+
+## Version History
+
+See [`CHANGELOG.md`](CHANGELOG.md). Highlights of the v2 line: 10 core templates across 6 layers (v1 had 4), work-item templates and prompts with dual agent/chat usage, ADR/DDR compilation, release lifecycle guide. v2.1 adds defined output locations (`tasks/`, `plans/`, `mockups/`), a canonical task schema, Claude Code slash commands in the scaffold, stack-neutral prompts, and the scaffold sync script.

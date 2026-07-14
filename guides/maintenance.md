@@ -1,6 +1,6 @@
-# Documentation Maintenance Guide (v2)
+# Documentation Maintenance Guide
 
-> **Purpose**: This guide explains when and how to update the 10 core documentation types (7 system templates + 3 work item templates) to keep them synchronized with the codebase. Outdated documentation leads to incorrect AI task generation and wasted effort.
+> **Purpose**: This guide explains when and how to update the 12 documentation artifacts (10 templates + HTML mockups + Component Examples) to keep them synchronized with the codebase. Outdated documentation leads to incorrect AI task generation and wasted effort.
 
 ---
 
@@ -34,6 +34,8 @@ Treat documentation with the same rigor as code:
 
 ## Update Triggers by Document Type
 
+> **Stack note:** The checklists in this guide use a .NET + Angular + Tailwind example stack (EF Core entities, C# DTOs, Angular components, Tailwind tokens) — substitute the equivalents from the stack declared in your CLAUDE.md.
+
 ### 1. Persona Documents
 
 **Update When:**
@@ -58,6 +60,8 @@ Treat documentation with the same rigor as code:
 ---
 
 ### 2. Stakeholder Definition
+
+> **Note:** Triggers referencing Current Work / Release History / Under Consideration / Not Planned assume the continuous development model. If using the versioned model, these sections don't exist yet — see `guides/release-lifecycle.md`.
 
 **Update When:**
 - Feature shipped (move from Current Work → Release History)
@@ -236,11 +240,11 @@ Treat documentation with the same rigor as code:
 - [ ] Colors match current design tokens from UI Specification?
 - [ ] Layout matches current ASCII sketch and component hierarchy?
 - [ ] All states are accurate and correctly labeled?
-- [ ] File naming follows `mockups/{task-id}-{screen-name}.html` convention?
+- [ ] File naming follows the `mockups/T-XXX-screen-name.html` convention?
 
 ---
 
-### 9. Component Examples (from DDR Compilation)
+### 9. Component Examples (`docs/component-examples.md`, from DDR Compilation)
 
 **Update When:**
 - Design tokens change in the UI Specification (colors, typography, spacing)
@@ -250,7 +254,7 @@ Treat documentation with the same rigor as code:
 
 **Update Process:**
 1. Re-run DDR compilation using `compile-ddrs.md` with the updated DDR files or profile
-2. Replace the Component Examples Appendix with the newly compiled version
+2. Replace `docs/component-examples.md` with the newly compiled Component Examples Appendix
 3. Update any CLAUDE.md Design Patterns that changed due to updated DDR constraints
 4. Regenerate affected HTML mockups using the updated component examples as context
 
@@ -298,6 +302,8 @@ Use this checklist periodically to verify documentation is in sync with code.
 
 ### Weekly Verification
 
+> **Team-size tiering:** A weekly cadence suits multi-developer teams. Solo developers should run this checklist monthly or per-release instead — weekly is overkill when one person makes every change.
+
 - [ ] CLAUDE.md patterns match recent PRs
 - [ ] Architecture reflects any new services or endpoints
 - [ ] Data Model reflects any entity/field changes in recent PRs
@@ -317,7 +323,7 @@ Use this checklist periodically to verify documentation is in sync with code.
 
 ### Quarterly Verification
 
-- [ ] Full documentation audit across all 10 document types
+- [ ] Full documentation audit across all 12 documentation artifacts
 - [ ] Archive completed/resolved work items (move to `docs/work-items/archive/` or mark clearly)
 - [ ] Stakeholder definition alignment with product direction
 - [ ] Architecture review against deployed system
@@ -347,10 +353,9 @@ Add doc updates to PR when:
 | Changed DTO shape | API Specification |
 | Added/changed screen or page | UI Specification |
 | Changed component hierarchy | UI Specification |
-| Changed design tokens | UI Specification |
+| Changed design tokens | UI Specification + HTML Mockups (affected screens) |
 | Added/changed shared component | UI Specification |
-| Changed design tokens          | HTML Mockups (affected screens) |
-| Changed screen layout          | HTML Mockups (affected screens) |
+| Changed screen layout | HTML Mockups (affected screens) |
 
 ### PR Checklist for Reviewers
 
@@ -372,14 +377,14 @@ Every update to a living spec document must include a changelog entry at the bot
 
 **Format:**
 
-| Date | Change | Context |
-|------|--------|---------|
-| YYYY-MM-DD | Brief description of what changed | PR link, feature name, or reason |
+| Date | Author | Change Description | Reason |
+|------|--------|-------------------|--------|
+| YYYY-MM-DD | [name] | Brief description of what changed | PR link, feature name, or trigger |
 
 **Rules:**
 - One row per logical change (group related field additions into one entry, don't list each field separately)
 - Date is the date the change is made, not the date it ships
-- Context should help someone understand *why* this changed — link a PR, name the feature, or describe the trigger
+- Reason should help someone understand *why* this changed — link a PR, name the feature, or describe the trigger
 - Changelog entries are append-only — never edit or remove previous entries
 - When multiple docs are updated in the same PR, each doc gets its own changelog entry
 
@@ -450,9 +455,9 @@ Added/changed API endpoint     → API Specification
 Changed DTO shape or status    → API Specification
 Added/changed screen or page   → UI Specification
 Changed component hierarchy    → UI Specification
-Changed design tokens          → UI Specification
+Changed design tokens          → UI Specification + HTML Mockups
+                                 (affected screens)
 Added/changed shared component → UI Specification
-Changed design tokens          → HTML Mockups (affected screens)
 Changed screen layout          → HTML Mockups (affected screens)
 Updated DDR in shared repo     → Re-run DDR compilation, update
                                  Component Examples, CLAUDE.md

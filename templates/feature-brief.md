@@ -14,7 +14,7 @@
 | **ID** | FEAT-[XXX] |
 | **Name** | [Feature name — short, descriptive] |
 | **Target Version** | [Version or "Continuous"] |
-| **Status** | [Not Started · In Progress · Tasks Generated · Completed · Cancelled] |
+| **Status** | [Not Started · In Progress · Tasks Generated · Blocked · Completed · Cancelled] |
 | **Priority** | [Critical · High · Medium · Low] |
 | **Requested By** | [Who requested this — stakeholder, user feedback, internal team] |
 | **Date Created** | [YYYY-MM-DD] |
@@ -137,6 +137,8 @@
 - [Constraint 1 — e.g., "Must work within WhatsApp Flows JSON structure"]
 - [Constraint 2 — e.g., "Cannot add new external dependencies"]
 - [Constraint 3 — e.g., "Must be backward-compatible with existing API clients"]
+
+**Non-Functional Requirements (optional):** [Performance, security, accessibility, or scalability requirements specific to this feature — e.g., "List renders 500 items in under 200ms", "New UI meets WCAG 2.1 AA". Delete if none beyond the global standards.]
 
 ---
 

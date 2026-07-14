@@ -158,11 +158,11 @@
 
 ### 5.1 External Services
 
-| Service | Purpose | Protocol | Auth Method |
-|---------|---------|----------|-------------|
-| [Service 1] | [Purpose] | REST/GraphQL/gRPC | [OAuth/API Key/etc.] |
-| [Service 2] | [Purpose] | [Protocol] | [Auth] |
-| [Service 3] | [Purpose] | [Protocol] | [Auth] |
+| Service | Purpose | Protocol | Auth Method | Failure Strategy |
+|---------|---------|----------|-------------|------------------|
+| [Service 1] | [Purpose] | REST/GraphQL/gRPC | [OAuth/API Key/etc.] | [e.g., Queue + retry] |
+| [Service 2] | [Purpose] | [Protocol] | [Auth] | [e.g., Circuit breaker, fallback value] |
+| [Service 3] | [Purpose] | [Protocol] | [Auth] | [e.g., Fail fast, surface error to user] |
 
 ### 5.2 Internal Communication
 
@@ -173,7 +173,7 @@
 
 ---
 
-## 6. Security Architecture
+## 6. Security & Observability
 
 ### 6.1 Authentication
 
@@ -194,6 +194,17 @@
 | [User PII] | [Encryption type] | [TLS version] | [Who can access] |
 | [Credentials] | [Encryption type] | [Protocol] | [Access pattern] |
 | [Business Data] | [Encryption type] | [Protocol] | [Access pattern] |
+
+### 6.4 Observability
+
+> *How the running system is watched. Keep it brief — one row per concern is enough for task generation to respect the established tooling.*
+
+| Concern | Tooling / Approach | Key Conventions |
+|---------|-------------------|-----------------|
+| Logging | [e.g., Structured JSON logs via a logger service] | [e.g., No PII in logs; include request ID] |
+| Metrics | [e.g., Prometheus + Grafana] | [e.g., RED metrics per endpoint] |
+| Tracing | [e.g., OpenTelemetry, sampled at 10%] | [e.g., Propagate trace ID across services] |
+| Alerting | [e.g., PagerDuty on error-rate threshold] | [e.g., Alert on symptoms, not causes] |
 
 ---
 
@@ -247,4 +258,12 @@ When generating architecture-related tasks:
 3. **Technology choices**: Use only technologies in the stack unless migration is explicitly needed
 4. **Security**: All generated tasks must respect the security architecture
 5. **Scalability**: Consider scaling implications in design tasks
-6. **Integration**: Reference integration points for external service tasks
+6. **Integration**: Reference integration points for external service tasks — every external call must follow the Failure Strategy declared in Section 5.1
+
+---
+
+## Changelog
+
+| Date | Author | Change Description | Reason |
+|------|--------|-------------------|--------|
+| YYYY-MM-DD | [name] | Initial version | — |

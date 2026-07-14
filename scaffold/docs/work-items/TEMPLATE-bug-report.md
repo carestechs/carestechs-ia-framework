@@ -1,4 +1,6 @@
-# Bug Report: BUG-001 — [One-line Summary]
+<!-- Copy this file to docs/work-items/BUG-XXX-short-title.md (next free ID) before filling. -->
+
+# Bug Report: BUG-XXX — [One-line Summary]
 
 > **Purpose**: Structured bug description before generating investigation and fix tasks.
 > **Template reference**: `.ai-framework/templates/bug-report.md`
@@ -9,7 +11,7 @@
 
 | Field | Value |
 |-------|-------|
-| **ID** | BUG-001 |
+| **ID** | BUG-XXX |
 | **Summary** | <!-- TODO: One-line description of the bug --> |
 | **Severity** | <!-- TODO: Critical · High · Medium · Low --> |
 | **Status** | Reported |
@@ -125,3 +127,15 @@
 | **Violated AC** | <!-- TODO: Which acceptance criterion the bug contradicts --> |
 | **Spec Reference** | <!-- TODO: Which spec defines the correct behavior --> |
 | **Related Work Items** | <!-- TODO: FEAT/BUG/IMP IDs --> |
+
+---
+
+## 10. Root Cause & Resolution
+
+<!-- TODO: Fill when Status moves to Resolved — do not guess the root cause while investigating (hypotheses belong in Section 6 Observations) -->
+
+| Field | Value |
+|-------|-------|
+| **Root Cause** | <!-- TODO: The actual underlying defect — "X did Y because Z", not "fixed the bug" --> |
+| **Fix Summary** | <!-- TODO: What was changed — files/components touched and the nature of the change --> |
+| **Fixed In** | <!-- TODO: Version, commit hash, or PR reference --> |

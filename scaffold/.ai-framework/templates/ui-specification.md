@@ -66,7 +66,7 @@
 | `space-6` | [1.5rem / 24px] | [Section margins] |
 | `space-8` | [2rem / 32px] | [Page-level padding] |
 
-> **Base unit**: [X]rem. All spacing is a multiple of the base unit. Use Tailwind spacing classes (`p-2`, `gap-4`, `mt-6`, etc.) mapped to these values.
+> **Base unit**: [X]rem. All spacing is a multiple of the base unit. Use the spacing utilities of the styling system declared in CLAUDE.md [e.g., Tailwind classes `p-2`, `gap-4`, `mt-6`] mapped to these values.
 
 ### 2.4 Component Library
 
@@ -103,14 +103,14 @@
 
 > *Defines the breakpoint system and responsive strategy. If DDRs were compiled, these are pre-filled from responsive-category DDRs.*
 
-| Breakpoint | Width | Tailwind Prefix | Primary Use |
-|------------|-------|-----------------|-------------|
+| Breakpoint | Width | Utility Prefix [e.g., Tailwind] | Primary Use |
+|------------|-------|--------------------------------|-------------|
 | Mobile | [< 640px] | (base) | [Single column, stacked layout, full-width cards] |
 | Tablet | [640px - 1023px] | [sm:, md:] | [Collapsed sidebar, 2-column grid where appropriate] |
 | Desktop | [1024px - 1279px] | [lg:] | [Full sidebar, multi-column layouts] |
 | Large Desktop | [1280px+] | [xl:, 2xl:] | [Max-width content, additional whitespace] |
 
-**Responsive Strategy**: [Mobile-first / Desktop-first] — [One sentence explaining the choice and its implications for Tailwind class authoring]
+**Responsive Strategy**: [Mobile-first / Desktop-first] — [One sentence explaining the choice and its implications for how responsive utility classes are authored]
 
 ---
 
@@ -249,7 +249,7 @@
 |------|-----------|------|-------------|
 | [item] | Input | [ItemDto] | [The data to display] |
 | [compact] | Input | [boolean] | [Whether to use compact layout] |
-| [clicked] | Output | [EventEmitter\<string\>] | [Emitted when user clicks, payload is item ID] |
+| [clicked] | Output | [event\<string\> — e.g., Angular `EventEmitter<string>`, React callback prop] | [Emitted when user clicks, payload is item ID] |
 
 #### Visual Variants
 
@@ -269,7 +269,7 @@
 
 ### When generating frontend tasks, use this document to:
 
-1. **Derive component structure** — Use the Component Hierarchy to know exactly which Angular components to create or modify for each screen.
+1. **Derive component structure** — Use the Component Hierarchy to know exactly which components to create or modify for each screen.
 2. **Map data requirements** — Use Component → API Mapping to know which service calls each component needs.
 3. **Specify all states** — Every component task should include handling for loading, empty, and error states as defined in the States table.
 4. **Define interactions precisely** — Use the User Interactions table to specify exact behavior, not vague descriptions.
@@ -279,12 +279,20 @@
 
 8. **Use state patterns consistently** — Reference Section 2.5 for the standard loading, empty, error, and disabled patterns. Every screen must use these patterns — do not invent new loading or error UIs.
 9. **Use defined breakpoints** — Reference Section 2.6 for the responsive breakpoints and strategy. Follow the mobile-first or desktop-first approach consistently across all screens.
-10. **Reference component examples** — If DDRs were compiled with a Component Examples Appendix, use those HTML/Tailwind patterns as the starting point for mockups and implementations. DDR examples take precedence over AI invention.
+10. **Reference component examples** — If DDRs were compiled with a Component Examples Appendix, use those HTML markup patterns as the starting point for mockups and implementations. DDR examples take precedence over AI invention.
 
 ### Rules:
 
 - Every frontend task must reference a specific screen from Section 5
 - Every component must handle all 4 states (default, loading, empty, error) unless explicitly noted otherwise
-- Use Angular Material components listed in Section 2.4 — do not build custom primitives
-- Use Tailwind classes for layout and spacing — do not create component CSS
+- Use the component library from Section 2.4 — do not build custom primitives
+- Use utility classes from the styling system declared in CLAUDE.md [e.g., Tailwind] for layout and spacing — do not create per-component CSS
 - Shared components (Section 6) must be used instead of duplicating UI across screens
+
+---
+
+## Changelog
+
+| Date | Author | Change Description | Reason |
+|------|--------|-------------------|--------|
+| YYYY-MM-DD | [name] | Initial version | — |

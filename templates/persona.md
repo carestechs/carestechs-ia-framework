@@ -25,16 +25,24 @@
 
 > *Describe the acute pain point this persona experiences. Be specific about when, where, and how the problem manifests.*
 
-### The Problem Scenario: "[Memorable Name for Peak Pain]"
+### The Problem: "[Memorable Name for Peak Pain]"
 
-[Describe the specific scenario when the problem is most acute]:
+[Describe the specific scenario when the problem is most acute — when it happens, where, and what it looks like]:
 
 - [Symptom/manifestation 1]
 - [Symptom/manifestation 2]
 - [Symptom/manifestation 3]
 - [Symptom/manifestation 4]
 
-### Consequences
+### Current Workaround
+
+[How the persona solves this today without the product — manual process, spreadsheet, competitor tool, hired help, or simply enduring it]
+
+### Why That Fails
+
+[What makes the current workaround painful or insufficient — where it breaks down, what it costs in time/money/errors, and why the persona hasn't just fixed it themselves]
+
+### Consequences of Inaction
 
 This results in:
 
@@ -49,39 +57,25 @@ This results in:
 
 ## 3. Why [Name] Was Selected as the First Customer Segment
 
-> *Explain the strategic reasoning for targeting this persona first.*
+> *Explain the strategic reasoning for targeting this persona first. Answer each prompt below in a few sentences or bullets — concrete, evidence-based answers here directly improve task prioritization later.*
 
 We deliberately chose [Name] over other possible segments because:
 
-### a) The Pain Is [Acute/Frequent/etc.]
+### a) Why This Segment Feels the Pain Most
 
-[Explain why the pain is particularly pressing for this persona]
+[Explain why the problem is more acute, more frequent, or more costly for this persona than for the other segments you considered — what makes them the sharpest first fit for the solution]
 
-### b) [Volume/Scale/Usage] Justifies [Solution Type]
+### b) Evidence of Demand
 
-Their [usage pattern] is [sufficient] enough that:
-- [Benefit 1 - e.g., efficiency gains have real impact]
-- [Benefit 2 - e.g., error reduction improves margins]
-- [Benefit 3 - e.g., time saved is meaningful]
+[What evidence shows this persona actually wants this solved — user interviews, support requests, money already spent on workarounds, churn reasons, waitlist signups. If evidence is thin, state the assumption you are betting on and how you will validate it.]
 
-### c) [Key Value Prop] Is a Business Tool, Not [Alternative]
+### c) What Success Looks Like for Them
 
-For [Name], [the product's key feature]:
-- [Business outcome 1]
-- [Business outcome 2]
-- [Business outcome 3]
+[Describe the concrete outcome that would make this persona consider the product indispensable — time saved per week, errors avoided, revenue gained, stress removed. Be specific: this feeds directly into the Success Metrics of the Stakeholder Definition.]
 
-The [feature] is not [what it might seem] - it is [what it actually provides].
+### d) Willingness to Adopt (and Pay, if applicable)
 
-### d) Willingness to Pay Exists
-
-[Name] is already paying for [the problem]:
-- [Hidden cost 1]
-- [Hidden cost 2]
-- [Hidden cost 3]
-- [Hidden cost 4]
-
-Paying a predictable fee to [solve the problem] is an easy trade-off.
+[Why this persona will actually switch: what the problem already costs them today (time, money, lost business), why adopting the product is an easy trade-off, and any adoption barriers to plan around — tech comfort, ingrained habits, procurement, switching costs.]
 
 ---
 

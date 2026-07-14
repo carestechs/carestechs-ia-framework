@@ -1,6 +1,8 @@
-# Context Compilation Guide (v2)
+# Context Compilation Guide
 
 > **Purpose**: This guide explains how to assemble the right documentation context for AI task generation using the 10 core templates: 7 system templates (Persona, Stakeholder Definition, Architecture, CLAUDE.md, Data Model, API Specification, UI Specification) and 3 work item templates (Feature Brief, Bug Report, Improvement Proposal).
+>
+> **Canonical source**: The per-task-type tables in this guide are the canonical context-selection matrix for humans. AI agents use the routing table in the project's CLAUDE.md, which mirrors these recipes. Other documents (README, getting-started) carry only teasers that link here.
 
 ---
 
@@ -122,6 +124,7 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 | Optional | Architecture | Multi-component bug | Affected components |
 | Optional | Data Model | Data-related bugs | Affected entity definitions |
 | Optional | API Specification | API-related bugs | Affected endpoint definitions |
+| Optional | UI Specification | UI-related bugs | Affected screen specs, states, interactions |
 | Optional | Stakeholder Definition | Scope clarification needed | Scope lock, principles |
 
 **Example Assembly**:
@@ -185,6 +188,8 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 
 **Goal**: Generate comprehensive test tasks covering requirements and edge cases.
 
+> **Note:** No dedicated prompt exists for this task type — use `prompts/base-template.md` with this context recipe.
+
 | Priority | Document | Include When | What to Include |
 |----------|----------|--------------|-----------------|
 | Required | CLAUDE.md | Always | Testing conventions section |
@@ -210,6 +215,8 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 ### 5. Integration
 
 **Goal**: Generate tasks for connecting to external services correctly.
+
+> **Note:** No dedicated prompt exists for this task type — use `prompts/base-template.md` with this context recipe.
 
 | Priority | Document | Include When | What to Include |
 |----------|----------|--------------|-----------------|
@@ -248,6 +255,8 @@ Context should be provided in layers, from broad (strategic) to narrow (tactical
 ### 6. Prioritization & Roadmap Planning
 
 **Goal**: Evaluate and prioritize work items based on product strategy.
+
+> **Note:** No dedicated prompt exists for this task type — use `prompts/base-template.md` with this context recipe.
 
 | Priority | Document | Include When | What to Include |
 |----------|----------|--------------|-----------------|
@@ -294,12 +303,12 @@ Consider: user impact, severity, development cost, strategic alignment, dependen
 
 ### 7. UI Mockup Generation
 
-**Goal**: Generate a self-contained HTML mockup for stakeholder visual approval before Angular implementation.
+**Goal**: Generate a self-contained HTML mockup for stakeholder visual approval before implementation in the stack declared in CLAUDE.md [e.g., Angular].
 
 | Priority | Document | Include When | What to Include |
 |----------|----------|--------------|-----------------|
 | Required | UI Specification | Always | Target screen's spec block (layout, hierarchy, states) + Design System section (colors, typography, spacing) |
-| Required | CLAUDE.md | Always | Design tokens, Tailwind conventions, frontend patterns |
+| Required | CLAUDE.md | Always | Design tokens, CSS conventions [e.g., Tailwind], frontend patterns |
 | Recommended | API Specification | When screen displays data | Response DTO shapes for realistic placeholder content |
 | Optional | Persona | User-facing screens | Content tone for placeholder text |
 | Optional | Stakeholder Definition | Branding needed | Product name, philosophy |
@@ -313,7 +322,7 @@ Consider: user impact, severity, development cost, strategic alignment, dependen
   </ui-specification>
 
   <code-conventions>
-    [CLAUDE.md: Tailwind conventions, design tokens, frontend patterns]
+    [CLAUDE.md: CSS conventions (e.g., Tailwind), design tokens, frontend patterns]
   </code-conventions>
 
   <api-spec>
@@ -377,7 +386,7 @@ Consider: user impact, severity, development cost, strategic alignment, dependen
 | Optional | Profile file | When using a curated visual identity | Profile from DDR repo with override values for tokens |
 | Recommended | `.ai-framework/templates/` | Always | Target templates for correct heading structure (agents read directly) |
 
-**Note:** This task type produces pre-filled *Design System sections*, not a final deliverable. Run it when bootstrapping a new project, after applying ADRs (Step 0.5) and before filling in UI-related templates (Phase 2, Step 7).
+**Note:** This task type produces pre-filled *Design System sections*, not a final deliverable. Run it when bootstrapping a new project, after applying ADRs (Step 1.1) and before filling in UI-related templates (Phase 2, Step 7).
 
 **Example Assembly**:
 ```xml
@@ -439,18 +448,18 @@ For this task, only the Order Service is relevant.
 
 Agents have direct file access and don't need XML assembly. Follow these steps:
 
-1. **Identify the task type** from the user's request (Feature, Bug, Refactor, Spec Generation, UI Spec, UI Mockup, Release Transition)
+1. **Identify the task type** from the user's request — one of the 10 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation)
 2. **Read the files** listed in the CLAUDE.md routing table for that task type
 3. **For large documents**, read only the sections relevant to the task — e.g., for a task about labels, read only the Label entity from `data-model.md` and label endpoints from `api-spec.md`
 4. **Read the prompt template** from `.ai-framework/prompts/` — use the **Output Format** section as your deliverable structure, and apply the **Guidance**, **Constraints**, and **Post-Generation Checklist**
-5. **Generate the deliverable** directly — no XML wrapping needed
+5. **Generate the deliverable** directly — no XML wrapping needed — and write it to its canonical location (task lists to `tasks/FEAT-XXX-tasks.md` etc., plans to `plans/plan-T-XXX-short-title.md`, mockups to `mockups/T-XXX-screen-name.html`)
 
 ### Path B: Manual Context Assembly (Chat Workflows)
 
 For copy-paste workflows where you assemble an XML prompt to submit to Claude:
 
 #### Step 1: Identify Task Type
-What kind of task are you generating? (Feature, Bug, Refactor, Test, Integration, Prioritization, UI Mockup)
+What kind of task are you generating? One of the 10 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation)
 
 #### Step 2: Check Required Documents
 Consult the task-type tables above for your task type. Gather required documents.
@@ -458,7 +467,7 @@ Consult the task-type tables above for your task type. Gather required documents
 #### Step 3: Assess Complexity
 - **Simple task**: CLAUDE.md only (or + 1 other document)
 - **Standard task**: 2-3 documents
-- **Complex task**: All 4+ documents
+- **Complex task**: 4+ documents (extract only the relevant sections of each)
 
 #### Step 4: Extract Relevant Sections
 Don't include entire documents if only portions are relevant.
@@ -493,28 +502,20 @@ Include the specific request, constraints, and output format requirements.
 
 ## Quick Reference Card
 
-```
-┌───────────────┬──────────────────────────────────────────────────────────┐
-│ Task Type     │ Must Include                        │ Recommended        │
-├───────────────┼─────────────────────────────────────┼────────────────────┤
-│ New Feature   │ Feature Brief + Stakeholder +       │ Data Model, API Spec,      │
-│               │ CLAUDE.md                           │ UI Spec                    │
-│ Bug Fix       │ Bug Report + CLAUDE.md              │ Architecture, Data Model   │
-│ Refactoring   │ Improvement Proposal + CLAUDE.md +  │ Data Model                 │
-│               │ Architecture                        │                            │
-│ Testing       │ CLAUDE.md                           │ API Spec, UI Spec          │
-│ Integration   │ Architecture + CLAUDE.md +          │                            │
-│               │ Data Model + API Spec               │                            │
-│ Prioritization│ Work Items + Stakeholder + Persona  │ Architecture               │
-│ UI Mockup     │ UI Spec + CLAUDE.md                 │ API Spec, Persona          │
-│ Release       │ Stakeholder + CLAUDE.md             │ Architecture,              │
-│ Transition    │                                     │ release-lifecycle.md       │
-│ ADR           │ ADR files +                         │                            │
-│ Compilation   │ .ai-framework/templates/            │                            │
-│ DDR           │ DDR files (+ optional profile) +    │                            │
-│ Compilation   │ .ai-framework/templates/            │                            │
-└───────────────┴─────────────────────────────────────┴────────────────────────────┘
-```
+| Task Type | Must Include | Recommended / Optional |
+|-----------|--------------|------------------------|
+| New Feature | Feature Brief + Stakeholder + CLAUDE.md | Data Model, API Spec, UI Spec, Persona, Architecture |
+| Bug Fix | Bug Report + CLAUDE.md | Architecture, Data Model, API Spec, UI Spec, Stakeholder |
+| Refactoring | Improvement Proposal + CLAUDE.md + Architecture | Data Model, Stakeholder |
+| Testing* | CLAUDE.md | Architecture, Stakeholder |
+| Integration* | Architecture + CLAUDE.md + Data Model + API Spec | Stakeholder |
+| Prioritization* | Work Items + Stakeholder + Persona | Architecture |
+| UI Mockup | UI Spec + CLAUDE.md | API Spec, Persona, Stakeholder |
+| Release Transition | Stakeholder + CLAUDE.md | Architecture, `guides/release-lifecycle.md` |
+| ADR Compilation | ADR files | `.ai-framework/templates/` |
+| DDR Compilation | DDR files (+ optional profile) | `.ai-framework/templates/` |
+
+\* No dedicated prompt — use `prompts/base-template.md` with this context recipe.
 
 ---
 

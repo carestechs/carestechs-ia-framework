@@ -1,24 +1,207 @@
-# Bug Fix Task Generation Prompt (v2)
-
-> **Purpose**: Generate investigation and fix tasks for reported bugs. This prompt helps structure bug analysis and produces actionable tasks for resolution.
->
-> **v2 Note**: This version uses 10 core templates (7 system templates + 3 work item templates). Bugs should be described in a **Bug Report** (`docs/work-items/BUG-*.md`) before task generation. The inline `<bug-report>` is still supported as a fallback for quick/ad-hoc usage.
+# Bug Fix Task Generation Prompt
 
 ---
 
-## How to Use This Template
+## Purpose
 
-**AI agents (Claude Code, etc.):** Skip the XML context assembly below — you have direct file access. Instead:
-1. Read the files listed in CLAUDE.md's routing table for "Bug fix"
-2. Read the Bug Report from `docs/work-items/BUG-*.md` for the target bug. If no Bug Report exists, gather the bug details from the user and use the inline `<bug-report>` fallback
-3. Use the **Output Format** section below (three-phase structure: Investigation, Implementation, Verification) as your deliverable structure
-4. Apply the **Constraints** and **Post-Generation Checklist** to shape your output
+Generate investigation and fix tasks for reported bugs. This prompt helps structure bug analysis and produces actionable tasks for resolution.
 
-**Chat workflows (manual copy-paste):** Copy the XML template below, paste your documentation into the `<context>` sections, fill in the `<bug-report-doc>` (or `<bug-report>` fallback), and submit to Claude.
+Bugs should be described in a **Bug Report** (`docs/work-items/BUG-XXX-short-title.md`) before task generation. An inline description (`<inline-request>`) is supported as a fallback for quick/ad-hoc usage.
+
+This prompt uses the **canonical task schema defined in `prompts/base-template.md`** (field list, order, enums, grouping). Deltas declared here: the `Type` enum adds **`Investigation`**; tasks are organized into the three-phase structure below with phase-preset `Workflow` values.
 
 ---
 
-## Prompt Template (Chat Workflow)
+## How to Use
+
+- **AI agents (Claude Code, etc.):** Read the context files listed in your project CLAUDE.md's routing table for "Bug fix", read the Bug Report from `docs/work-items/BUG-XXX-short-title.md` (if none exists, gather the bug details from the user as an inline request), follow the sections below, and **write** the task list to `tasks/BUG-XXX-tasks.md` (or `tasks/adhoc-short-title-tasks.md` for inline requests with no work item).
+- **Chat workflows (manual copy-paste):** Use the XML skeleton in the [Chat Workflow Template (XML)](#chat-workflow-template-xml) appendix. Include this prompt's Output Format and Constraints sections alongside the skeleton so the assistant knows the expected schema.
+
+---
+
+## Required Context
+
+Context selection lives in the **canonical matrix**: `guides/context-compilation.md` (humans) or the CLAUDE.md routing table (agents).
+
+For bug fixes: **required** = Bug Report + CLAUDE.md; **optional** = Architecture, Data Model, API Spec, UI Specification (per bug type — e.g., data-model for data integrity/calculation bugs, api-spec for API response bugs, ui-specification for display bugs).
+
+Prompt-specific notes:
+
+- **Bug Report** (preferred): `docs/work-items/BUG-XXX-short-title.md` provides structured impact assessment, traceability, entity mapping, and severity justification. Generates more targeted investigation tasks.
+- **Inline `<inline-request>`** (fallback): use for quick/ad-hoc bug fixes when a full Bug Report hasn't been written yet. Faster but less structured.
+
+---
+
+## Guidance
+
+Generate tasks to investigate and fix the bug. Tasks should:
+
+1. Start with investigation/diagnosis tasks
+2. Identify root cause before proposing solutions
+3. Include fix implementation tasks
+4. Include regression tests to prevent recurrence
+5. Consider related areas that might have the same issue
+6. Include verification steps
+
+Do not:
+
+- Jump to solutions without investigation
+- Over-engineer the fix
+- Scope creep into refactoring unrelated code
+
+### Three-Phase Structure
+
+Organize tasks into three phases. The `Workflow` field is pre-set by phase:
+
+- **Phase 1 — Investigation:** `Type: Investigation`, `Workflow: investigation-first` — complete investigation steps and document findings before any fix tasks begin.
+- **Phase 2 — Implementation:** `Workflow: standard` — investigation is complete, proceed with the fix.
+- **Phase 3 — Verification & Prevention:** `Type: Testing`, `Workflow: standard` — implement tests and verify.
+
+(The full `Workflow` enum — including `mockup-first` — remains valid; it is simply rarely needed for bug fixes.)
+
+---
+
+## Output Format
+
+**Output file:** `tasks/BUG-XXX-tasks.md` (matching the Bug Report's ID; `tasks/adhoc-short-title-tasks.md` for inline requests). AI agents write this file — the task list is not just chat output.
+
+**Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` enum delta: adds `Investigation`. Every task block in every phase includes Description and Acceptance Criteria.
+
+Phase presets:
+
+### Phase 1: Investigation
+
+```
+### T-[XXX]: [Verb-first investigation task title]
+
+**Type:** Investigation
+**Workflow:** investigation-first
+
+**Description:**
+[What question this investigation answers and what will be examined]
+
+**Rationale:**
+[1-2 sentences: why this investigation is needed — what symptom or report triggered it]
+
+**Acceptance Criteria:**
+- [ ] Root cause identified, or hypothesis documented with supporting evidence
+- [ ] Findings documented: what was confirmed, what was ruled out
+- [ ] [Additional criteria specific to this investigation]
+
+**Dependencies:** None
+**Complexity:** [S | M | L | XL]
+
+**Files to Modify/Create:**
+- [files or code areas to examine] - [what to look for]
+- [where findings are recorded, e.g., the Bug Report's Root Cause section]
+
+**Technical Notes:**
+- Investigation steps: [ordered steps to perform]
+- Expected findings: [what you expect to discover or rule out]
+```
+
+### Phase 2: Implementation
+
+```
+### T-[XXX]: [Verb-first fix task title]
+
+**Type:** [Backend | Frontend | Database]
+**Workflow:** standard
+
+**Description:**
+[What fix will be implemented]
+
+**Rationale:**
+[1-2 sentences: why this fix is needed — which root cause or investigation finding it addresses]
+
+**Acceptance Criteria:**
+- [ ] Bug no longer reproducible with original steps
+- [ ] [Additional criteria]
+
+**Dependencies:** [T-XXX, T-YYY — investigation task IDs]
+**Complexity:** [S | M | L | XL]
+
+**Files to Modify/Create:**
+- [file/path] - [what changes]
+
+**Technical Notes:**
+- Root cause addressed: [how this fix addresses the root cause]
+- Implementation approach: [high-level approach to the fix]
+- Regression risk: [what could break, how to verify it doesn't]
+```
+
+### Phase 3: Verification & Prevention
+
+```
+### T-[XXX]: [Verb-first test/verification task title]
+
+**Type:** Testing
+**Workflow:** standard
+
+**Description:**
+[What testing will be done]
+
+**Rationale:**
+[1-2 sentences: why this verification is needed — what regression risk or edge case it guards against]
+
+**Acceptance Criteria:**
+- [ ] Test covering the exact bug scenario exists and passes
+- [ ] Related scenarios and edge cases (incl. boundary values) are covered
+- [ ] Full test suite passes — no regressions introduced by the fix
+
+**Dependencies:** [T-XXX, T-YYY — fix task IDs]
+**Complexity:** [S | M | L | XL]
+
+**Files to Modify/Create:**
+- [test/file/path] - [test cases added]
+
+**Technical Notes:**
+- Test cases: [the exact bug scenario, related scenarios, edge cases]
+- Verification steps: [how to verify the fix works and nothing else broke]
+```
+
+### Summary Section
+
+After all tasks, provide:
+
+- Most likely root cause hypothesis
+- Confidence level in diagnosis
+- Risk assessment of proposed fix
+- Monitoring recommendations post-fix
+- Related areas to audit for similar issues
+
+---
+
+## Constraints
+
+- Fix must not break existing functionality
+- Must include a test that would have caught this bug
+- Must update error handling if the error was unclear
+- Investigation tasks precede fix tasks; fix tasks precede verification tasks (enforced via Dependencies)
+- One `Type` per task; Dependencies are plain task ID lists (or `None`)
+- Add project-specific constraints in the request
+
+---
+
+## Post-Generation Checklist
+
+After Claude generates tasks, verify:
+
+- [ ] Investigation tasks come before fix tasks
+- [ ] Root cause is identified, not just symptoms treated
+- [ ] Fix addresses root cause, not workaround
+- [ ] Test would catch this bug if it regressed
+- [ ] Boundary conditions are tested
+- [ ] Related code areas are audited
+- [ ] Error messages improved if they were unclear
+- [ ] Monitoring/alerting considered for future detection
+- [ ] Every task block (all three phases) has Description and Acceptance Criteria
+- [ ] Complexity uses the full `S | M | L | XL` scale; dependencies are plain ID lists
+- [ ] Task list saved to `tasks/BUG-XXX-tasks.md` (agents)
+
+---
+
+## Chat Workflow Template (XML)
 
 ```xml
 <task-generation-request>
@@ -44,18 +227,18 @@
 
 <task-type>Bug Fix</task-type>
 
-<bug-report-doc>
-<!-- PREFERRED: Paste the full Bug Report document (from docs/work-items/BUG-XXX-name.md) -->
-<!-- The Bug Report template provides structured fields for reproduction steps, evidence,
+<bug-report>
+<!-- PREFERRED: Paste the full Bug Report document (from docs/work-items/BUG-XXX-short-title.md).
+     The Bug Report template provides structured fields for reproduction steps, evidence,
      impact assessment, affected entities, and traceability.
      See .ai-framework/templates/bug-report.md for the full template. -->
 [Paste full Bug Report content]
-</bug-report-doc>
+</bug-report>
 
-<!-- FALLBACK: If no Bug Report document exists, use this inline report instead.
-     Remove the <bug-report-doc> block above and uncomment this block. -->
+<!-- FALLBACK: If no Bug Report document exists, use this inline request instead.
+     Remove the <bug-report> block above and uncomment this block. -->
 <!--
-<bug-report>
+<inline-request>
 **Bug ID:** [BUG-XXX]
 **Severity:** [Critical | High | Medium | Low]
 **Reported Date:** [Date]
@@ -82,9 +265,7 @@
 - User context: [Relevant user state]
 
 **Error Messages/Logs:**
-```
 [Any error messages, stack traces, or relevant log output]
-```
 
 **Additional Context:**
 - Frequency: [Always | Sometimes | Rarely]
@@ -99,24 +280,12 @@
 **Known Error Patterns:**
 - [Error code/pattern seen in logs]
 - [Related error handling behavior]
-</bug-report>
+</inline-request>
 -->
 
 <request>
 Generate tasks to investigate and fix this bug.
-
-Tasks should:
-1. Start with investigation/diagnosis tasks
-2. Identify root cause before proposing solutions
-3. Include fix implementation tasks
-4. Include regression tests to prevent recurrence
-5. Consider related areas that might have the same issue
-6. Include verification steps
-
-Do not:
-- Jump to solutions without investigation
-- Over-engineer the fix
-- Scope creep into refactoring unrelated code
+[Add any bug-specific focus, e.g., which behavior to zero in on.]
 </request>
 
 <constraints>
@@ -126,146 +295,16 @@ Do not:
 - [Add project-specific constraints]
 </constraints>
 
-<output-format>
-## Task Output Format
-
-Generate tasks in three phases:
-
-### Phase 1: Investigation
-
-```
-### T-[XXX]: [Investigation Task Title]
-
-**Type:** Investigation
-**Workflow:** investigation-first
-**Complexity:** [S | M | L]
-**Dependencies:** None
-
-**Investigation Goal:**
-[What question this investigation answers]
-
-**Rationale:**
-[1-2 sentences: why this investigation is needed — what symptom or report triggered it]
-
-**Investigation Steps:**
-1. [Step to perform]
-2. [Step to perform]
-3. [Step to perform]
-
-**Expected Findings:**
-[What you expect to discover or rule out]
-
-**Output:**
-[What this task produces - hypothesis, root cause identification, etc.]
-```
-
-### Phase 2: Implementation
-
-```
-### T-[XXX]: [Fix Task Title]
-
-**Type:** [Backend | Frontend | Database]
-**Workflow:** standard
-**Complexity:** [S | M | L]
-**Dependencies:** [Investigation task IDs]
-
-**Description:**
-[What fix will be implemented]
-
-**Rationale:**
-[1-2 sentences: why this fix is needed — which root cause or investigation finding it addresses]
-
-**Root Cause Addressed:**
-[How this fix addresses the root cause]
-
-**Implementation Approach:**
-[High-level approach to the fix]
-
-**Files to Modify:**
-- [file/path] - [what changes]
-
-**Acceptance Criteria:**
-- [ ] Bug no longer reproducible with original steps
-- [ ] [Additional criteria]
-
-**Regression Risk:**
-[What could break, how to verify it doesn't]
-```
-
-### Phase 3: Verification & Prevention
-
-```
-### T-[XXX]: [Test/Verification Task Title]
-
-**Type:** Testing
-**Workflow:** standard
-**Complexity:** [S | M]
-**Dependencies:** [Fix task IDs]
-
-**Description:**
-[What testing will be done]
-
-**Rationale:**
-[1-2 sentences: why this verification is needed — what regression risk or edge case it guards against]
-
-**Test Cases:**
-- [Test case 1 - the exact bug scenario]
-- [Test case 2 - related scenario]
-- [Test case 3 - edge case]
-
-**Verification Steps:**
-1. [How to verify fix works]
-2. [How to verify nothing else broke]
-```
-
-## Workflow Classification
-
-The **Workflow** field is pre-set by phase:
-
-- **Phase 1 (Investigation):** always `investigation-first` — complete investigation steps and document findings before any fix tasks begin.
-- **Phase 2 (Implementation):** always `standard` — investigation is complete, proceed with the fix.
-- **Phase 3 (Verification):** always `standard` — implement tests and verify.
-
-## Summary Section
-
-After all tasks, provide:
-- Most likely root cause hypothesis
-- Confidence level in diagnosis
-- Risk assessment of proposed fix
-- Monitoring recommendations post-fix
-- Related areas to audit for similar issues
-</output-format>
-
 </task-generation-request>
 ```
 
 ---
 
-## Context Selection Guide (v2)
+## Example
 
-### What to Include
+Order calculation bug.
 
-| Document | When to Include | Why |
-|----------|-----------------|-----|
-| Bug Report | Always (preferred) | Full `docs/work-items/BUG-*.md` for target bug |
-| CLAUDE.md | Always | Navigate codebase, understand structure and patterns |
-| Architecture | Multi-component bugs | Understand data flow and component interactions |
-| Data Model | Data integrity/calculation bugs | Understand entity definitions and business rules |
-| API Specification | API response/status bugs | Understand expected endpoint behavior |
-| UI Specification | UI/display bugs | Understand expected screen behavior |
-| Stakeholder Definition | Scope questions | Clarify expected behavior from product perspective |
-| Persona | User-facing bugs | Understand user impact and priority |
-
-### Bug Report vs Inline Report
-
-- **Bug Report** (preferred): Use `docs/work-items/BUG-*.md`. Provides structured impact assessment, traceability, entity mapping, and severity justification. Generates more targeted investigation tasks.
-- **Inline `<bug-report>`** (fallback): Use for quick/ad-hoc bug fixes when a full Bug Report hasn't been written yet. Faster but less structured.
-
----
-
-## Example: Order Calculation Bug
-
-> **Note:** This example uses the inline `<bug-report>` fallback for brevity. For more targeted investigation tasks, use a full Bug Report document via `<bug-report-doc>` as described in the Prompt Template above.
+> **Note:** This example uses the inline `<inline-request>` fallback for brevity. For more targeted investigation tasks, use a full Bug Report document via `<bug-report>` as described above.
 
 ```xml
 <task-generation-request>
@@ -300,7 +339,7 @@ Cart → Order Service (calculate totals) → Database
 
 <task-type>Bug Fix</task-type>
 
-<bug-report>
+<inline-request>
 **Bug ID:** BUG-234
 **Severity:** High
 **Reported Date:** 2024-01-15
@@ -336,7 +375,7 @@ No errors - calculation completes but with wrong value
 **Affected Entities/Data:**
 - Order: items (OrderItem[]), subtotal (computed), deliveryFee (fixed/calculated), total (subtotal + deliveryFee)
 - Business Rules: Subtotal = sum of (item.price * quantity), Delivery fee waived if subtotal > $50, Total = subtotal + deliveryFee
-</bug-report>
+</inline-request>
 
 <request>
 Generate tasks to investigate and fix the delivery fee calculation bug.
@@ -349,24 +388,5 @@ Focus on finding why the $50 threshold isn't being applied correctly.
 - Must verify threshold works at boundary values ($50.00, $50.01)
 </constraints>
 
-<output-format>
-[Standard format as specified above]
-</output-format>
-
 </task-generation-request>
 ```
-
----
-
-## Post-Generation Checklist
-
-After Claude generates tasks, verify:
-
-- [ ] Investigation tasks come before fix tasks
-- [ ] Root cause is identified, not just symptoms treated
-- [ ] Fix addresses root cause, not workaround
-- [ ] Test would catch this bug if it regressed
-- [ ] Boundary conditions are tested
-- [ ] Related code areas are audited
-- [ ] Error messages improved if they were unclear
-- [ ] Monitoring/alerting considered for future detection

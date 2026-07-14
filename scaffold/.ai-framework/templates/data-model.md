@@ -26,11 +26,11 @@
 
 > *Every entity belongs to exactly one module. Cross-module references use IDs only — no shared tables, no cross-module foreign keys at the ORM level.*
 
-| Module | Entities Owned | DbContext |
-|--------|---------------|-----------|
-| [Module A] | [Entity1, Entity2] | [ModuleADbContext] |
-| [Module B] | [Entity3, Entity4] | [ModuleBDbContext] |
-| [Module C] | [Entity5, Entity6, Entity7] | [ModuleCDbContext] |
+| Module | Entities Owned | Persistence Unit [e.g., EF Core DbContext / Prisma schema / repository module] |
+|--------|---------------|--------------------------------------------------------------------------------|
+| [Module A] | [Entity1, Entity2] | [e.g., ModuleADbContext] |
+| [Module B] | [Entity3, Entity4] | [e.g., ModuleBDbContext] |
+| [Module C] | [Entity5, Entity6, Entity7] | [e.g., ModuleCDbContext] |
 
 ---
 
@@ -93,7 +93,7 @@
 
 ### 4.3 Cross-Module References
 
-> *These are ID-only references — no EF Core navigation properties, no database-level foreign keys across module boundaries.*
+> *These are ID-only references — no ORM-level navigation properties or relations [e.g., EF Core navigation properties / Prisma relation fields], no database-level foreign keys across module boundaries.*
 
 | Source Entity (Module) | Target Entity (Module) | Field | Purpose |
 |----------------------|----------------------|-------|---------|
@@ -174,10 +174,18 @@
 
 When generating tasks from this document:
 
-1. **Module boundaries**: Every data-access task must target the correct module's DbContext — never query across module boundaries
+1. **Module boundaries**: Every data-access task must target the correct module's persistence unit [e.g., DbContext / Prisma client / repository] — never query across module boundaries
 2. **Field completeness**: Generated entity classes must include all fields defined here with correct types and constraints
 3. **Relationship integrity**: Ensure cascade behaviors and cross-module ID-only references are respected in migrations
 4. **Enum consistency**: Use the enum values defined here — do not invent new values without updating this document
 5. **Index awareness**: Include index creation in migration tasks for fields marked with indexes
 6. **Naming conventions**: Table and column names must follow the conventions in Section 6
-7. **Cross-module lookups**: When a task needs data from another module, generate a service call through the interface in Shared — not a direct DB query
+7. **Cross-module lookups**: When a task needs data from another module, generate a call through that module's public interface [e.g., a service interface in a shared contracts project / the module's exported API] — not a direct DB query
+
+---
+
+## Changelog
+
+| Date | Author | Change Description | Reason |
+|------|--------|-------------------|--------|
+| YYYY-MM-DD | [name] | Initial version | — |

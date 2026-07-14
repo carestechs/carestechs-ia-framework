@@ -98,6 +98,16 @@ src/
 - <!-- e.g., Don't put business logic in route handlers -->
 - <!-- e.g., Don't use `console.log` — use the logger service -->
 
+### Design Patterns
+
+#### Design Patterns to Follow
+
+<!-- TODO: Populated by DDR compilation (.ai-framework/prompts/compile-ddrs.md) — or fill in design patterns manually. -->
+
+#### Design Anti-Patterns to Avoid
+
+<!-- TODO: Populated by DDR compilation (.ai-framework/prompts/compile-ddrs.md) — or fill in design anti-patterns manually. -->
+
 ---
 
 ## Error Handling
@@ -137,37 +147,41 @@ This project includes a bundled AI framework (`.ai-framework/`) with prompt temp
 
 ### Task Generation Routing
 
-When asked to generate tasks, identify the task type, read the required files, then read the prompt template for output format.
+When asked to generate tasks, identify the task type, read the required files, read the prompt template for output format, then **write the output file** listed in the Output column — do not leave results only in chat.
 
-| Task Type | Prompt Template | Files to Read |
-|-----------|----------------|---------------|
-| New feature | `.ai-framework/prompts/feature-tasks.md` | `docs/work-items/FEAT-*.md` (target feature), `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/data-model.md`, `docs/api-spec.md`, `docs/ui-specification.md` |
-| Bug fix | `.ai-framework/prompts/bugfix-tasks.md` | `docs/work-items/BUG-*.md` (target bug), `CLAUDE.md`, `docs/ARCHITECTURE.md` |
-| Refactoring | `.ai-framework/prompts/refactor-tasks.md` | `docs/work-items/IMP-*.md` (target improvement), `CLAUDE.md`, `docs/ARCHITECTURE.md` |
-| Spec generation | `.ai-framework/prompts/spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md` |
-| UI spec generation | `.ai-framework/prompts/ui-spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`, `docs/api-spec.md` |
-| UI mockup | `.ai-framework/prompts/mockup-generation.md` | `docs/ui-specification.md` (target screen + Design System), `CLAUDE.md` |
-| ADR compilation | `.ai-framework/prompts/compile-adrs.md` | ADR files (from shared ADR repo), `.ai-framework/templates/` |
-| DDR compilation | `.ai-framework/prompts/compile-ddrs.md` | DDR files (from shared DDR repo), `.ai-framework/templates/` |
-| Release transition | `.ai-framework/guides/release-lifecycle.md` | `docs/stakeholder-definition.md`, `CLAUDE.md` |
-| Task implementation plan | `.ai-framework/prompts/plan-generation.md` | `CLAUDE.md`, task definition, files listed in task's "Files to Modify/Create" |
+| Task Type | Prompt Template | Files to Read (required) | Output |
+|-----------|----------------|--------------------------|--------|
+| New feature | `.ai-framework/prompts/feature-tasks.md` | `docs/work-items/FEAT-*.md` (target feature), `docs/stakeholder-definition.md`, `CLAUDE.md` | `tasks/FEAT-XXX-tasks.md` |
+| Bug fix | `.ai-framework/prompts/bugfix-tasks.md` | `docs/work-items/BUG-*.md` (target bug), `CLAUDE.md` | `tasks/BUG-XXX-tasks.md` |
+| Refactoring | `.ai-framework/prompts/refactor-tasks.md` | `docs/work-items/IMP-*.md` (target improvement), `CLAUDE.md`, `docs/ARCHITECTURE.md` | `tasks/IMP-XXX-tasks.md` |
+| Spec generation | `.ai-framework/prompts/spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md` | `docs/data-model.md`, `docs/api-spec.md` |
+| UI spec generation | `.ai-framework/prompts/ui-spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`, `docs/api-spec.md` | `docs/ui-specification.md` |
+| UI mockup | `.ai-framework/prompts/mockup-generation.md` | `docs/ui-specification.md` (target screen + Design System), `CLAUDE.md` | `mockups/T-XXX-screen-name.html` |
+| ADR compilation | `.ai-framework/prompts/compile-adrs.md` | ADR files (from shared ADR repo), `.ai-framework/templates/` | Updated `CLAUDE.md` sections |
+| DDR compilation | `.ai-framework/prompts/compile-ddrs.md` | DDR files (from shared DDR repo), `.ai-framework/templates/` | `docs/component-examples.md`, updated `docs/ui-specification.md` + `CLAUDE.md` design sections |
+| Release transition | `.ai-framework/guides/release-lifecycle.md` | `docs/stakeholder-definition.md`, `CLAUDE.md` | Updated `docs/stakeholder-definition.md` |
+| Task implementation plan | `.ai-framework/prompts/plan-generation.md` | `CLAUDE.md`, task definition, files listed in task's "Files to Modify/Create" | `plans/plan-T-XXX-short-title.md` |
+| Testing / Integration / Prioritization | No dedicated prompt — use `.ai-framework/prompts/base-template.md` with the context recipe from `.ai-framework/guides/context-compilation.md` | Per the context recipe for that task type | `tasks/adhoc-short-title-tasks.md` |
 
 **Optional context** (read only when relevant to the specific task):
 
 | Task Type | Optional Files | When to Include |
 |-----------|---------------|-----------------|
+| New feature | `docs/data-model.md`, `docs/api-spec.md`, `docs/ui-specification.md` | When the feature touches data, API, or UI respectively — typical for most features |
 | New feature | `docs/ARCHITECTURE.md`, `docs/personas/primary-user.md` | Multi-component features, user-facing features |
-| Bug fix | `docs/data-model.md`, `docs/api-spec.md`, `docs/ui-specification.md` | Data/API/UI bugs respectively |
+| Bug fix | `docs/ARCHITECTURE.md`, `docs/data-model.md`, `docs/api-spec.md`, `docs/ui-specification.md` | Multi-component bugs; data/API/UI bugs respectively |
 | Refactoring | `docs/data-model.md`, `docs/stakeholder-definition.md` | Data refactors, scope questions |
 | Spec generation | `docs/personas/primary-user.md` | User-facing entity/endpoint decisions |
 | UI mockup | `docs/api-spec.md`, `docs/personas/primary-user.md` | Data-driven screens, content tone |
 | Prioritization | `docs/work-items/FEAT-*.md`, `docs/work-items/BUG-*.md`, `docs/work-items/IMP-*.md`, `docs/stakeholder-definition.md`, `docs/personas/` | Comparing and prioritizing work items |
 
-**Work Items** (`docs/work-items/`): Feature Briefs, Bug Reports, and Improvement Proposals are the preferred input for task generation. If no work item document exists for a task, the prompts support inline fallbacks — but structured work items produce higher-quality task breakdowns.
+**Work Items** (`docs/work-items/`): Feature Briefs, Bug Reports, and Improvement Proposals are the preferred input for task generation. Blank starters ship in the scaffold as `docs/work-items/TEMPLATE-feature-brief.md`, `TEMPLATE-bug-report.md`, and `TEMPLATE-improvement-proposal.md` — copy one to `FEAT-XXX-short-title.md` (next free ID) before filling it in. If no work item document exists for a task, the prompts support inline fallbacks — but structured work items produce higher-quality task breakdowns.
+
+**Claude Code shortcuts**: The scaffold ships slash-command wrappers in `.claude/commands/` (e.g., `/feature-tasks FEAT-001`, `/bugfix-tasks BUG-002`, `/mockup-generation T-012`). Each wrapper reads the matching prompt template and the routing table above, then writes the output file per this table — prefer them over re-explaining the workflow by hand.
 
 ### Workflow Enforcement
 
-Each task definition includes a **Workflow** field. Before starting any task, check its Workflow value and follow the required steps:
+Each task definition (in the task-list file under `tasks/` — e.g., `tasks/FEAT-XXX-tasks.md`, `tasks/BUG-XXX-tasks.md`, `tasks/IMP-XXX-tasks.md`) includes a **Workflow** field. Before starting any task, check its Workflow value and follow the required steps:
 
 | Workflow | Required Steps Before Implementation |
 |----------|--------------------------------------|
@@ -182,9 +196,9 @@ Each task definition includes a **Workflow** field. Before starting any task, ch
 
 ### Development Pipeline
 
-When implementing tasks from a generated task list, follow this sequence for **each task**:
+When implementing tasks from a generated task list (saved in `tasks/` per the routing table above), follow this sequence for **each task**:
 
-1. **Pick a task** from the task list (respect dependency order).
+1. **Pick a task** from the task-list file in `tasks/` (respect dependency order).
 2. **Check its Workflow field** and complete any prerequisites (see Workflow Enforcement above).
 3. **Generate an implementation plan** using `.ai-framework/prompts/plan-generation.md`. Output: `plans/plan-T-XXX-short-title.md`.
 4. **Implement** following the steps in the plan.

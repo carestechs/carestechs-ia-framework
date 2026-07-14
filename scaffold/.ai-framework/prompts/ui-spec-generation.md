@@ -1,24 +1,176 @@
 # UI Spec Generation Prompt
 
-> **Purpose**: Generate a UI Specification document from existing strategic, architectural, and specification documentation. Use this prompt when you have the stakeholder definition, architecture, API spec, and code conventions, and need to derive the screen layouts, component hierarchy, design tokens, and interaction patterns before generating frontend feature tasks.
->
-> **When to use**: After completing the API Specification (Step 6) and before generating feature tasks (Phase 3). This fills the gap between "what data is available" and "what the UI looks like."
+## Purpose
+
+Generate a UI Specification document from existing strategic, architectural, and specification documentation. Use this prompt when you have the stakeholder definition, architecture, API spec, and code conventions, and need to derive the screen layouts, component hierarchy, design tokens, and interaction patterns before generating frontend feature tasks.
+
+**When to use**: After completing the API Specification and before generating feature tasks. This fills the gap between "what data is available" and "what the UI looks like." (If applicable — skip for CLI tools, libraries, or headless services with no UI.)
 
 ---
 
-## How to Use This Template
+## How to Use
 
-**AI agents (Claude Code, etc.):** Skip the XML context assembly below — you have direct file access. Instead:
-1. Read the files listed in CLAUDE.md's routing table for "UI spec generation"
-2. Read the output format template from `.ai-framework/templates/ui-specification.md` for section structure
-3. Use the **Guidance** and **Output Format** sections below to derive screens, components, and interactions
-4. Apply the **Constraints** and **Post-Generation Checklist** to validate quality
-
-**Chat workflows (manual copy-paste):** Copy the XML template below, paste your documentation into the `<context>` sections, and submit to Claude.
+- **AI agents (Claude Code, etc.):** Read the context files listed in the project CLAUDE.md routing table for "UI spec generation", follow the **Guidance**, **Output Format**, and **Constraints** sections below, and **write the output file**: `docs/ui-specification.md`.
+- **Chat workflows (manual copy-paste):** Use the XML skeleton in the **Chat Workflow Template (XML)** appendix — paste your documentation into the `<context>` sections and include the Guidance, Output Format, and Constraints sections of this prompt alongside it.
 
 ---
 
-## Prompt Template (Chat Workflow)
+## Required Context
+
+Context selection follows the canonical matrix — see `guides/context-compilation.md` (for manual assembly) or the project CLAUDE.md routing table (for agents).
+
+Prompt-specific notes:
+
+- **All four required documents (Stakeholder Definition, Architecture, API Specification, CLAUDE.md) should be included in full.** The UI spec needs the complete picture to derive a comprehensive screen inventory and component hierarchy.
+- **Data Model** is recommended — entity definitions inform display fields, relationships inform navigation, enums inform dropdown/filter options.
+- **Persona** is optional — include it for interaction complexity, information density, and onboarding decisions.
+- **Compiled DDR output** (Design System tables, State Patterns, Responsive Breakpoints) is recommended if DDRs were compiled — use compiled values directly instead of deriving them.
+- Read the output format template from `.ai-framework/templates/ui-specification.md` for section structure.
+
+---
+
+## Guidance
+
+### Prerequisites
+
+Before generating a UI spec, you should have:
+1. **Stakeholder Definition** — for user flows and scope
+2. **Architecture** — for module structure
+3. **Data Model** — for entity definitions (generate first if missing)
+4. **API Specification** — for endpoint definitions (generate first if missing)
+5. **CLAUDE.md** — for frontend conventions
+
+### Deriving Screens from User Flows
+
+1. Read the Scope Lock — every in-scope feature implies at least one screen
+2. Read the User Flow — each phase maps to one or more screens
+3. For each screen, identify:
+   - What data it displays (from API Spec response DTOs)
+   - What actions the user can take (from API Spec request endpoints)
+   - What navigation leads to/from it (from user flow transitions)
+
+### Deriving Components from Entities
+
+1. Each entity typically has:
+   - A **list component** (table or card grid) — maps to list endpoint
+   - A **detail component** (view/edit form) — maps to get/update endpoints
+   - A **create component** (dialog or form) — maps to create endpoint
+   - A **card component** (compact display) — used in lists, boards, and references
+
+2. Cross-entity relationships create:
+   - **Nested lists** (e.g., project → task list within project detail)
+   - **Selection components** (e.g., assignee selector referencing users)
+   - **Navigation patterns** (e.g., click task card → task detail)
+
+### Deriving Interactions from Endpoints
+
+Map each API endpoint to a user interaction:
+
+| Endpoint Pattern | Typical Interaction |
+|-----------------|-------------------|
+| GET /api/resources | Page load, filter change, search |
+| GET /api/resources/:id | Click item to view detail |
+| POST /api/resources | Submit create form/dialog |
+| PUT/PATCH /api/resources/:id | Submit edit form, inline edit, drag-drop |
+| DELETE /api/resources/:id | Click delete with confirmation dialog |
+| POST /api/resources/:id/action | Click action button (assign, move, etc.) |
+
+### Deriving Design Tokens
+
+1. **If DDRs were compiled**: Use the compiled Design System values directly for colors, typography, spacing, state patterns, and responsive breakpoints. Do not re-derive or invent new values — the DDR compilation is the authoritative source.
+2. If the project has brand guidelines (but no DDR compilation), extract colors, fonts, and spacing
+3. If using a component library [e.g., Angular Material], document the theme configuration
+4. Map semantic colors (primary, error, success) to specific hex values
+5. Define typography scale based on the heading hierarchy needed
+
+### States for Every Screen
+
+Every screen specification MUST include:
+
+| State | What to Define |
+|-------|---------------|
+| **Default** | What the screen looks like with data loaded |
+| **Loading** | What shows while data is being fetched (skeleton, spinner, shimmer) |
+| **Empty** | What shows when there's no data yet (illustration, message, CTA) |
+| **Error** | What shows when data fetch fails (error message, retry button) |
+
+### Review and Validate
+
+After generating, validate against the source docs:
+- Does every user flow step have a screen?
+- Does every screen map to at least one API endpoint?
+- Does every entity have a display component?
+- Are all states (loading, empty, error) specified for every screen?
+- Are the component library and styling constraints from CLAUDE.md respected?
+
+---
+
+## Output Format
+
+Write the generated document to the canonical location: **`docs/ui-specification.md`**.
+
+Generate a complete document following the template structure from `.ai-framework/templates/ui-specification.md`:
+
+1. **Overview** — UI summary + Key UI Decisions table
+2. **Design System** — Colors, typography, spacing, component library usage
+3. **Screen Inventory** — Table of all screens with routes, auth, layouts
+4. **Shared Layouts** — App shell structure, public layout
+5. **Screen Specifications** — Per-screen blocks with:
+   - Layout sketch (ASCII)
+   - Component hierarchy (tree)
+   - Component → API mapping (table)
+   - States: default, loading, empty, error
+   - User interactions: action → result → API call
+6. **Shared Components** — Reusable components with inputs/outputs/variants
+7. **Usage Notes** — Rules for AI task generation
+
+Derive all content from the context documents provided:
+- Screens from stakeholder user flows and scope lock
+- Component hierarchy from architecture modules and API endpoint groupings
+- Design tokens from project branding and conventions (or compiled DDR output)
+- Interaction patterns from user flow steps and API endpoints
+- States (loading, empty, error) for every screen and component
+
+---
+
+## Constraints
+
+- Follow all conventions from CLAUDE.md exactly — use the component framework, component library, and styling system declared there [e.g., Angular standalone components + Angular Material + Tailwind]
+- Use the component library declared in CLAUDE.md — do not define custom UI primitives when the library provides an equivalent
+- Use the styling system declared in CLAUDE.md for all layout and spacing — do not create ad-hoc component-scoped styles outside its conventions
+- Respect module boundaries from the architecture document — components belong to the module whose data they primarily display
+- Only include screens for features within the scope lock — do not invent screens or features beyond it
+- Every screen must map to at least one API endpoint
+- Every entity with a list endpoint must have a corresponding list screen or embedded list component
+- Use the response envelope format from CLAUDE.md when describing what data components receive
+
+---
+
+## Post-Generation Checklist
+
+After the AI generates a UI spec document, verify:
+
+- [ ] Every user flow phase from the stakeholder definition has at least one screen
+- [ ] Every screen in the Screen Inventory has a full specification in Section 5
+- [ ] Every screen specification includes all 4 states (default, loading, empty, error)
+- [ ] Every screen has a component hierarchy tree
+- [ ] Every screen and component maps to at least one API endpoint from the API spec
+- [ ] Every entity from the data model has a display component (list, detail, or card)
+- [ ] Every interaction is specific (not vague) — each maps to a UI element, result, and API call
+- [ ] Component hierarchy uses the conventions declared in CLAUDE.md [e.g., Angular standalone components, no NgModules]
+- [ ] All UI uses the component library and styling system declared in CLAUDE.md (no custom primitives or ad-hoc styles)
+- [ ] Shared components used in 2+ screens are documented in Section 6
+- [ ] Design tokens (colors, typography, spacing) are fully defined
+- [ ] All component-library components used are listed with customization notes
+- [ ] Routes follow a consistent pattern and match the screen inventory
+- [ ] No screens exist for features outside the scope lock
+- [ ] Layout sketches match the shared layout definitions in Section 4
+
+---
+
+## Chat Workflow Template (XML)
+
+Copy this skeleton, paste your documentation into the `<context>` sections, and submit together with the Guidance, Output Format, and Constraints sections above.
 
 ```xml
 <ui-spec-generation-request>
@@ -50,8 +202,9 @@
 </data-model>
 
 <code-conventions>
-<!-- REQUIRED: Angular/Material/Tailwind constraints, naming conventions,
-     and frontend patterns directly constrain component implementation. -->
+<!-- REQUIRED: Frontend stack conventions (component framework, component library,
+     styling system), naming conventions, and frontend patterns directly
+     constrain component implementation. -->
 [Paste full CLAUDE.md content]
 </code-conventions>
 
@@ -74,173 +227,18 @@
 <spec-type>UI Specification</spec-type>
 
 <request>
-Generate a complete UI Specification document for this project.
-
-Use the template structure from `.ai-framework/templates/ui-specification.md`
-as the output format.
-
-Derive all content from the context documents provided:
-- Screens from stakeholder user flows and scope lock
-- Component hierarchy from architecture modules and API endpoint groupings
-- Design tokens from project branding and conventions
-- Interaction patterns from user flow steps and API endpoints
-- States (loading, empty, error) for every screen and component
-
-Do not invent screens or features beyond the defined scope lock.
+Generate a complete UI Specification document for this project,
+following the Guidance, Output Format, and Constraints from prompts/ui-spec-generation.md.
 </request>
-
-<guidance>
-## Deriving Screens from User Flows
-
-1. Read the Scope Lock — every in-scope feature implies at least one screen
-2. Read the User Flow — each phase maps to one or more screens
-3. For each screen, identify:
-   - What data it displays (from API Spec response DTOs)
-   - What actions the user can take (from API Spec request endpoints)
-   - What navigation leads to/from it (from user flow transitions)
-
-## Deriving Components from Entities
-
-1. Each entity typically has:
-   - A **list component** (table or card grid) — maps to list endpoint
-   - A **detail component** (view/edit form) — maps to get/update endpoints
-   - A **create component** (dialog or form) — maps to create endpoint
-   - A **card component** (compact display) — used in lists, boards, and references
-
-2. Cross-entity relationships create:
-   - **Nested lists** (e.g., project → task list within project detail)
-   - **Selection components** (e.g., assignee selector referencing users)
-   - **Navigation patterns** (e.g., click task card → task detail)
-
-## Deriving Interactions from Endpoints
-
-Map each API endpoint to a user interaction:
-
-| Endpoint Pattern | Typical Interaction |
-|-----------------|-------------------|
-| GET /api/resources | Page load, filter change, search |
-| GET /api/resources/:id | Click item to view detail |
-| POST /api/resources | Submit create form/dialog |
-| PUT/PATCH /api/resources/:id | Submit edit form, inline edit, drag-drop |
-| DELETE /api/resources/:id | Click delete with confirmation dialog |
-| POST /api/resources/:id/action | Click action button (assign, move, etc.) |
-
-## Deriving Design Tokens
-
-1. **If DDRs were compiled**: Use the compiled Design System values directly for colors, typography, spacing, state patterns, and responsive breakpoints. Do not re-derive or invent new values — the DDR compilation is the authoritative source.
-2. If the project has brand guidelines (but no DDR compilation), extract colors, fonts, and spacing
-3. If using a component library (Angular Material), document the theme configuration
-4. Map semantic colors (primary, error, success) to specific hex values
-5. Define typography scale based on the heading hierarchy needed
-
-## States for Every Screen
-
-Every screen specification MUST include:
-
-| State | What to Define |
-|-------|---------------|
-| **Default** | What the screen looks like with data loaded |
-| **Loading** | What shows while data is being fetched (skeleton, spinner, shimmer) |
-| **Empty** | What shows when there's no data yet (illustration, message, CTA) |
-| **Error** | What shows when data fetch fails (error message, retry button) |
-</guidance>
-
-<constraints>
-- Follow all conventions from CLAUDE.md exactly (Angular standalone components, Angular Material, Tailwind, etc.)
-- Use Angular Material components — do not define custom UI primitives when Material provides an equivalent
-- Use Tailwind CSS for all layout and spacing — do not create component-scoped CSS
-- Respect module boundaries from the architecture document — components belong to the module whose data they primarily display
-- Only include screens for features within the scope lock
-- Every screen must map to at least one API endpoint
-- Every entity with a list endpoint must have a corresponding list screen or embedded list component
-- Use the response envelope format from CLAUDE.md when describing what data components receive
-</constraints>
-
-<output-format>
-## Output Requirements
-
-Generate a complete document following the template structure from
-`.ai-framework/templates/ui-specification.md`:
-
-1. **Overview** — UI summary + Key UI Decisions table
-2. **Design System** — Colors, typography, spacing, component library usage
-3. **Screen Inventory** — Table of all screens with routes, auth, layouts
-4. **Shared Layouts** — App shell structure, public layout
-5. **Screen Specifications** — Per-screen blocks with:
-   - Layout sketch (ASCII)
-   - Component hierarchy (tree)
-   - Component → API mapping (table)
-   - States: default, loading, empty, error
-   - User interactions: action → result → API call
-6. **Shared Components** — Reusable components with inputs/outputs/variants
-7. **Usage Notes** — Rules for AI task generation
-
-## Quality Checks:
-- [ ] Every user flow step from the stakeholder definition has a corresponding screen
-- [ ] Every screen maps to at least one API endpoint from the API spec
-- [ ] Every entity from the data model has a display component (list, detail, or card)
-- [ ] All 4 states (default, loading, empty, error) are defined for every screen
-- [ ] Component hierarchy uses Angular standalone components (no NgModules)
-- [ ] All UI uses Angular Material components and Tailwind CSS (no custom primitives or CSS files)
-- [ ] Shared components are identified and documented (used in 2+ screens)
-- [ ] Routes follow a consistent pattern and match the screen inventory
-- [ ] Interactions are specific (not vague) — each maps to a UI element, result, and API call
-</output-format>
 
 </ui-spec-generation-request>
 ```
 
 ---
 
-## Context Selection Guide
+## Example
 
-### What to Include
-
-| Document | Priority | What to Include |
-|----------|----------|-----------------|
-| Stakeholder Definition | Required | Full document — user flows, scope lock, philosophy |
-| Architecture | Required | Full document — modules, components, real-time capabilities |
-| API Specification | Required | Full document — all endpoints, DTOs, status codes |
-| CLAUDE.md | Required | Full document — Angular/Material/Tailwind conventions |
-| Data Model | Recommended | Full document — entities inform display fields and navigation |
-| Persona | Optional | Include for interaction complexity and onboarding decisions |
-| Compiled DDR output | Recommended | Pre-defined Design System values from DDR compilation — use directly instead of deriving |
-
-**All four required documents should be included in full.** The UI spec needs the complete picture to derive a comprehensive screen inventory and component hierarchy.
-
----
-
-## Workflow
-
-### Step 1: Ensure Prerequisites Exist
-
-Before generating a UI spec, you should have:
-1. **Stakeholder Definition** — for user flows and scope
-2. **Architecture** — for module structure
-3. **Data Model** — for entity definitions (generate first if missing)
-4. **API Specification** — for endpoint definitions (generate first if missing)
-5. **CLAUDE.md** — for frontend conventions
-
-### Step 2: Generate UI Specification
-
-Assemble all context documents and run the prompt above. The AI will derive:
-- Screens from user flows
-- Components from entities and endpoints
-- Interactions from API endpoints
-- Design tokens from conventions
-
-### Step 3: Review and Validate
-
-After generating, validate against the source docs:
-- Does every user flow step have a screen?
-- Does every screen map to at least one API endpoint?
-- Does every entity have a display component?
-- Are all states (loading, empty, error) specified for every screen?
-- Are Angular Material and Tailwind constraints respected?
-
----
-
-## Example: Generating a UI Spec for a Project Management App
+Generating a UI Spec for a project management app (this example project declares an Angular stack in its CLAUDE.md — substitute your own):
 
 ```xml
 <ui-spec-generation-request>
@@ -314,21 +312,4 @@ Map each screen to the appropriate API endpoints.
 </ui-spec-generation-request>
 ```
 
----
-
-## Post-Generation Checklist
-
-After the AI generates a UI spec document, verify:
-
-- [ ] Every user flow phase from the stakeholder definition has at least one screen
-- [ ] Every screen in the Screen Inventory has a full specification in Section 5
-- [ ] Every screen specification includes all 4 states (default, loading, empty, error)
-- [ ] Every screen has a component hierarchy tree
-- [ ] Every component maps to at least one API endpoint
-- [ ] Every interaction specifies the UI element, result, and API call
-- [ ] Shared components used in 2+ screens are documented in Section 6
-- [ ] Design tokens (colors, typography, spacing) are fully defined
-- [ ] All Angular Material components used are listed with customization notes
-- [ ] Routes are consistent with the screen inventory
-- [ ] No screens exist for features outside the scope lock
-- [ ] Layout sketches match the shared layout definitions in Section 4
+**Output:** `docs/ui-specification.md` — a complete UI specification following the `ui-specification.md` template structure.

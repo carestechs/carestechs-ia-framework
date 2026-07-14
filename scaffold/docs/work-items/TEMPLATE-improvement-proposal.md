@@ -1,4 +1,6 @@
-# Improvement Proposal: IMP-001 — [Improvement Name]
+<!-- Copy this file to docs/work-items/IMP-XXX-short-title.md (next free ID) before filling. -->
+
+# Improvement Proposal: IMP-XXX — [Improvement Name]
 
 > **Purpose**: Describe a refactoring or improvement at a high level before generating implementation tasks.
 > **Template reference**: `.ai-framework/templates/improvement-proposal.md`
@@ -9,11 +11,12 @@
 
 | Field | Value |
 |-------|-------|
-| **ID** | IMP-001 |
+| **ID** | IMP-XXX |
 | **Name** | <!-- TODO: Short, descriptive improvement name --> |
 | **Type** | <!-- TODO: Refactoring · Performance · Testability · Maintainability · Security · Accessibility · Developer Experience --> |
 | **Status** | Proposed |
 | **Priority** | <!-- TODO: Critical · High · Medium · Low --> |
+| **Estimated Effort** | <!-- TODO: S · M · L · XL (S = hours, M = 1-2 days, L = up to a week, XL = multi-week — consider splitting) --> |
 | **Proposed By** | <!-- TODO: Who proposed this --> |
 | **Date Created** | <!-- TODO: YYYY-MM-DD --> |
 

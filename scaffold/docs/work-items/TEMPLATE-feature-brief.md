@@ -1,4 +1,6 @@
-# Feature Brief: FEAT-001 — [Feature Name]
+<!-- Copy this file to docs/work-items/FEAT-XXX-short-title.md (next free ID) before filling. -->
+
+# Feature Brief: FEAT-XXX — [Feature Name]
 
 > **Purpose**: Describe a feature at a high level before breaking it down into implementation tasks.
 > **Template reference**: `.ai-framework/templates/feature-brief.md`
@@ -9,10 +11,10 @@
 
 | Field | Value |
 |-------|-------|
-| **ID** | FEAT-001 |
+| **ID** | FEAT-XXX |
 | **Name** | <!-- TODO: Short, descriptive feature name --> |
 | **Target Version** | <!-- TODO: Version number or "Continuous" --> |
-| **Status** | Not Started |
+| **Status** | Not Started <!-- Not Started · In Progress · Tasks Generated · Blocked · Completed · Cancelled --> |
 | **Priority** | <!-- TODO: Critical · High · Medium · Low --> |
 | **Requested By** | <!-- TODO: Who requested this --> |
 | **Date Created** | <!-- TODO: YYYY-MM-DD --> |
@@ -106,6 +108,8 @@
 <!-- TODO: Technical, business, or timeline constraints -->
 -
 -
+
+**Non-Functional Requirements (optional):** <!-- TODO: Performance, security, accessibility, or scalability requirements specific to this feature — delete if none beyond the global standards -->
 
 ---
 

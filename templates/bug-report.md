@@ -154,7 +154,21 @@
 
 ---
 
-## 10. Usage Notes for AI Task Generation
+## 10. Root Cause & Resolution
+
+> *Fill this section when the Status moves to Resolved. It closes the loop: future investigations of similar symptoms start here, and it feeds regression-test generation.*
+
+| Field | Value |
+|-------|-------|
+| **Root Cause** | [The actual underlying defect — code path, wrong assumption, missing validation. Be specific: "X did Y because Z", not "fixed the bug"] |
+| **Fix Summary** | [What was changed to fix it — files/components touched and the nature of the change] |
+| **Fixed In** | [Version, commit hash, or PR reference where the fix shipped] |
+
+<!-- TODO: Leave this section with placeholder values until the bug is actually resolved. Do not guess the root cause here while Status is Reported/Investigating — hypotheses belong in Section 6 (Observations). -->
+
+---
+
+## 11. Usage Notes for AI Task Generation
 
 When generating investigation and fix tasks from this Bug Report:
 
@@ -166,3 +180,4 @@ When generating investigation and fix tasks from this Bug Report:
 6. **Impact-proportionate response**: Use Section 8 (Impact Assessment) to calibrate fix scope. A data-loss bug requires more thorough testing than a cosmetic issue.
 7. **Traceability**: Include the Bug Report ID (BUG-XXX) in the task generation output summary for cross-referencing.
 8. **Fix verification**: Generated fix tasks must include a test case that reproduces the exact bug scenario from Section 2.
+9. **Resolution capture**: The final generated task should include filling Section 10 (Root Cause & Resolution) and setting Status to Resolved once the fix is verified.

@@ -1,24 +1,319 @@
-# Refactoring Task Generation Prompt (v2)
-
-> **Purpose**: Generate tasks for refactoring code while maintaining functionality. Use this when improving code quality, architecture, or preparing for new features.
->
-> **v2 Note**: This version uses 10 core templates (7 system templates + 3 work item templates). Improvements should be described in an **Improvement Proposal** (`docs/work-items/IMP-*.md`) before task generation. The inline `<refactoring-scope>` is still supported as a fallback for quick/ad-hoc usage.
+# Refactoring Task Generation Prompt
 
 ---
 
-## How to Use This Template
+## Purpose
 
-**AI agents (Claude Code, etc.):** Skip the XML context assembly below — you have direct file access. Instead:
-1. Read the files listed in CLAUDE.md's routing table for "Refactoring"
-2. Read the Improvement Proposal from `docs/work-items/IMP-*.md` for the target improvement. If no Improvement Proposal exists, gather the refactoring scope from the user and use the inline `<refactoring-scope>` fallback
-3. Use the **Output Format** section below (four-phase structure: Preparation, Parallel Implementation, Migration, Cleanup, Verification) as your deliverable structure
-4. Apply the **Constraints** and **Safety Checklist** to shape your output
+Generate tasks for refactoring code while maintaining functionality. Use this when improving code quality, architecture, or preparing for new features.
 
-**Chat workflows (manual copy-paste):** Copy the XML template below, paste your documentation into the `<context>` sections, fill in the `<improvement-proposal>` (or `<refactoring-scope>` fallback), and submit to Claude.
+Improvements should be described in an **Improvement Proposal** (`docs/work-items/IMP-XXX-short-title.md`) before task generation. An inline description (`<inline-request>`) is supported as a fallback for quick/ad-hoc usage.
+
+This prompt uses the **canonical task schema defined in `prompts/base-template.md`** (field list, order, enums, grouping). Deltas declared here: the `Type` enum adds **`Cleanup`**; tasks are organized into the five-phase safety structure below with phase-preset `Workflow` values.
 
 ---
 
-## Prompt Template (Chat Workflow)
+## How to Use
+
+- **AI agents (Claude Code, etc.):** Read the context files listed in your project CLAUDE.md's routing table for "Refactoring", read the Improvement Proposal from `docs/work-items/IMP-XXX-short-title.md` (if none exists, gather the refactoring scope from the user as an inline request), follow the sections below, and **write** the task list to `tasks/IMP-XXX-tasks.md` (or `tasks/adhoc-short-title-tasks.md` for inline requests with no work item).
+- **Chat workflows (manual copy-paste):** Use the XML skeleton in the [Chat Workflow Template (XML)](#chat-workflow-template-xml) appendix. Include this prompt's Output Format and Constraints sections alongside the skeleton so the assistant knows the expected schema.
+
+---
+
+## Required Context
+
+Context selection lives in the **canonical matrix**: `guides/context-compilation.md` (humans) or the CLAUDE.md routing table (agents).
+
+For refactoring: **required** = Improvement Proposal + CLAUDE.md + Architecture (current and target structure); **optional** = Data Model (data layer refactoring), Stakeholder Definition (large-scale refactoring that affects product scope).
+
+Prompt-specific notes:
+
+- **Improvement Proposal** (preferred): `docs/work-items/IMP-XXX-short-title.md` provides structured risk assessment, success criteria, test coverage baseline, and traceability. Generates safer, better-phased refactoring tasks.
+- **Inline `<inline-request>`** (fallback): use for quick/ad-hoc refactoring when a full Improvement Proposal hasn't been written yet. Faster but less structured.
+
+---
+
+## Guidance
+
+Generate tasks to refactor the identified area. Tasks should:
+
+1. Start with test coverage verification/improvement
+2. Proceed in small, safe increments
+3. Maintain functionality at every step (no broken intermediate states)
+4. Include migration steps if data/API changes needed
+5. End with cleanup of old code
+6. Verify no regression after each major change
+
+Do not:
+
+- Change functionality (this is refactoring, not enhancement)
+- Introduce new features during refactoring
+- Leave dead code or commented-out old code
+- Skip test updates for changed code
+
+### Workflow Classification
+
+Refactoring tasks default to **`standard`** — refactoring maintains existing functionality. The full enum remains valid: use `investigation-first` when the current behavior of the code being refactored is poorly understood and must be documented before restructuring; `mockup-first` applies only in the rare case a refactoring legitimately reworks a user-facing screen.
+
+### Common Refactoring Patterns
+
+When generating refactoring tasks, consider these safe patterns:
+
+**1. Strangler Fig Pattern**
+- Build new alongside old
+- Gradually migrate consumers
+- Delete old when unused
+
+**2. Branch by Abstraction**
+- Introduce abstraction layer
+- Implement old behavior behind abstraction
+- Implement new behavior behind abstraction
+- Switch via configuration/flag
+- Remove old implementation
+
+**3. Parallel Change**
+- Add new field/method alongside old
+- Migrate consumers one by one
+- Remove old field/method
+
+**4. Extract and Delegate**
+- Extract subset of functionality to new module
+- Original delegates to new module
+- Gradually move more logic to new module
+
+---
+
+## Output Format
+
+**Output file:** `tasks/IMP-XXX-tasks.md` (matching the Improvement Proposal's ID; `tasks/adhoc-short-title-tasks.md` for inline requests). AI agents write this file — the task list is not just chat output.
+
+**Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` enum delta: adds `Cleanup`. Every task block in every phase includes Description and Acceptance Criteria. No nested sub-task lists — one T-XXX block per unit of work.
+
+Generate tasks in phases that ensure safety:
+
+### Phase 0: Preparation (Safety Net)
+
+Create **separate tasks** for the coverage baseline and for each coverage gap — do not nest a sub-task list inside one block.
+
+```
+### T-[XXX]: Establish test coverage baseline for [affected area]
+
+**Type:** Testing
+**Workflow:** standard
+
+**Description:**
+[Measure and document current test coverage for the code being refactored;
+list untested scenarios and missing edge cases]
+
+**Rationale:**
+[1-2 sentences: why a documented baseline is needed before refactoring begins]
+
+**Acceptance Criteria:**
+- [ ] Current coverage for the affected area measured and documented
+- [ ] Coverage gaps listed (untested scenarios, missing edge cases)
+- [ ] All existing tests pass before any refactoring begins
+
+**Dependencies:** None
+**Complexity:** [S | M | L | XL]
+
+**Files to Modify/Create:**
+- [coverage report / baseline notes location]
+```
+
+```
+### T-[XXX]: Add tests for [uncovered scenario or edge case]
+
+**Type:** Testing
+**Workflow:** standard
+
+**Description:**
+[Add the missing tests for one specific gap identified in the baseline task —
+create one task like this per coverage gap]
+
+**Rationale:**
+[1-2 sentences: why this scenario must be covered before the refactoring touches it]
+
+**Acceptance Criteria:**
+- [ ] Scenario has passing test coverage
+- [ ] Tests exercise current (pre-refactoring) behavior
+
+**Dependencies:** [T-XXX]
+**Complexity:** [S | M | L | XL]
+
+**Files to Modify/Create:**
+- [test/file/path] - [tests added]
+```
+
+### Phase 1: Safe Parallel Implementation
+
+```
+### T-[XXX]: [Create new structure]
+
+**Type:** [Backend | Frontend]
+**Workflow:** standard
+
+**Description:**
+[Create new implementation alongside old, without removing old]
+
+**Rationale:**
+[1-2 sentences: why this new structure is needed — which problem from the current state it resolves]
+
+**Acceptance Criteria:**
+- [ ] New structure is complete
+- [ ] Old code still works unchanged
+- [ ] New structure passes all intended tests
+
+**Dependencies:** [T-XXX, T-YYY]
+**Complexity:** [S | M | L | XL]
+
+**Files to Modify/Create:**
+- [new/file/path.ts] - [purpose]
+
+**Technical Notes:**
+- Approach: [how to build new structure without breaking old]
+- Coexistence strategy: [how old and new will coexist temporarily]
+```
+
+### Phase 2: Migration
+
+```
+### T-[XXX]: [Migrate component/consumer X]
+
+**Type:** [Backend | Frontend]
+**Workflow:** standard
+
+**Description:**
+[Switch specific consumer from old to new implementation]
+
+**Rationale:**
+[1-2 sentences: why this consumer needs to migrate — what benefit the new implementation provides]
+
+**Acceptance Criteria:**
+- [ ] Component uses new implementation
+- [ ] All tests still pass
+- [ ] No regression in functionality
+
+**Dependencies:** [T-XXX, T-YYY]
+**Complexity:** [S | M | L | XL]
+
+**Files to Modify/Create:**
+- [consumer/file/path.ts] - [switch to new implementation]
+
+**Technical Notes:**
+- Migration steps: [ordered steps, ending with functional verification]
+- Rollback plan: [how to quickly revert if problems found]
+```
+
+### Phase 3: Cleanup
+
+```
+### T-[XXX]: Remove old implementation
+
+**Type:** Cleanup
+**Workflow:** standard
+
+**Description:**
+[Remove old code now that migration is complete]
+
+**Rationale:**
+[1-2 sentences: why cleanup is safe now — what migration milestones confirm the old code is unused]
+
+**Acceptance Criteria:**
+- [ ] No references to old implementation remain
+- [ ] No dead code left behind
+- [ ] Build succeeds
+- [ ] All tests pass
+
+**Dependencies:** [T-XXX, T-YYY — all migration task IDs]
+**Complexity:** [S | M | L | XL]
+
+**Files to Modify/Create:**
+- [old/file/path.ts] - DELETE
+- [file/with/imports.ts] - remove old imports
+```
+
+### Phase 4: Verification
+
+```
+### T-[XXX]: Final verification
+
+**Type:** Testing
+**Workflow:** standard
+
+**Description:**
+[Run the full verification pass across the refactored area — original and new
+test suites, static checks, performance benchmarks, and documentation review]
+
+**Rationale:**
+[1-2 sentences: why final verification is needed — what confidence it provides that the refactoring preserved behavior]
+
+**Acceptance Criteria:**
+- [ ] All original tests pass
+- [ ] New tests pass
+- [ ] Performance benchmarks met (if applicable)
+- [ ] No type/lint errors
+- [ ] Documentation updated
+- [ ] Team walkthrough completed (if significant change)
+
+**Dependencies:** [T-XXX, T-YYY — cleanup task IDs]
+**Complexity:** [S | M | L | XL]
+
+**Files to Modify/Create:**
+- [documentation files to update, if any]
+```
+
+### Summary Section
+
+After all tasks, provide:
+
+- Total tasks by phase
+- Critical path and estimated sequence
+- Risk assessment
+- Recommended review points (where to pause and verify)
+- Rollback strategy summary
+
+---
+
+## Constraints
+
+- No functionality changes — this is refactoring, not enhancement
+- Every phase must leave the system in a working state
+- Old code is removed only after all consumers have migrated and verification passes
+- One `Type` per task; Dependencies are plain task ID lists (or `None`)
+- Apply the project-specific constraints supplied in the request, e.g.:
+  - Must maintain backward compatibility: [Yes/No, details]
+  - Can break internal APIs: [Yes/No]
+  - Deployment strategy: [All at once | Incremental | Feature flagged]
+  - Rollback plan required: [Yes/No]
+
+---
+
+## Post-Generation Checklist
+
+### Safety Checklist
+
+Before approving generated refactoring tasks:
+
+- [ ] Tests are written/verified BEFORE refactoring begins
+- [ ] Each phase leaves system in working state
+- [ ] No "big bang" changes that can't be incrementally deployed
+- [ ] Rollback strategy exists for each significant change
+- [ ] Old code removed only after verification
+- [ ] Documentation updates included
+- [ ] Team review points identified
+- [ ] Performance implications considered
+- [ ] No functionality changes hidden in refactoring
+
+### Schema Checklist
+
+- [ ] Every task block (all phases) has Description and Acceptance Criteria
+- [ ] No nested sub-task lists — each unit of work is its own T-XXX block
+- [ ] Complexity uses the full `S | M | L | XL` scale
+- [ ] Dependencies are plain task ID lists (or `None`) forming a valid DAG
+- [ ] Task list saved to `tasks/IMP-XXX-tasks.md` (agents)
+
+---
+
+## Chat Workflow Template (XML)
 
 ```xml
 <task-generation-request>
@@ -45,17 +340,17 @@
 <task-type>Refactoring</task-type>
 
 <improvement-proposal>
-<!-- PREFERRED: Paste the full Improvement Proposal document (from docs/work-items/IMP-XXX-name.md) -->
-<!-- The Improvement Proposal template provides structured fields for current/desired state,
+<!-- PREFERRED: Paste the full Improvement Proposal document (from docs/work-items/IMP-XXX-short-title.md).
+     The Improvement Proposal template provides structured fields for current/desired state,
      risk assessment, success criteria, test coverage, and traceability.
      See .ai-framework/templates/improvement-proposal.md for the full template. -->
 [Paste full Improvement Proposal content]
 </improvement-proposal>
 
-<!-- FALLBACK: If no Improvement Proposal exists, use this inline scope instead.
+<!-- FALLBACK: If no Improvement Proposal exists, use this inline request instead.
      Remove the <improvement-proposal> block above and uncomment this block. -->
 <!--
-<refactoring-scope>
+<inline-request>
 **Refactoring Type:** [Code Quality | Architecture | Performance | Testability | Maintainability]
 
 **Target Area:**
@@ -87,25 +382,12 @@
 **Current Test Coverage:**
 - [Current coverage status for affected area]
 - [Known gaps or concerns]
-</refactoring-scope>
+</inline-request>
 -->
 
 <request>
 Generate tasks to refactor the identified area.
-
-Tasks should:
-1. Start with test coverage verification/improvement
-2. Proceed in small, safe increments
-3. Maintain functionality at every step (no broken intermediate states)
-4. Include migration steps if data/API changes needed
-5. End with cleanup of old code
-6. Verify no regression after each major change
-
-Do not:
-- Change functionality (this is refactoring, not enhancement)
-- Introduce new features during refactoring
-- Leave dead code or commented-out old code
-- Skip test updates for changed code
+[Add any refactoring-specific focus here.]
 </request>
 
 <constraints>
@@ -117,221 +399,16 @@ Do not:
 - [Additional constraints]
 </constraints>
 
-<output-format>
-## Task Output Format
-
-Generate tasks in phases that ensure safety:
-
-### Phase 0: Preparation (Safety Net)
-
-```
-### T-[XXX]: Verify/Improve Test Coverage
-
-**Type:** Testing
-**Workflow:** standard
-**Complexity:** [S | M | L]
-**Dependencies:** None
-
-**Rationale:**
-[1-2 sentences: why this coverage task is needed before refactoring begins]
-
-**Current Coverage:**
-[Known test coverage for affected code]
-
-**Coverage Gaps:**
-- [Gap 1 - untested scenario]
-- [Gap 2 - missing edge case]
-
-**Tasks:**
-1. [Add test for scenario X]
-2. [Add test for scenario Y]
-
-**Acceptance Criteria:**
-- [ ] All current functionality has test coverage
-- [ ] Tests pass before any refactoring begins
-- [ ] Test coverage baseline documented
-```
-
-### Phase 1: Safe Parallel Implementation
-
-```
-### T-[XXX]: [Create New Structure]
-
-**Type:** [Backend | Frontend]
-**Workflow:** standard
-**Complexity:** [S | M | L | XL]
-**Dependencies:** [T-XXX (test coverage)]
-
-**Description:**
-[Create new implementation alongside old, without removing old]
-
-**Rationale:**
-[1-2 sentences: why this new structure is needed — which problem from the current state it resolves]
-
-**Approach:**
-[How to build new structure without breaking old]
-
-**Files Created:**
-- [new/file/path.ts] - [purpose]
-
-**Coexistence Strategy:**
-[How old and new will coexist temporarily]
-
-**Acceptance Criteria:**
-- [ ] New structure is complete
-- [ ] Old code still works unchanged
-- [ ] New structure passes all intended tests
-```
-
-### Phase 2: Migration
-
-```
-### T-[XXX]: [Migrate Component/Consumer X]
-
-**Type:** [Backend | Frontend]
-**Workflow:** standard
-**Complexity:** [S | M | L]
-**Dependencies:** [T-XXX (new structure)]
-
-**Description:**
-[Switch specific consumer from old to new implementation]
-
-**Rationale:**
-[1-2 sentences: why this consumer needs to migrate — what benefit the new implementation provides]
-
-**Migration Steps:**
-1. [Step 1]
-2. [Step 2]
-3. [Verify functionality]
-
-**Rollback Plan:**
-[How to quickly revert if problems found]
-
-**Acceptance Criteria:**
-- [ ] Component uses new implementation
-- [ ] All tests still pass
-- [ ] No regression in functionality
-```
-
-### Phase 3: Cleanup
-
-```
-### T-[XXX]: Remove Old Implementation
-
-**Type:** Cleanup
-**Workflow:** standard
-**Complexity:** [S | M]
-**Dependencies:** [All migration tasks]
-
-**Description:**
-[Remove old code now that migration is complete]
-
-**Rationale:**
-[1-2 sentences: why cleanup is safe now — what migration milestones confirm the old code is unused]
-
-**Files to Remove/Modify:**
-- [old/file/path.ts] - DELETE
-- [file/with/imports.ts] - remove old imports
-
-**Acceptance Criteria:**
-- [ ] No references to old implementation remain
-- [ ] No dead code left behind
-- [ ] Build succeeds
-- [ ] All tests pass
-```
-
-### Phase 4: Verification
-
-```
-### T-[XXX]: Final Verification
-
-**Type:** Testing
-**Workflow:** standard
-**Complexity:** [S | M]
-**Dependencies:** [Cleanup tasks]
-
-**Rationale:**
-[1-2 sentences: why final verification is needed — what confidence it provides that the refactoring preserved behavior]
-
-**Verification Checklist:**
-- [ ] All original tests pass
-- [ ] New tests pass
-- [ ] Performance benchmarks met (if applicable)
-- [ ] No TypeScript/lint errors
-- [ ] Documentation updated
-- [ ] Team walkthrough completed (if significant change)
-```
-
-## Workflow Classification
-
-All refactoring tasks use **`standard`** workflow. Refactoring maintains existing functionality — it does not introduce new screens (no `mockup-first`) or investigate unknowns (no `investigation-first`).
-
-## Summary Section
-
-After all tasks, provide:
-- Total tasks by phase
-- Critical path and estimated sequence
-- Risk assessment
-- Recommended review points (where to pause and verify)
-- Rollback strategy summary
-</output-format>
-
 </task-generation-request>
 ```
 
 ---
 
-## Common Refactoring Patterns
+## Example
 
-When generating refactoring tasks, Claude should consider these safe patterns:
+Service extraction.
 
-### 1. Strangler Fig Pattern
-- Build new alongside old
-- Gradually migrate consumers
-- Delete old when unused
-
-### 2. Branch by Abstraction
-- Introduce abstraction layer
-- Implement old behavior behind abstraction
-- Implement new behavior behind abstraction
-- Switch via configuration/flag
-- Remove old implementation
-
-### 3. Parallel Change
-- Add new field/method alongside old
-- Migrate consumers one by one
-- Remove old field/method
-
-### 4. Extract and Delegate
-- Extract subset of functionality to new module
-- Original delegates to new module
-- Gradually move more logic to new module
-
----
-
-## Context Selection Guide (v2)
-
-### What to Include
-
-| Document | When to Include | Why |
-|----------|-----------------|-----|
-| Improvement Proposal | Always (preferred) | Full `docs/work-items/IMP-*.md` for target improvement |
-| CLAUDE.md | Always | Target patterns and conventions |
-| Architecture | Always | Understand component relationships, current vs target |
-| Data Model | Data layer refactoring | Understand entity definitions and relationships |
-| Stakeholder Definition | Large-scale refactoring | Ensure refactoring aligns with product direction |
-| Persona | Rarely | Only if refactoring affects user-visible behavior |
-
-### Improvement Proposal vs Inline Scope
-
-- **Improvement Proposal** (preferred): Use `docs/work-items/IMP-*.md`. Provides structured risk assessment, success criteria, test coverage baseline, and traceability. Generates safer, better-phased refactoring tasks.
-- **Inline `<refactoring-scope>`** (fallback): Use for quick/ad-hoc refactoring when a full Improvement Proposal hasn't been written yet. Faster but less structured.
-
----
-
-## Example: Service Extraction
-
-> **Note:** This example uses the inline `<refactoring-scope>` fallback for brevity. For safer, better-phased refactoring tasks, use a full Improvement Proposal document via `<improvement-proposal>` as described in the Prompt Template above.
+> **Note:** This example uses the inline `<inline-request>` fallback for brevity. For safer, better-phased refactoring tasks, use a full Improvement Proposal document via `<improvement-proposal>` as described above.
 
 ```xml
 <task-generation-request>
@@ -367,7 +444,7 @@ OrderController → OrderService → PaymentService
 
 <task-type>Refactoring</task-type>
 
-<refactoring-scope>
+<inline-request>
 **Refactoring Type:** Architecture
 
 **Target Area:** OrderService
@@ -406,7 +483,7 @@ OrderService is a 1500-line file that handles:
 - OrderService has ~60% coverage
 - Payment paths well-tested, notification paths have gaps
 - No integration tests between payment and notification flows
-</refactoring-scope>
+</inline-request>
 
 <request>
 Generate tasks to extract PaymentService and NotificationService from OrderService.
@@ -418,25 +495,5 @@ Generate tasks to extract PaymentService and NotificationService from OrderServi
 - Must have feature flag to rollback payment service extraction
 </constraints>
 
-<output-format>
-[Standard format as specified above]
-</output-format>
-
 </task-generation-request>
 ```
-
----
-
-## Safety Checklist
-
-Before approving generated refactoring tasks:
-
-- [ ] Tests are written/verified BEFORE refactoring begins
-- [ ] Each phase leaves system in working state
-- [ ] No "big bang" changes that can't be incrementally deployed
-- [ ] Rollback strategy exists for each significant change
-- [ ] Old code removed only after verification
-- [ ] Documentation updates included
-- [ ] Team review points identified
-- [ ] Performance implications considered
-- [ ] No functionality changes hidden in refactoring

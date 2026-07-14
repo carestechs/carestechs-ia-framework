@@ -1,6 +1,7 @@
 # API Specification Template
 
 > **Purpose**: Document all REST API endpoints with their routes, methods, request/response shapes, authentication requirements, and status codes. This provides AI with the contract definitions needed to generate consistent backend controllers, frontend services, and integration tests.
+> **Applicability**: If applicable — skip this document for CLI tools, libraries, and headless services with no HTTP API. The framework assumes a web app + REST API shape; if your product exposes a different contract surface (e.g., a CLI command set or a public library API), document that contract elsewhere instead.
 
 ---
 
@@ -71,6 +72,32 @@
 | [pageSize] | [int] | [20] | [Items per page (max 100)] |
 | [sortBy] | [string] | [created_at] | [Field to sort by] |
 | [sortDir] | [string] | [desc] | [Sort direction: asc or desc] |
+
+### 2.5 Error Catalog
+
+> *Enumerate the stable, machine-readable error identifiers clients can rely on — the RFC 7807 `type` values (or error codes if you use a code-based format). Endpoints reference these instead of inventing ad-hoc errors. Add rows as new error conditions appear; never repurpose an existing identifier.*
+
+| Error Code / `type` | HTTP Status | When Used | Notes |
+|---------------------|-------------|-----------|-------|
+| [validation-error] | [400] | [Request body or query fails validation] | [`errors` object lists per-field messages] |
+| [unauthorized] | [401] | [Missing, expired, or invalid auth token] | [Client should redirect to login / refresh token] |
+| [forbidden] | [403] | [Authenticated but lacks the required role] | — |
+| [not-found] | [404] | [Resource does not exist or is soft-deleted] | — |
+| [conflict] | [409] | [Uniqueness or state conflict — e.g., duplicate name] | [`detail` names the conflicting field] |
+| [rate-limited] | [429] | [Client exceeded request quota] | [Include `Retry-After` header] |
+
+<!-- TODO: Replace with your real catalog. Use full URIs for RFC 7807 `type` values if your convention requires them (e.g., https://yourapp.example/errors/validation-error). -->
+
+### 2.6 Authentication Endpoints
+
+> *Model authentication endpoints (login, token refresh, logout, password reset) like any other endpoints — full endpoint blocks in Section 3 with request/response shapes and status codes. Do not leave auth as prose-only.*
+
+Guidance:
+
+- Give auth endpoints their own module section (e.g., "3.1 Auth") so controller/service tasks are generated for them like any other module.
+- Document token lifetimes, refresh semantics, and where tokens are stored/sent as part of the endpoint blocks or Section 2.3.
+- Mark which auth endpoints are public (login, refresh) vs authenticated (logout, change password) in the **Auth** attribute.
+- Failed authentication uses the same error format as everything else — reference the Error Catalog (Section 2.5) entries [unauthorized] / [validation-error] rather than a custom shape.
 
 ---
 
@@ -222,3 +249,12 @@ When generating tasks from this document:
 5. **Response envelope**: All responses must use the shared envelope format — never return raw entities
 6. **Pagination**: Endpoints returning lists must support pagination parameters and return meta with totals
 7. **Frontend alignment**: Frontend service tasks should mirror the endpoint signatures defined here — same paths, same request/response shapes
+8. **Error catalog discipline**: Error responses must use identifiers from the Error Catalog (Section 2.5) — add a new catalog row before introducing a new error condition
+
+---
+
+## Changelog
+
+| Date | Author | Change Description | Reason |
+|------|--------|-------------------|--------|
+| YYYY-MM-DD | [name] | Initial version | — |

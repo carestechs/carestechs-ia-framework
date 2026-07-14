@@ -67,65 +67,55 @@ This platform solves both by [how the solution addresses both needs].
 
 ---
 
-## 4. [Key Stakeholder Concern Area] Strategy
+## 4. [Dominant Stakeholder Concern] Strategy (Optional)
 
-> *Address the most critical stakeholder concern with a dedicated section.*
+> *If your product has a dominant stakeholder concern — compliance, performance, cost, data privacy, reliability, offline support — describe the strategy for it here. Rename the heading to the actual concern (e.g., "Payment Strategy", "Data Privacy Strategy"). Delete this section if no single concern dominates.*
 
-### 4.1 [Version] [Concern Area] Options
+### 4.1 The Concern and the Chosen Approach
 
-[Approach description]:
+**The concern:** [Name the concern and why stakeholders care — e.g., "Restaurant owners fear losing orders during peak hours if the system goes down"]
 
-- **[Option 1]** ([Primary/Secondary])
-- **[Option 2]** ([Optional/Required])
+**The approach in [version]:** [The deliberate choice made for this version — including simpler options that were chosen over more ambitious ones, and what was explicitly ruled out]
 
 ### 4.2 Why This Works
 
-- [Rationale 1]
-- [Rationale 2]
-- [Rationale 3]
-- [Rationale 4]
+- [Rationale 1 — e.g., matches the actual scale of first customers]
+- [Rationale 2 — e.g., avoids infrastructure the team cannot operate yet]
+- [Rationale 3 — e.g., keeps the launch date realistic]
 
-This is not a limitation - it is a **deliberate [strategic choice] choice**.
+[If the approach is intentionally limited, say so explicitly — e.g., "This is a deliberate choice, not an oversight. Revisit when [trigger/version]."]
 
 ---
 
 ## 5. UX Strategy Overview
 
-> *High-level approach to user experience.*
+> *High-level approach to user experience — the interaction model a stakeholder would care about, not screen-by-screen detail (that lives in the UI Specification).*
 
-### 5.1 [Core UX Pattern] Logic
+### 5.1 Primary Interaction Model
 
-The user [primary interaction pattern].
+**How users get things done:** [The core interaction pattern — e.g., "a single board with drag-and-drop", "a guided step-by-step wizard", "a conversational flow in a messaging app"]
 
-**Why:**
-- [Reason 1]
-- [Reason 2]
-- [Reason 3]
+**Why this model fits the persona:**
+- [Reason tied to the persona's skills or context — e.g., "non-technical users need one linear path, not a dashboard of options"]
+- [Reason tied to the usage scenario — e.g., "used one-handed on a phone during the busiest hour of the day"]
 
-Once [trigger], the system [response].
+**Key UX commitments:** [The 2-4 experience qualities the product promises — e.g., "no core action takes more than 3 taps", "every state is recoverable, no dead ends". These become constraints on UI tasks.]
 
 ---
 
-## 6. [Asset/Resource] Strategy
+## 6. [Asset/Resource] Strategy (Optional)
 
-> *How key resources (visuals, content, etc.) are handled.*
+> *If the product depends on a shared pool of assets or resources — image libraries, content templates, seeded catalogs, starter data — describe how they are sourced, organized, and governed. Rename the heading to the actual asset (e.g., "Image Library Strategy"). Delete this section if not applicable.*
 
-To guarantee [quality goal] regardless of [variable], the platform provides [solution].
+**What the platform provides and why:** [The asset/resource supplied centrally, and the quality or consistency goal it protects — e.g., "a curated image library so menus look professional regardless of the owner's photography skills"]
 
-This ensures:
-- [Benefit 1]
-- [Benefit 2]
-- [Benefit 3]
-
-### [Asset] Categories
+**Categories:**
 
 - [Category 1] ([examples])
 - [Category 2] ([examples])
 - [Category 3] ([examples])
-- [Category 4] ([examples])
-- [Category 5] ([examples])
 
-[Constraint or note about customization]
+**Governance:** [Who can add or modify assets, what customization users are allowed, and any licensing/quality constraints]
 
 ---
 
