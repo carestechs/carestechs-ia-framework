@@ -71,6 +71,8 @@ Organize tasks into three phases. The `Workflow` field is pre-set by phase:
 
 Phase presets:
 
+> **Cross-system / contract bugs — first investigation step.** When the bug crosses a system boundary (an external API, a protocol, an NDJSON / JSON schema, a file format, an executor's response shape, a message queue payload, an SDK), the first investigation step MUST be **"verify the contract empirically against the producer."** Read the producer's authoritative source (its schema definitions, its own serialization tests, its OpenAPI doc), capture a real sample of the on-the-wire payload, and confirm the code-under-test's reader matches. The whole class of "silent shape mismatch" bugs — where both sides are wrong consistently and existing tests pass against a self-consistent fiction — is invisible without this step. Don't trust comments, type names, or harness fixtures that claim to mirror the producer; verify against the producer itself.
+
 ### Phase 1: Investigation
 
 ```
