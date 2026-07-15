@@ -2,6 +2,15 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.2] — 2026-07-15
+
+### Added
+- **Three new eval cases** (framework-repo only), bringing prompt coverage to 4 of the 5 generation prompts:
+  - `bugfix-tasks/case-002-overdue-timezone` — internal timezone bug (Status: Reported, root cause deliberately unfilled); asserts investigation-first ordering and root-cause discipline; judge rubric explicitly rewards *not* inventing a producer-contract step for an internal bug.
+  - `review-tasks/case-003-review-flawed-tasks` — a validator-clean task list with four planted semantic defects (dependency inversion, scope creep, Type mismatch, AC-5 coverage omission); asserts the fresh-context review reaches a revise verdict and cites each defect. Tests exactly what the validators cannot catch.
+  - `refactor-tasks/case-004-date-logic-extraction` — duplicated date logic across API and UI; asserts the Phase-0 coverage baseline precedes the refactor and the Cleanup type is used.
+  - All three inputs pass `validate-specs.py --strict` clean; every case ships a hand-written reference output verified to satisfy its own assertions.
+
 ## [2.4.1] — 2026-07-14
 
 ### Changed

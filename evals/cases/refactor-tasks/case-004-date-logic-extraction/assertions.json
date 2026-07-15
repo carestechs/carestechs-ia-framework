@@ -1,0 +1,39 @@
+{
+  "output": "output/tasks.md",
+  "checks": [
+    {
+      "type": "validator",
+      "root": "input"
+    },
+    {
+      "type": "task_count",
+      "min": 4,
+      "max": 14
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)baseline|characteriz",
+      "reason": "Phase 0 safety net — a coverage baseline / characterization tests must precede any restructuring"
+    },
+    {
+      "type": "must_match",
+      "pattern": "Cleanup",
+      "reason": "refactor-tasks' Type enum delta — removing the old duplicated code is a Cleanup-typed task"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)angular|ngmodule|arauco",
+      "reason": "stack leak — fixture is React/Express"
+    },
+    {
+      "type": "paths_exist",
+      "root": "input",
+      "allow_new": true
+    },
+    {
+      "type": "shard_refs_resolve",
+      "root": "input",
+      "allow_new": true
+    }
+  ]
+}

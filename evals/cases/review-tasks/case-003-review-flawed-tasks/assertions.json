@@ -1,0 +1,40 @@
+{
+  "output": "output/review.md",
+  "checks": [
+    {
+      "type": "must_match",
+      "pattern": "(?i)verdict",
+      "reason": "the review must reach an explicit verdict"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)revise",
+      "reason": "four planted semantic defects (dependency inversion, scope creep, type mismatch, AC coverage gap) must force a revise verdict"
+    },
+    {
+      "type": "must_match",
+      "pattern": "T-002",
+      "reason": "planted defect: T-002 (Frontend dialog) consumes the label endpoints created only in T-004 but depends solely on T-001 — dependency inversion any competent review must flag"
+    },
+    {
+      "type": "must_match",
+      "pattern": "T-005",
+      "reason": "planted defect: T-005's label usage analytics export endpoint is outside the work item's Included scope — scope creep any competent review must flag"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)AC-5|delete confirmation",
+      "reason": "planted defect: the coverage table omits AC-5 (delete confirmation) — 5 rows for 6 ACs"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)angular|ngmodule|arauco",
+      "reason": "stack leak — fixture is React/Express"
+    },
+    {
+      "type": "shard_refs_resolve",
+      "root": "input",
+      "allow_new": true
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+-- fixture placeholder — real schema not needed for eval path checks
