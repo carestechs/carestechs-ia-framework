@@ -1,0 +1,492 @@
+{
+  "label": "v2.4.2",
+  "samples_per_case": 3,
+  "gen_cmd": "claude -p \"Read GENERATE.md in the current directory and follow it exactly.\" --permission-mode acceptEdits --allowedTools \"Bash(python *)\"",
+  "judge": false,
+  "cases": {
+    "case-001-task-labels": {
+      "samples": [
+        {
+          "sample": 1,
+          "generated": true,
+          "passed": false,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist"
+            },
+            {
+              "status": "FAIL",
+              "type": "shard_refs_resolve"
+            },
+            {
+              "status": "SKIP",
+              "type": "judge"
+            }
+          ],
+          "secs": 690
+        },
+        {
+          "sample": 2,
+          "generated": true,
+          "passed": false,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist"
+            },
+            {
+              "status": "FAIL",
+              "type": "shard_refs_resolve"
+            },
+            {
+              "status": "SKIP",
+              "type": "judge"
+            }
+          ],
+          "secs": 619
+        },
+        {
+          "sample": 3,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve"
+            },
+            {
+              "status": "SKIP",
+              "type": "judge"
+            }
+          ],
+          "secs": 583
+        }
+      ],
+      "pass_rate": "33%",
+      "failing_checks": {
+        "shard_refs_resolve": 2
+      }
+    },
+    "case-002-overdue-timezone": {
+      "samples": [
+        {
+          "sample": 1,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve"
+            },
+            {
+              "status": "SKIP",
+              "type": "judge"
+            }
+          ],
+          "secs": 535
+        },
+        {
+          "sample": 2,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve"
+            },
+            {
+              "status": "SKIP",
+              "type": "judge"
+            }
+          ],
+          "secs": 473
+        },
+        {
+          "sample": 3,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve"
+            },
+            {
+              "status": "SKIP",
+              "type": "judge"
+            }
+          ],
+          "secs": 315
+        }
+      ],
+      "pass_rate": "100%",
+      "failing_checks": {}
+    },
+    "case-003-review-flawed-tasks": {
+      "samples": [
+        {
+          "sample": 1,
+          "generated": true,
+          "passed": false,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "FAIL",
+              "type": "shard_refs_resolve"
+            }
+          ],
+          "secs": 393
+        },
+        {
+          "sample": 2,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve"
+            }
+          ],
+          "secs": 364
+        },
+        {
+          "sample": 3,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve"
+            }
+          ],
+          "secs": 307
+        }
+      ],
+      "pass_rate": "67%",
+      "failing_checks": {
+        "shard_refs_resolve": 1
+      }
+    },
+    "case-004-date-logic-extraction": {
+      "samples": [
+        {
+          "sample": 1,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve"
+            }
+          ],
+          "secs": 526
+        },
+        {
+          "sample": 2,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve"
+            }
+          ],
+          "secs": 404
+        },
+        {
+          "sample": 3,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve"
+            }
+          ],
+          "secs": 457
+        }
+      ],
+      "pass_rate": "100%",
+      "failing_checks": {}
+    }
+  }
+}
