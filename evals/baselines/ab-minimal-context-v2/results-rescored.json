@@ -9,7 +9,7 @@
         {
           "sample": "sample-1.md",
           "generated": true,
-          "passed": false,
+          "passed": true,
           "checks": [
             {
               "status": "PASS",
@@ -47,9 +47,9 @@
               "detail": "all shard references resolve or are sanctioned (new)"
             },
             {
-              "status": "FAIL",
+              "status": "PASS",
               "type": "judge",
-              "detail": "score 6/10 (min 7) \u2014 Spec fidelity seriously deficient: claims no spec docs exist and marks existing data-model/api-spec indexes, endpoints/tasks.md, and components.md as (new), contradicting ground truth; guesses instead of flagging open questions; task_labels table omits mandated UUID id and created_at/updated_at conventions; recreated error catalog drops unauthorized; Decomposition, dependency order, and 6/6 AC coverage are sound; minor flaws: duplicate (new) file listings across tasks, malformed coverage table, missing T-002/T-003 dependency links"
+              "detail": "score 8/10 (min 7) \u2014 Buildable dependency graph with no false parallelism; all 6 ACs plausibly covered; Highly concrete plan-ability: paths, function names, SQL constraints, query invalidation; Spec-faithful contracts: /api/v1 base path, envelope+meta, conflict/validation-error catalog codes, plural snake_case tables"
             }
           ]
         },
@@ -96,19 +96,65 @@
             {
               "status": "PASS",
               "type": "judge",
-              "detail": "score 8/10 (min 7) \u2014 Buildable dependency graph with no false parallelism; all 6 ACs covered with plausible, substantiated attributions; Concrete file paths and technical notes make every task plan-able standalone; Spec fidelity mostly exact: /api/v1 base path, envelope+meta, 409 conflict for duplicate names, snake_case plural tables, NNN migration naming"
+              "detail": "score 7/10 (min 7) \u2014 Excellent granularity, buildable dependency graph, full 6-AC coverage with plausible attribution, and highly concrete plan-ability; Spec details largely match ground truth: /api/v1 base path, data/meta envelope, 409 conflict for duplicates, snake_case plural tables, kebab-case shards, Zod/ApiError/repository/test conventions; Penalized: falsely treats the project as having no spec docs, marking existing files (api-spec index, data-model index, endpoints/tasks.md, components.md) as (new) and re-authoring the existing Error Catalog"
+            }
+          ]
+        },
+        {
+          "sample": "sample-3.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "12 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) \u2014 Sound 12-task decomposition with buildable dependencies and full, plausible AC-1..6 coverage; Spec details largely match ground truth: /api/v1 base path, data/meta envelopes, 409 conflict catalog code, snake_case plural tables, NNN-description.sql migration; Penalized: asserts the project has no spec docs and creates docs/api-spec/index.md, docs/data-model/index.md, and ui-spec inventory as (new), contradicting ground truth where they already exist \u00e2\u20ac\u201d guessed instead of flagging an open question"
             }
           ]
         }
       ],
-      "pass_rate": "50%",
+      "pass_rate": "100%",
       "judge_scores": [
-        6,
+        8,
+        7,
         8
       ],
-      "failing_checks": {
-        "judge": 1
-      }
+      "failing_checks": {}
     }
   }
 }

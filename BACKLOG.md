@@ -35,3 +35,8 @@ the orchestrator can detect step completion from the repo.
 - **Best-of-N generation** — orchestrator-side: sample N task lists, discard validator
   failures, fresh-context review the survivors, pick/synthesize. Documented in
   `prompts/review-tasks.md`.
+
+- **`judge_samples` key for run-evals.py** (from EXP-001 addendum 2): judge scores
+  within ±1 of `min_score` are noisy (same sample scored 6 and 8 across passes).
+  Automate median-of-N judging for gating decisions. Revisit when a judge score
+  gates a real decision.

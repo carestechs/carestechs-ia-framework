@@ -94,3 +94,18 @@ their tokens (fidelity); dense briefs are necessary but not sufficient; the
 self-check loop remains the compliance guarantee. The 30-page-documents position
 remains unsupported: everything measured here was achieved with lean contract-style
 shards.
+
+### Addendum 2 (2026-07-15): arm B completed at n=3; judge variance observed
+
+The third arm B sample was generated (deterministic PASS, judged 8/10) and the full
+n=3 archive re-judged in one pass: **arm B final = 3/3 deterministic, judge 7.7 avg
+(7–8)** vs arm A 9.0 (9–9). The fidelity gap holds at ~1.3–2 points, direction
+consistent across every judge pass.
+
+**Variance note.** The borderline sample-1 scored **6** in one judge pass (failing,
+with a specific spec-contradiction finding) and **8** in another (passing) — single
+judge runs are noisy near the threshold, exactly as the self-consistency literature
+predicts. Arm A's tight 9–9 range was stable across passes. Practical rule adopted:
+treat single judge scores within ±1 of `min_score` as inconclusive; for gating
+decisions, run the judge 3× and take the median. Candidate runner improvement:
+a `judge_samples` key automating this.
