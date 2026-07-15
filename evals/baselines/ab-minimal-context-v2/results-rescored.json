@@ -1,0 +1,112 @@
+{
+  "label": "ab-minimal-context-v2",
+  "samples_per_case": 0,
+  "gen_cmd": "claude -p \"Read GENERATE.md in the current directory and follow it exactly.\" --permission-mode acceptEdits --allowedTools \"Bash(python *)\"",
+  "judge": true,
+  "cases": {
+    "case-901-task-labels-minimal-context": {
+      "samples": [
+        {
+          "sample": "sample-1.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "13 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) \u2014 Clean single-purpose decomposition with plausible complexity and buildable dependency order; All 6 ACs covered with plausible attribution, but the coverage table is malformed (missing header/separator rows and AC descriptions); File-list inconsistencies: T-007 marks src/db/label.ts as new though T-005 creates it; T-013 re-marks test files already created by T-005/T-006"
+            }
+          ]
+        },
+        {
+          "sample": "sample-2.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "13 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) \u2014 Single-purpose tasks with one Type each and plausible complexity across all 13 tasks; Buildable dependency graph: schema\u00e2\u2020\u2019migration\u00e2\u2020\u2019repository\u00e2\u2020\u2019API\u00e2\u2020\u2019UI\u00e2\u2020\u2019tests, with every UI task depending on the endpoint it consumes; All 6 ACs covered with attributions that match actual task content across backend, UI, and tests"
+            }
+          ]
+        }
+      ],
+      "pass_rate": "100%",
+      "judge_scores": [
+        8,
+        9
+      ],
+      "failing_checks": {}
+    }
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "label": "ab-minimal-context",
+  "samples_per_case": 3,
+  "gen_cmd": "claude -p \"Read GENERATE.md in the current directory and follow it exactly.\" --permission-mode acceptEdits --allowedTools \"Bash(python *)\"",
+  "judge": true,
+  "cases": {
+    "case-901-task-labels-minimal-context": {
+      "samples": [
+        {
+          "sample": 1,
+          "generated": true,
+          "passed": false,
+          "checks": [
+            {
+              "status": "FAIL",
+              "type": "validator",
+              "detail": "validator failed:"
+            },
+            {
+              "status": "FAIL",
+              "type": "task_count",
+              "detail": "0 tasks, expected 6-16"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) \u2014 All 13 tasks are single-purpose with one Type each and plausible complexity; Dependency graph is fully buildable with no false parallelism; each UI task depends on the endpoint it consumes; All 6 ACs covered with plausible attribution plus an extra Section 9 edge-case table"
+            }
+          ],
+          "secs": 358
+        },
+        {
+          "sample": 2,
+          "generated": true,
+          "passed": false,
+          "checks": [
+            {
+              "status": "FAIL",
+              "type": "validator",
+              "detail": "validator failed:"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) \u2014 Buildable dependency graph with no false parallelism; UI tasks depend on the endpoints they consume; All 6 ACs plus edge cases and constraints covered with plausible, verifiable attribution; Highly concrete files and technical notes make every task plannable standalone"
+            }
+          ],
+          "secs": 499
+        },
+        {
+          "sample": 3,
+          "generated": true,
+          "passed": false,
+          "checks": [
+            {
+              "status": "FAIL",
+              "type": "validator",
+              "detail": "validator failed:"
+            },
+            {
+              "status": "FAIL",
+              "type": "task_count",
+              "detail": "0 tasks, expected 6-16"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) \u2014 Fine-grained single-purpose tasks with plausible complexity; Buildable ordering but TASK-011/012 omit dependency on TASK-007 label-list endpoint their pickers consume; All 6 ACs plus edge cases covered with accurate attribution"
+            }
+          ],
+          "secs": 281
+        }
+      ],
+      "pass_rate": "0%",
+      "judge_scores": [
+        9,
+        9,
+        8
+      ],
+      "failing_checks": {
+        "validator": 3,
+        "task_count": 2
+      }
+    }
+  }
+}

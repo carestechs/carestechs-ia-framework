@@ -2,6 +2,12 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.4] — 2026-07-15
+
+### Added
+- **EXP-001, the context A/B experiment** (`evals/experiments.md`): arm A (with sharded spec docs) vs arm B (`case-901`, spec docs physically removed from generation input, checked against the full fixture). Results: statistically indistinguishable on all metrics (A: 3/3 deterministic, judge 8.7; B: 2/2, judge 8.5; identical routes and error vocabulary) — because the work item's impact tables already carry the grounding. Three findings: the generation-time validator **self-check is the compliance lever** (its accidental omission in run 1 produced 0/3 schema compliance with unchanged judge scores); information density at the point of use beats document volume; briefs authored *from* specs compress them effectively (the realistic no-docs scenario remains untested). Both runs archived under `evals/baselines/ab-minimal-context*/`.
+- `case-901-task-labels-minimal-context`: permanent experimental arm tracking the docs/no-docs gap in future baselines.
+
 ## [2.4.3] — 2026-07-15
 
 First measured baseline, and the eval loop's first catch — a false-positive in its own assertion.
