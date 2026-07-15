@@ -20,6 +20,10 @@ restricted to python (so the agent can run the validators GENERATE.md asks for):
 Cases run in parallel (one worker per case); samples within a case run sequentially
 (they share the case's output path). Exit code is always 0 — a baseline is a
 measurement, not a gate. Python 3.8+, standard library only.
+
+--rescore LABEL re-runs the checks over the archived samples of an existing
+baseline WITHOUT regenerating (free): use it after changing assertions or the
+checker itself. Writes results-rescored.json next to the original results.json.
 """
 
 import argparse
@@ -93,6 +97,37 @@ def run_case(case_dir, args, label_dir):
     return name, results
 
 
+def rescore(label, judge):
+    label_dir = EVALS_DIR / "baselines" / label
+    if not label_dir.is_dir():
+        print(f"no baseline named {label!r} under evals/baselines/", file=sys.stderr)
+        return None, None
+    case_dirs = {c.parent.name: c.parent
+                 for c in EVALS_DIR.glob("cases/*/*/assertions.json")}
+    all_results = {}
+    for archived_case in sorted(d for d in label_dir.iterdir() if d.is_dir()):
+        case_dir = case_dirs.get(archived_case.name)
+        if case_dir is None:
+            print(f"[{archived_case.name}] skipped: no matching case directory")
+            continue
+        spec = json.loads((case_dir / "assertions.json").read_text(encoding="utf-8"))
+        out_path = case_dir / spec["output"]
+        results = []
+        for sample in sorted(archived_case.glob("sample-*.md")):
+            shutil.copy2(sample, out_path)
+            passed, checks = check_case(archived_case.name, judge)
+            out_path.unlink()
+            judge_prompt = case_dir / "output" / "judge-prompt.md"
+            if judge_prompt.exists():
+                judge_prompt.unlink()
+            print(f"[{archived_case.name}] {sample.name}: {'PASS' if passed else 'FAIL'}",
+                  flush=True)
+            results.append({"sample": sample.name, "generated": True, "passed": passed,
+                            "checks": [{"status": s, "type": t} for s, t in checks]})
+        all_results[archived_case.name] = results
+    return all_results, label_dir
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -104,19 +139,28 @@ def main():
     ap.add_argument("--timeout", type=int, default=900,
                     help="per-generation timeout in seconds (default 900)")
     ap.add_argument("--judge", action="store_true", help="also run judge checks per sample")
+    ap.add_argument("--rescore", default="",
+                    help="re-check archived samples of this baseline label (no generation)")
     args = ap.parse_args()
 
-    case_dirs = [c.parent for c in sorted(EVALS_DIR.glob("cases/*/*/assertions.json"))
-                 if args.case in str(c.parent)]
-    if not case_dirs:
-        print("no eval cases found", file=sys.stderr)
-        return 1
-    label_dir = EVALS_DIR / "baselines" / args.label
-    label_dir.mkdir(parents=True, exist_ok=True)
+    if args.rescore:
+        all_results, label_dir = rescore(args.rescore, args.judge)
+        if all_results is None:
+            return 1
+        args.samples = 0  # informational only in the JSON
+        args.label = args.rescore
+    else:
+        case_dirs = [c.parent for c in sorted(EVALS_DIR.glob("cases/*/*/assertions.json"))
+                     if args.case in str(c.parent)]
+        if not case_dirs:
+            print("no eval cases found", file=sys.stderr)
+            return 1
+        label_dir = EVALS_DIR / "baselines" / args.label
+        label_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"Baseline '{args.label}': {len(case_dirs)} case(s) x {args.samples} sample(s)")
-    with ThreadPoolExecutor(max_workers=len(case_dirs)) as pool:
-        all_results = dict(pool.map(lambda d: run_case(d, args, label_dir), case_dirs))
+        print(f"Baseline '{args.label}': {len(case_dirs)} case(s) x {args.samples} sample(s)")
+        with ThreadPoolExecutor(max_workers=len(case_dirs)) as pool:
+            all_results = dict(pool.map(lambda d: run_case(d, args, label_dir), case_dirs))
 
     print(f"\n{'case':42s} {'gen ok':>6s} {'passed':>6s} {'rate':>6s}  top failing checks")
     summary = {}
@@ -134,7 +178,7 @@ def main():
         print(f"{name:42s} {len(generated):3d}/{len(results):<2d} {len(passed):6d} {rate:>6s}  {top}")
         summary[name] = {"samples": results, "pass_rate": rate, "failing_checks": fail_counts}
 
-    results_path = label_dir / "results.json"
+    results_path = label_dir / ("results-rescored.json" if args.rescore else "results.json")
     results_path.write_text(json.dumps(
         {"label": args.label, "samples_per_case": args.samples,
          "gen_cmd": args.gen_cmd, "judge": args.judge, "cases": summary},

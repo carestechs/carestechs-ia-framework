@@ -2,6 +2,17 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.3] — 2026-07-15
+
+First measured baseline, and the eval loop's first catch — a false-positive in its own assertion.
+
+### Added
+- **`evals/run-baseline.py`**: N samples per case via headless Claude Code CLI (parallel across cases), archives every sample under `evals/baselines/<label>/`, tabulates pass rates and failing checks; `--rescore <label>` re-checks archived samples after assertion/checker changes without regenerating.
+- **Baseline `v2.4.2`** (4 cases × 3 samples, 12/12 generated, ~6–11 min/sample): initial scoring 75% overall; diagnosis showed all failures were the same false positive — prose mentions of legitimately-`(new)` shards failing the same-line marker requirement, a rule stricter than the prompts state. After the checker fix (below), rescored **12/12 pass** — the true v2.4.2 baseline.
+
+### Changed
+- `shard_refs_resolve` now sanctions a not-yet-existing shard reference when it is marked `(new)` on the same line, anywhere in the document, or in a `sanctioned_by` doc (typically the work item whose impact tables declare the new shards). Verified against a negative test: genuinely invented shards still fail.
+
 ## [2.4.2] — 2026-07-15
 
 ### Added

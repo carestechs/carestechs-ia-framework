@@ -43,7 +43,7 @@ Assertion types (see `run-evals.py` docstring for the JSON schema):
 | `task_count` | task count within an expected range (catches over/under-decomposition) |
 | `must_match` / `must_not_match` | required sections present; stack leaks and forbidden content absent |
 | `paths_exist` | every file a task touches exists in the fixture or is marked `(new)` |
-| `shard_refs_resolve` | every spec-shard reference resolves against the fixture (hallucination check) |
+| `shard_refs_resolve` | every spec-shard reference resolves against the fixture (hallucination check); a not-yet-existing shard is sanctioned when marked `(new)` on the same line, anywhere in the document, or in a doc listed in `sanctioned_by` (typically the work item) |
 | `judge` | anchored LLM-judge score against the case's `rubric.md`, with `reference/` as the known-good anchor (skipped unless `--judge`) |
 
 ## Judge checks

@@ -31,7 +31,8 @@ assertions.json:
        {"type": "must_match", "pattern": "## Acceptance Criteria Coverage", "reason": "..."},
        {"type": "must_not_match", "pattern": "(?i)angular", "reason": "..."},
        {"type": "paths_exist", "root": "input", "allow_new": true},
-       {"type": "shard_refs_resolve", "root": "input", "allow_new": true},
+       {"type": "shard_refs_resolve", "root": "input", "allow_new": true,
+        "sanctioned_by": ["input/docs/work-items/X.md"]},
        {"type": "judge", "rubric": "rubric.md", "reference": "reference/tasks.md", "min_score": 7}
      ]}
 
@@ -206,17 +207,32 @@ def run_check(check, case_dir, out_text, out_path, judge_opts):
     if ctype == "shard_refs_resolve":
         root = case_dir / check.get("root", "input")
         allow_new = check.get("allow_new", True)
+        # A not-yet-existing shard reference is sanctioned when marked (new) on the
+        # same line, on any line of the document itself, or in a sanctioning doc
+        # (typically the work item whose impact tables declare the (new) shards).
+        sanctioned = set()
+        if allow_new:
+            texts = [out_text]
+            for rel in check.get("sanctioned_by", []):
+                p = case_dir / rel
+                if p.is_file():
+                    texts.append(p.read_text(encoding="utf-8", errors="replace"))
+            for text in texts:
+                for line in text.splitlines():
+                    if "(new)" in line:
+                        for m in SHARD_REF_RE.finditer(line):
+                            sanctioned.add(m.group(0))
         bad = []
         for line in out_text.splitlines():
             for m in SHARD_REF_RE.finditer(line):
                 ref = m.group(0)
                 if (root / ref).exists():
                     continue
-                if allow_new and "(new)" in line:
+                if allow_new and ("(new)" in line or ref in sanctioned):
                     continue
                 bad.append(ref)
         if not bad:
-            return "PASS", "all shard references resolve"
+            return "PASS", "all shard references resolve or are sanctioned (new)"
         return "FAIL", "unresolved shard refs: " + ", ".join(sorted(set(bad))[:8])
 
     return "FAIL", f"unknown check type: {ctype!r}"

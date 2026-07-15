@@ -34,7 +34,10 @@
     {
       "type": "shard_refs_resolve",
       "root": "input",
-      "allow_new": true
+      "allow_new": true,
+      "sanctioned_by": [
+        "input/docs/work-items/FEAT-001-task-labels.md"
+      ]
     }
   ]
 }
