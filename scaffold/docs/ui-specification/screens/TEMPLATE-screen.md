@@ -1,4 +1,12 @@
 <!-- Copy this file to docs/ui-specification/screens/<screen-kebab>.md (e.g., "Project Board" → project-board.md) — one screen per file. -->
+<!-- Frontmatter: flat keys only — values are scalars or inline [a, b, c] arrays (no nesting, no multiline values); `screen` MUST equal the filename. -->
+
+---
+kind: screen
+screen: [screen-name]               # kebab-case; MUST equal the filename
+route: [/path]
+endpoints: [resource-a, resource-b] # resource shard names this screen calls (may be [])
+---
 
 # Screen: [Screen Name]
 

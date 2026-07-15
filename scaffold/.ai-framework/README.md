@@ -27,6 +27,7 @@ This folder contains a local copy of the **AI Task Generation Documentation Fram
 │   ├── feature-tasks.md
 │   ├── bugfix-tasks.md
 │   ├── refactor-tasks.md
+│   ├── review-tasks.md            # Fresh-session task-list review before implementation
 │   ├── spec-generation.md
 │   ├── ui-spec-generation.md
 │   ├── mockup-generation.md
@@ -34,6 +35,7 @@ This folder contains a local copy of the **AI Task Generation Documentation Fram
 │   ├── compile-adrs.md
 │   └── compile-ddrs.md
 ├── tools/                     # Shipped tools
+│   ├── validate-specs.py      # Cross-shard spec consistency + freshness linter — run after generating or editing specs
 │   └── validate-tasks.py      # Task-list validator — run it after generating any task list and fix every error
 └── guides/                    # Workflow guides
     ├── getting-started.md
@@ -74,6 +76,7 @@ your-project/
 │   ├── templates/                     # Full reference templates
 │   ├── prompts/                       # Prompt templates for AI task generation
 │   ├── tools/
+│   │   ├── validate-specs.py          # Cross-shard spec consistency + freshness linter
 │   │   └── validate-tasks.py          # Task-list validator — run after generating any task list
 │   └── guides/                        # Workflow guides
 ├── docs/
@@ -143,6 +146,7 @@ your-project/
 - **Generate specs from docs.** After filling Stakeholder + Architecture + CLAUDE.md, use `.ai-framework/prompts/spec-generation.md` (or `/spec-generation`) to generate `docs/data-model/` and `docs/api-spec/` (index + shards), then `.ai-framework/prompts/ui-spec-generation.md` (or `/ui-spec-generation`) for `docs/ui-specification/` (index + screens + components).
 - **Keep freshness stamps current.** Every spec `index.md` and shard (and `docs/ARCHITECTURE.md`) carries a `> **Last verified against code:** YYYY-MM-DD (commit ...)` line directly under its H1 — update it whenever you edit a file or verify it against the code. AI agents trust code over any shard whose stamp is missing or older than 30 days.
 - **Validate task lists.** After any task generation, run `python .ai-framework/tools/validate-tasks.py tasks/<file>.md` (add `--work-item docs/work-items/<file>.md` for features) and fix every error.
+- **Review task lists in a fresh session.** Before implementation (recommended for L/XL work), run `prompts/review-tasks.md` (or `/review-tasks FEAT-001`) in a NEW session with no generation history — it writes `tasks/<WORK-ITEM-ID>-review.md`.
 - **Update as you go.** These are living documents. Revisit them as your project evolves (see [`guides/maintenance.md`](guides/maintenance.md)).
 - **Upgrading the framework.** `VERSION` holds the installed semver (e.g., `2.1.0`). To upgrade, replace the `.ai-framework/` folder with the latest `scaffold/.ai-framework/` from the framework repo — your project docs are unaffected.
 

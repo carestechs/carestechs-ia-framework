@@ -115,6 +115,7 @@ Every acceptance criterion from the Feature Brief gets one row; `Covered By` lis
 After Claude generates tasks, verify:
 
 - [ ] Run `python .ai-framework/tools/validate-tasks.py tasks/FEAT-XXX-tasks.md --work-item docs/work-items/FEAT-XXX-short-title.md` and fix every error
+- [ ] Run `python .ai-framework/tools/validate-specs.py` and fix every error — confirms the spec shards the task list relies on are internally consistent and fresh
 - [ ] All acceptance criteria have corresponding tasks (the `## Acceptance Criteria Coverage` table is present and complete)
 - [ ] Database/model changes come before code that uses them
 - [ ] API endpoints are defined before frontend integration

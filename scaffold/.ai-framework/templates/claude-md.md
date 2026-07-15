@@ -410,6 +410,7 @@ When asked to generate tasks, identify the task type, read the required files, r
 | New feature | `.ai-framework/prompts/feature-tasks.md` | `docs/work-items/FEAT-*.md` (target feature), `docs/stakeholder-definition.md`, `CLAUDE.md` | `tasks/FEAT-XXX-tasks.md` |
 | Bug fix | `.ai-framework/prompts/bugfix-tasks.md` | `docs/work-items/BUG-*.md` (target bug), `CLAUDE.md` | `tasks/BUG-XXX-tasks.md` |
 | Refactoring | `.ai-framework/prompts/refactor-tasks.md` | `docs/work-items/IMP-*.md` (target improvement), `CLAUDE.md`, `docs/ARCHITECTURE.md` | `tasks/IMP-XXX-tasks.md` |
+| Task list review | `.ai-framework/prompts/review-tasks.md` | The task list under review (`tasks/<WORK-ITEM-ID>-tasks.md`), the work item, each spec's `index.md` + the shards named by the work item's impact tables, `CLAUDE.md`. **MUST run in a fresh agent session** — no generation history in context | `tasks/<WORK-ITEM-ID>-review.md` |
 | Spec generation | `.ai-framework/prompts/spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md` | `docs/data-model/index.md` + `docs/data-model/entities/*.md`, `docs/api-spec/index.md` + `docs/api-spec/endpoints/*.md` |
 | UI spec generation | `.ai-framework/prompts/ui-spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`, `docs/api-spec/index.md` + `docs/api-spec/endpoints/*.md` | `docs/ui-specification/` (`index.md` + `screens/*.md` + `components.md`) |
 | UI mockup | `.ai-framework/prompts/mockup-generation.md` | `docs/ui-specification/screens/<screen>.md` (target screen) + Design System from `docs/ui-specification/index.md`, `CLAUDE.md` | `mockups/T-XXX-screen-name.html` |
@@ -456,7 +457,9 @@ Each task definition (in the task-list file under `tasks/` — e.g., `tasks/FEAT
 
 When implementing tasks from a generated task list (saved in `tasks/` per the routing table above):
 
-0. **Validate the task list** — immediately after task generation (once per task list), run `python .ai-framework/tools/validate-tasks.py tasks/<file>.md` and fix every error before implementation begins.
+0. **Validate the task list** — immediately after task generation (once per task list), run `python .ai-framework/tools/validate-tasks.py tasks/<file>.md` and fix every error before implementation begins. Companion check: `python .ai-framework/tools/validate-specs.py` — the cross-shard spec-consistency linter — catches drift in the spec shards the task list relies on.
+
+**Fresh-context review (recommended for L/XL work):** in a NEW session, run the Task list review row from the routing table above (`.ai-framework/prompts/review-tasks.md` → `tasks/<WORK-ITEM-ID>-review.md`) — the reviewer must have no generation history in context. Address every required change before implementation.
 
 Then follow this sequence for **each task**:
 

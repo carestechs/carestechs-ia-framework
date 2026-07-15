@@ -1,4 +1,12 @@
 <!-- Copy this file to docs/api-spec/endpoints/<resource>.md — kebab-case, plural, matching the route segment (e.g., /api/task-labels → task-labels.md); one resource group per file, containing ALL endpoint blocks for that resource. -->
+<!-- Frontmatter: flat keys only — values are scalars or inline [a, b, c] arrays (no nesting, no multiline values); `resource` MUST equal the filename. -->
+
+---
+kind: resource
+resource: [resource-name]      # kebab-case; MUST equal the filename
+routes: [/api/resource-name]
+entities: [entity-a]           # entity shard names this resource reads/writes (may be [])
+---
 
 # Resource: [Resource Name] (`/api/[resource]`)
 

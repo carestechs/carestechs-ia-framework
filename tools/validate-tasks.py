@@ -46,6 +46,7 @@ FILE_BULLET_RE = re.compile(
     r"^\s*[-*]\s*`?(?P<path>[^`\s]+)`?\s*(?P<new>\(new\))?\s*(?:[-–—]\s*(?P<desc>.*))?$"
 )
 CHECKBOX_RE = re.compile(r"^\s*[-*]\s*\[[ xX]\]\s+\S")
+AC_BULLET_RE = re.compile(r"^\s*[-*]\s*\*\*AC-\d+\*\*\s*:")
 COVERAGE_HEADING_RE = re.compile(r"^#{2,4}\s+Acceptance Criteria Coverage\s*$", re.IGNORECASE)
 
 
@@ -293,7 +294,7 @@ def check_coverage(path, tasks, coverage, work_item, rep):
         if raw.startswith("#"):
             in_ac = False
             continue
-        if in_ac and CHECKBOX_RE.match(raw):
+        if in_ac and (CHECKBOX_RE.match(raw) or AC_BULLET_RE.match(raw)):
             ac_count += 1
     if ac_count and coverage["rows"] != ac_count:
         rep.warn(path, coverage["line"],

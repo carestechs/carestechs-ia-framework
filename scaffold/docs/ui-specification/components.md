@@ -1,3 +1,9 @@
+---
+kind: component-inventory
+---
+
+<!-- Frontmatter: flat keys only — this file's kind is fixed (`component-inventory`); same flat-keys constraint as the screen shards. -->
+
 # Shared Components
 
 > **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->

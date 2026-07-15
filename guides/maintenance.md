@@ -28,6 +28,8 @@ Every spec shard (`docs/data-model/entities/*.md`, `docs/api-spec/endpoints/*.md
 - **Verify untouched shards per release.** Re-verifying shards that no code change touched is part of the Sprint/Release Verification below — otherwise accurate shards accumulate stale stamps and force needless re-verification.
 - **Agents must verify before trusting.** Before relying on a shard whose stamp is missing or older than 30 days, verify its claims against the source (grep/read the relevant code). If it drifted: fix the shard, add a changelog entry to the spec's `index.md`, and update the stamp. This mirrors the "Trust code over docs" item in the CLAUDE.md Pre-Work Checklist.
 
+**Shard frontmatter:** every spec shard begins (before its H1) with a machine-readable frontmatter block — kind, name, and cross-references (e.g., an entity's `endpoints`/`screens`, a screen's `endpoints`) — used by `validate-specs.py` and by orchestrators for deterministic shard retrieval. Update the frontmatter whenever a shard's relationships change, not just its body — e.g., when a new screen starts calling a resource, add that resource to the screen shard's `endpoints` list. `python .ai-framework/tools/validate-specs.py` checks that these cross-references resolve and that stamps are fresh.
+
 ---
 
 ## Document Lifecycle Matrix
@@ -395,6 +397,7 @@ Add doc updates to PR when:
 - [ ] Freshness stamp updated on every spec shard edited in this PR
 - [ ] Changelog entry added to each updated spec's `index.md` (and `ARCHITECTURE.md` if it changed)
 - [ ] Task lists added/changed in this PR pass `python .ai-framework/tools/validate-tasks.py`
+- [ ] Spec shards pass `python .ai-framework/tools/validate-specs.py` (shards internally consistent — frontmatter cross-references resolve, freshness stamps present and fresh)
 ```
 
 ---

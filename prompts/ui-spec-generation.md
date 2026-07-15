@@ -118,21 +118,45 @@ Write the generated spec as a **sharded document set** at the canonical location
 6. **Changelog**
 
 **`docs/ui-specification/screens/<screen>.md`** — **one screen per file**, each with:
+- `kind: screen` frontmatter (retrieval keys — see below)
 - Layout sketch (ASCII)
 - Component hierarchy (tree)
 - Component → API mapping (table)
 - States: default, loading, empty, error
 - User interactions: action → result → API call
 
-**`docs/ui-specification/components.md`** — the shared components inventory (single file): reusable components with inputs/outputs/variants.
+**`docs/ui-specification/components.md`** — the shared components inventory (single file): `kind: component-inventory` frontmatter, then reusable components with inputs/outputs/variants.
 
 **Shard naming (mechanical, kebab-case):** screen "Project Board" → `screens/project-board.md`.
+
+**Frontmatter (required on every generated shard):** every screen shard and `components.md` begins with a frontmatter block — **before the H1** — carrying its machine-readable retrieval keys. **`index.md` gets no frontmatter.** Constraint: the frontmatter is parsed by a stdlib mini-parser — **flat keys only**; values are scalars or inline arrays `[a, b, c]`. No nesting, no multiline values, no quotes needed for kebab-case/path values.
+
+Screen shard (`docs/ui-specification/screens/<screen>.md`):
+
+```
+---
+kind: screen
+screen: project-board      # MUST equal the filename
+route: /projects/:id/board
+endpoints: [tasks, labels] # resource shard names this screen calls
+---
+```
+
+`docs/ui-specification/components.md`:
+
+```
+---
+kind: component-inventory
+---
+```
 
 **Freshness stamp:** every generated file (index, every screen shard, and components.md) starts with this line directly under its H1 — fill in today's date and the current commit hash:
 
 ```
 > **Last verified against code:** YYYY-MM-DD (commit `abc1234`)
 ```
+
+**File order in every shard:** frontmatter block → H1 → freshness stamp. The stamp lives only as the blockquote under the H1 — it is never duplicated into the frontmatter.
 
 Derive all content from the context documents provided:
 - Screens from stakeholder user flows and scope lock
@@ -160,7 +184,9 @@ Derive all content from the context documents provided:
 
 After the AI generates a UI spec document set, verify:
 
-- [ ] Every generated file (index.md, every screen shard, components.md) starts with the freshness stamp directly under its H1, filled with today's date and the current commit
+- [ ] Run `python .ai-framework/tools/validate-specs.py --root .` and fix every error
+- [ ] Every screen shard begins with its `kind: screen` frontmatter (flat keys only, `screen` key matches the filename) and `components.md` begins with `kind: component-inventory`; `index.md` has no frontmatter
+- [ ] Every generated file (index.md, every screen shard, components.md) starts with the freshness stamp directly under its H1 (after the frontmatter in shards), filled with today's date and the current commit
 - [ ] Every user flow phase from the stakeholder definition has at least one screen
 - [ ] Every screen in the Screen Inventory (index.md) has its own shard in `screens/` (kebab-case filename)
 - [ ] Every screen specification includes all 4 states (default, loading, empty, error)
@@ -323,4 +349,4 @@ Map each screen to the appropriate API endpoints.
 </ui-spec-generation-request>
 ```
 
-**Output:** `docs/ui-specification/index.md` + one `screens/<screen>.md` per screen (e.g., `screens/login.md`, `screens/project-board.md`) + `components.md` — a complete sharded UI specification following the `ui-specification.md` template structure, every file stamped `> **Last verified against code:** ...` directly under its H1.
+**Output:** `docs/ui-specification/index.md` + one `screens/<screen>.md` per screen (e.g., `screens/login.md`, `screens/project-board.md`) + `components.md` — a complete sharded UI specification following the `ui-specification.md` template structure, every shard opening with its frontmatter (`kind: screen` / `kind: component-inventory`) and every file stamped `> **Last verified against code:** ...` directly under its H1.

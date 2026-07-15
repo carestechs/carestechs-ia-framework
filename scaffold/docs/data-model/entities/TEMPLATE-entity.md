@@ -1,4 +1,13 @@
 <!-- Copy this file to docs/data-model/entities/<entity-kebab-singular>.md — one entity per file. -->
+<!-- Frontmatter: flat keys only — values are scalars or inline [a, b, c] arrays (no nesting, no multiline values); the kebab-case of `name` MUST equal the filename. -->
+
+---
+kind: entity
+name: [EntityName]         # PascalCase; kebab-case of it MUST equal the filename
+module: [OwningModule]
+endpoints: [resource-a]    # api-spec/endpoints/<x>.md shards that expose this entity (may be [])
+screens: [screen-a]        # ui-specification/screens/<x>.md shards that render it (may be [])
+---
 
 # Entity: [Entity Name]
 

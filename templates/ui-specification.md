@@ -252,7 +252,16 @@ Everything from here down to "Screen Shard" defines the contents of `index.md`. 
 
 One file per screen. Every shard follows this skeleton — reuse it verbatim when adding a new screen:
 
+> **Frontmatter note:** Flat keys only — values are scalars or inline `[a, b, c]` arrays (no nesting, no multiline values; parsed by `.ai-framework/tools/validate-specs.py`), and `screen` MUST match the filename. Screen shards and `components.md` only — `index.md` gets NO frontmatter.
+
 ````markdown
+---
+kind: screen
+screen: [screen-name]               # kebab-case; MUST equal the filename
+route: [/path]
+endpoints: [resource-a, resource-b] # resource shard names this screen calls (may be [])
+---
+
 # Screen: [Screen Name]
 
 > **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->
@@ -314,9 +323,13 @@ One file per screen. Every shard follows this skeleton — reuse it verbatim whe
 
 ## Shared Components File (`docs/ui-specification/components.md`)
 
-A single file inventorying every reusable component used across multiple screens, with inputs, outputs, and visual variants. Skeleton:
+A single file inventorying every reusable component used across multiple screens, with inputs, outputs, and visual variants. It carries the fixed `kind: component-inventory` frontmatter (same flat-keys constraint as the screen shards). Skeleton:
 
 ````markdown
+---
+kind: component-inventory
+---
+
 # Shared Components
 
 > **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->

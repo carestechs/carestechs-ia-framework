@@ -8,3 +8,4 @@ Read `.ai-framework/prompts/spec-generation.md` and follow it end-to-end.
 2. `$ARGUMENTS` optionally narrows the target — `data-model` or `api-spec` to generate just one spec. If empty, generate both.
 3. Generate the spec(s) following the prompt template's structure and quality criteria.
 4. Write the output files per the routing table's Output column: `docs/data-model/index.md` + `docs/data-model/entities/*.md` and `docs/api-spec/index.md` + `docs/api-spec/endpoints/*.md` — do not leave results only in chat.
+5. Run `python .ai-framework/tools/validate-specs.py --root .` and fix every error (frontmatter, cross-references, stamps).

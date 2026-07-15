@@ -2,6 +2,16 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.3.0] — 2026-07-14
+
+Verification harnesses: external-feedback checks at every step, per the self-correction research (models can't reliably self-review; tools and fresh contexts can).
+
+### Added
+- **`tools/validate-specs.py`** (shipped into `.ai-framework/tools/`): cross-shard consistency linter — frontmatter parsing/kind/name-vs-filename checks, cross-reference resolution (entity↔resource↔screen), index↔shard bidirectional consistency, freshness-stamp presence and staleness (`--max-age`, default 30 days), and work-item retrieval-key resolution. Wired into spec-generation/ui-spec-generation checklists (first item), task-prompt checklists (second item), the Development Pipeline, and the maintenance PR checklist.
+- **Shard frontmatter**: every spec shard now begins with flat machine-readable frontmatter (`kind`, `name`/`resource`/`screen`, cross-reference arrays) enabling deterministic retrieval-key resolution by orchestrators and mechanical linting. Index files carry none; the freshness stamp stays as the blockquote under the H1.
+- **`prompts/review-tasks.md`** + routing row "Task list review" + `/review-tasks` command: adversarial review of a generated task list in a FRESH agent session (no generation history) — runs both validators first as ground truth, then judges against a six-point rubric (AC completeness, scope fidelity, reference reality, dependency logic, sizing, workflow correctness) with CONFIRMED/PLAUSIBLE findings and an approve/revise verdict written to `tasks/<WORK-ITEM-ID>-review.md`. Includes orchestrator guidance for best-of-N candidate selection.
+- **`evals/` harness** (framework-repo only): golden-set regression testing for the prompts — fixture TaskFlow project + declarative assertions (`validator`, `task_count`, `must_match`/`must_not_match`, `paths_exist`, `shard_refs_resolve`) executed by `evals/run-evals.py`; generation and checking deliberately separated so the check step is deterministic and CI-safe.
+
 ## [2.2.0] — 2026-07-14
 
 Context-efficiency and precision release: load less, trust fresher, verify outputs.

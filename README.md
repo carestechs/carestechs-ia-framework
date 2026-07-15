@@ -155,7 +155,11 @@ carestechs-ia-framework/
 │   ├── improvement-proposal.md  # → docs/work-items/IMP-XXX-*.md
 │   └── examples/                # Genuinely filled work-item examples ("TaskFlow" sample product)
 ├── tools/                       # Shipped tooling (synced into scaffold/.ai-framework/tools/)
-│   └── validate-tasks.py        # Task-list schema/DAG/coverage validator (machine gate)
+│   ├── validate-tasks.py        # Task-list schema/DAG/coverage validator (machine gate)
+│   └── validate-specs.py        # Cross-shard consistency + freshness linter
+├── evals/                       # Prompt regression evals (framework-repo only, not shipped)
+│   ├── run-evals.py             # Deterministic assertion runner
+│   └── cases/                   # Golden fixture projects + assertions per prompt
 ├── prompts/                     # Claude-optimized prompt templates (agent-first, chat appendix)
 │   ├── base-template.md         # Canonical task schema + common prompt structure
 │   ├── feature-tasks.md         # Generate feature tasks   → tasks/FEAT-XXX-tasks.md
@@ -238,4 +242,4 @@ Testing, Integration, and Prioritization have context recipes in the guide but n
 
 ## Version History
 
-See [`CHANGELOG.md`](CHANGELOG.md). Highlights of the v2 line: 10 core templates across 6 layers (v1 had 4), work-item templates and prompts with dual agent/chat usage, ADR/DDR compilation, release lifecycle guide. v2.1 adds defined output locations (`tasks/`, `plans/`, `mockups/`), a canonical task schema, Claude Code slash commands in the scaffold, stack-neutral prompts, and the scaffold sync script. v2.2 shards the spec docs for retrieval-key context loading, splits contract from rationale, adds freshness stamps, and ships the `validate-tasks.py` output gate.
+See [`CHANGELOG.md`](CHANGELOG.md). Highlights of the v2 line: 10 core templates across 6 layers (v1 had 4), work-item templates and prompts with dual agent/chat usage, ADR/DDR compilation, release lifecycle guide. v2.1 adds defined output locations (`tasks/`, `plans/`, `mockups/`), a canonical task schema, Claude Code slash commands in the scaffold, stack-neutral prompts, and the scaffold sync script. v2.2 shards the spec docs for retrieval-key context loading, splits contract from rationale, adds freshness stamps, and ships the `validate-tasks.py` output gate. v2.3 adds the verification harnesses: shard frontmatter, the `validate-specs.py` cross-shard linter, the fresh-context task-list review prompt, and the `evals/` golden-set regression harness.

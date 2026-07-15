@@ -304,6 +304,7 @@ When the Improvement Proposal defines success criteria / acceptance criteria, en
 ## Post-Generation Checklist
 
 - [ ] Run `python .ai-framework/tools/validate-tasks.py tasks/IMP-XXX-tasks.md` and fix every error
+- [ ] Run `python .ai-framework/tools/validate-specs.py` and fix every error — confirms the spec shards the task list relies on are internally consistent and fresh
 
 ### Safety Checklist
 

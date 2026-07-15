@@ -1,0 +1,40 @@
+{
+  "output": "output/tasks.md",
+  "checks": [
+    {
+      "type": "validator",
+      "work_item": "input/docs/work-items/FEAT-001-task-labels.md",
+      "root": "input"
+    },
+    {
+      "type": "task_count",
+      "min": 6,
+      "max": 16
+    },
+    {
+      "type": "must_match",
+      "pattern": "## Acceptance Criteria Coverage",
+      "reason": "coverage table required"
+    },
+    {
+      "type": "must_match",
+      "pattern": "\\(new\\)",
+      "reason": "the feature creates files that do not exist in the fixture (label entity/endpoints/screen shards, code, migrations) — at least one path must be marked (new)"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)angular|ngmodule|arauco",
+      "reason": "stack leak — fixture is React/Express"
+    },
+    {
+      "type": "paths_exist",
+      "root": "input",
+      "allow_new": true
+    },
+    {
+      "type": "shard_refs_resolve",
+      "root": "input",
+      "allow_new": true
+    }
+  ]
+}

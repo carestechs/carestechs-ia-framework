@@ -199,7 +199,17 @@ When generating tasks from this document set:
 
 One file per entity. Every shard follows this skeleton — reuse it verbatim when adding a new entity:
 
+> **Frontmatter note:** Flat keys only — values are scalars or inline `[a, b, c]` arrays (no nesting, no multiline values; parsed by `.ai-framework/tools/validate-specs.py`), and the kebab-case of `name` MUST match the filename. Shards only — `index.md` gets NO frontmatter.
+
 ````markdown
+---
+kind: entity
+name: [EntityName]         # PascalCase; kebab-case of it MUST equal the filename
+module: [OwningModule]
+endpoints: [resource-a]    # api-spec/endpoints/<x>.md shards that expose this entity (may be [])
+screens: [screen-a]        # ui-specification/screens/<x>.md shards that render it (may be [])
+---
+
 # Entity: [Entity Name]
 
 > **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->

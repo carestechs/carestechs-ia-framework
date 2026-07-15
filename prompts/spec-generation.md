@@ -95,11 +95,38 @@ Write the generated spec as a **sharded document set** at the canonical location
 
 **Shard naming (mechanical, kebab-case):** entity `TaskLabel` → `entities/task-label.md` (singular); resource `/api/task-labels` → `endpoints/task-labels.md` (matches the route segment, plural).
 
+**Frontmatter (required on every generated shard):** every shard begins with a frontmatter block — **before the H1** — carrying its machine-readable retrieval keys. **Index files get no frontmatter.** Constraint: the frontmatter is parsed by a stdlib mini-parser — **flat keys only**; values are scalars or inline arrays `[a, b, c]`. No nesting, no multiline values, no quotes needed for kebab-case/path values.
+
+Entity shard (`docs/data-model/entities/<entity>.md`):
+
+```
+---
+kind: entity
+name: TaskLabel            # PascalCase; kebab-case of it MUST equal the filename
+module: Projects
+endpoints: [task-labels]   # api-spec/endpoints/<x>.md shards that expose this entity (may be [])
+screens: [project-board]   # ui-specification/screens/<x>.md shards that render it (may be [])
+---
+```
+
+Resource shard (`docs/api-spec/endpoints/<resource>.md`):
+
+```
+---
+kind: resource
+resource: task-labels      # MUST equal the filename
+routes: [/api/task-labels]
+entities: [task-label]     # entity shard names this resource reads/writes
+---
+```
+
 **Freshness stamp:** every generated file (index and every shard) starts with this line directly under its H1 — fill in today's date and the current commit hash:
 
 ```
 > **Last verified against code:** YYYY-MM-DD (commit `abc1234`)
 ```
+
+**File order in every shard:** frontmatter block → H1 → freshness stamp. The stamp lives only as the blockquote under the H1 — it is never duplicated into the frontmatter.
 
 **Index files hold cross-cutting content only** — anything specific to one entity or one resource lives in its shard.
 
@@ -123,6 +150,7 @@ Use the section structure from `.ai-framework/templates/data-model.md` for the i
 7. Changelog
 
 `docs/data-model/entities/<entity>.md` — **one entity per file**:
+- `kind: entity` frontmatter (retrieval keys — see above)
 - Owning module
 - Fields table (types, constraints, indexes)
 - Relationships (1:N, M:N, cross-module — with cascade behaviors)
@@ -140,7 +168,7 @@ Use the section structure from `.ai-framework/templates/api-spec.md` for the ind
 5. Usage Notes for AI Task Generation
 6. Changelog
 
-`docs/api-spec/endpoints/<resource>.md` — **one resource group per file**: all endpoint blocks for that resource, each with route, method, auth, request/response DTOs, and status codes.
+`docs/api-spec/endpoints/<resource>.md` — **one resource group per file**: `kind: resource` frontmatter (retrieval keys — see above), then all endpoint blocks for that resource, each with route, method, auth, request/response DTOs, and status codes.
 
 ---
 
@@ -160,7 +188,9 @@ Use the section structure from `.ai-framework/templates/api-spec.md` for the ind
 After the AI generates a spec document set, verify:
 
 ### For Both:
-- [ ] Every generated file (index and every shard) starts with the freshness stamp directly under its H1, filled with today's date and the current commit
+- [ ] Run `python .ai-framework/tools/validate-specs.py --root .` and fix every error
+- [ ] Every generated shard begins with its frontmatter block (`kind: entity` / `kind: resource`, flat keys only, name/resource key matches the filename); index files have none
+- [ ] Every generated file (index and every shard) starts with the freshness stamp directly under its H1 (after the frontmatter in shards), filled with today's date and the current commit
 - [ ] Index files hold cross-cutting content only — every entity/resource lives in its own shard
 - [ ] Shard filenames follow the kebab-case naming rule (entity singular; resource matches the route segment)
 
@@ -303,4 +333,4 @@ Assign each entity to the correct module per the architecture.
 </spec-generation-request>
 ```
 
-**Output:** `docs/data-model/index.md` + one `docs/data-model/entities/<entity>.md` per entity (e.g., `entities/task-item.md`, `entities/project.md`) — a complete sharded data model following the `data-model.md` template structure, every file stamped `> **Last verified against code:** ...` directly under its H1.
+**Output:** `docs/data-model/index.md` + one `docs/data-model/entities/<entity>.md` per entity (e.g., `entities/task-item.md`, `entities/project.md`) — a complete sharded data model following the `data-model.md` template structure, every shard opening with its `kind: entity` frontmatter and every file stamped `> **Last verified against code:** ...` directly under its H1.

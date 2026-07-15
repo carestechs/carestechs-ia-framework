@@ -197,7 +197,16 @@ When generating tasks from this document set:
 
 One file per resource group, containing ALL endpoint blocks for that resource. Every shard follows this skeleton — reuse it verbatim when adding a new resource:
 
+> **Frontmatter note:** Flat keys only — values are scalars or inline `[a, b, c]` arrays (no nesting, no multiline values; parsed by `.ai-framework/tools/validate-specs.py`), and `resource` MUST match the filename. Shards only — `index.md` gets NO frontmatter.
+
 ````markdown
+---
+kind: resource
+resource: [resource-name]      # kebab-case; MUST equal the filename
+routes: [/api/resource-name]
+entities: [entity-a]           # entity shard names this resource reads/writes (may be [])
+---
+
 # Resource: [Resource Name] (`/api/[resource]`)
 
 > **Last verified against code:** <!-- YYYY-MM-DD (commit abc1234) — update whenever you confirm this file matches the code -->

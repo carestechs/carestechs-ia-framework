@@ -419,6 +419,61 @@ Consider: user impact, severity, development cost, strategic alignment, dependen
 
 ---
 
+### 11. Task List Review
+
+**Goal**: Adversarially review a generated task list before planning and implementation — verify AC coverage, scope fidelity, reference reality, dependency logic, sizing, and workflow correctness.
+
+**Prompt:** `.ai-framework/prompts/review-tasks.md` — writes the review to `tasks/<WORK-ITEM-ID>-review.md` (verdict + findings table).
+
+| Priority | Document | Include When | What to Include |
+|----------|----------|--------------|-----------------|
+| Required | Task List | Always | The full task list under review (`tasks/<WORK-ITEM-ID>-tasks.md`) |
+| Required | Work Item | Always | The full `docs/work-items/` document the task list was generated from |
+| Required | Data Model | Always | `docs/data-model/index.md` + entity shards named by the work item's impact tables |
+| Required | API Specification | Always | `docs/api-spec/index.md` + endpoint shards named by the work item's impact tables |
+| Required | UI Specification | Always | `docs/ui-specification/index.md` + screen shards named by the work item's impact tables |
+| Required | CLAUDE.md | Always | Full document |
+
+That list is exhaustive — nothing else goes into the reviewer's context. Two rules are absolute for this task type:
+
+1. **Run in a FRESH context.** Never include the generating agent's conversation transcript or reasoning. Same-session self-review is unreliable; the reviewer must see only the artifacts and specs listed above.
+2. **Never include `docs/rationale/`.** As with every recipe in this guide, rationale files stay out of context.
+
+Before judging semantics, the reviewer runs the external validators — `python .ai-framework/tools/validate-tasks.py` and `python .ai-framework/tools/validate-specs.py` — and treats their output as ground truth (see the prompt's Guidance).
+
+**Example Assembly**:
+```xml
+<context>
+  <task-list>
+    [Full task list under review from tasks/<WORK-ITEM-ID>-tasks.md]
+  </task-list>
+
+  <work-item>
+    [Full work item from docs/work-items/ — the one the task list was generated from]
+  </work-item>
+
+  <data-model>
+    [docs/data-model/index.md + the entity shards named by the impact table]
+  </data-model>
+
+  <api-spec>
+    [docs/api-spec/index.md + the endpoint shards named by the impact table]
+  </api-spec>
+
+  <ui-specification>
+    [docs/ui-specification/index.md + the screen shards named by the impact table]
+  </ui-specification>
+
+  <code-conventions>
+    [Full CLAUDE.md]
+  </code-conventions>
+
+  <!-- NOTHING ELSE: no generator transcript, no reasoning, no docs/rationale/ -->
+</context>
+```
+
+---
+
 ## Context Size Management
 
 ### Guideline: Quality Over Quantity
@@ -466,7 +521,7 @@ For this task, only the Order Service is relevant.
 
 Agents have direct file access and don't need XML assembly. Follow these steps:
 
-1. **Identify the task type** from the user's request — one of the 10 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation)
+1. **Identify the task type** from the user's request — one of the 11 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation, Task List Review)
 2. **Read the files** listed in the CLAUDE.md routing table for that task type
 3. **For the sharded spec docs**, read each spec's `index.md` plus only the shards named by the work item's impact tables — e.g., for a task about the `TaskLabel` entity and the `/api/task-labels` resource, read `docs/data-model/index.md` + `docs/data-model/entities/task-label.md` and `docs/api-spec/index.md` + `docs/api-spec/endpoints/task-labels.md`. Never read whole spec directories, and never read `docs/rationale/`
 4. **Read the prompt template** from `.ai-framework/prompts/` — use the **Output Format** section as your deliverable structure, and apply the **Guidance**, **Constraints**, and **Post-Generation Checklist**
@@ -477,7 +532,7 @@ Agents have direct file access and don't need XML assembly. Follow these steps:
 For copy-paste workflows where you assemble an XML prompt to submit to Claude:
 
 #### Step 1: Identify Task Type
-What kind of task are you generating? One of the 10 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation)
+What kind of task are you generating? One of the 11 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation, Task List Review)
 
 #### Step 2: Check Required Documents
 Consult the task-type tables above for your task type. Gather required documents.
@@ -536,10 +591,13 @@ Include the specific request, constraints, and output format requirements.
 | Release Transition | Stakeholder + CLAUDE.md | Architecture, `guides/release-lifecycle.md` |
 | ADR Compilation | ADR files | `.ai-framework/templates/` |
 | DDR Compilation | DDR files (+ optional profile) | `.ai-framework/templates/` |
+| Task List Review‡ | Task list + Work Item + Data Model† + API Spec† + UI Spec† + CLAUDE.md | — (nothing else) |
 
 \* No dedicated prompt — use `prompts/base-template.md` with this context recipe.
 
 † Sharded spec — include the spec's `index.md` plus ONLY the shards named by the work item's impact tables (see Retrieval Keys). Never load the whole directory; never load `docs/rationale/`.
+
+‡ Runs in a FRESH context via `.ai-framework/prompts/review-tasks.md` — never include the generator's transcript or reasoning, never `docs/rationale/`. Output: `tasks/<WORK-ITEM-ID>-review.md`.
 
 ---
 
