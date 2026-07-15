@@ -3,17 +3,25 @@
 
 Usage:
     python evals/run-evals.py [--case SUBSTRING] [--require-all] [--list]
+                              [--judge] [--judge-cmd TEMPLATE]
 
 Each case lives at evals/cases/<prompt>/<case>/ with:
     GENERATE.md       instructions an agent follows to produce the output
     input/            self-contained fixture project
     assertions.json   declarative checks (see below)
+    rubric.md         judge rubric (only for cases with a judge check)
+    reference/        known-good anchor output for the judge
     output/           where generated artifacts land (disposable)
 
-This runner is deterministic: it only CHECKS outputs that already exist. Producing
-an output is a separate step done by an agent following the case's GENERATE.md
-(see evals/README.md). Cases with no output are reported as MISSING and skipped,
-unless --require-all is passed (CI mode after a generation step).
+This runner is deterministic by default: it only CHECKS outputs that already exist.
+Producing an output is a separate step done by an agent following the case's
+GENERATE.md (see evals/README.md). Cases with no output are reported as MISSING and
+skipped, unless --require-all is passed (CI mode after a generation step).
+
+`judge` checks call a model and are therefore SKIPPED unless --judge is passed.
+The judge command is a template with a {prompt_file} placeholder; the default uses
+the Claude Code CLI. The judge prompt embeds the rubric, the reference anchor, and
+the candidate, and demands a final JSON verdict {"score": 1-10, "reasons": [...]}.
 
 assertions.json:
     {"output": "output/tasks.md",
@@ -23,11 +31,12 @@ assertions.json:
        {"type": "must_match", "pattern": "## Acceptance Criteria Coverage", "reason": "..."},
        {"type": "must_not_match", "pattern": "(?i)angular", "reason": "..."},
        {"type": "paths_exist", "root": "input", "allow_new": true},
-       {"type": "shard_refs_resolve", "root": "input", "allow_new": true}
+       {"type": "shard_refs_resolve", "root": "input", "allow_new": true},
+       {"type": "judge", "rubric": "rubric.md", "reference": "reference/tasks.md", "min_score": 7}
      ]}
 
-Exit code 0 when every check of every checked case passes (and, with
---require-all, every case had an output); 1 otherwise.
+Exit code 0 when every executed check of every checked case passes (and, with
+--require-all, every case had an output); 1 otherwise. SKIPs never fail a case.
 Python 3.8+, standard library only.
 """
 
@@ -42,20 +51,50 @@ EVALS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = EVALS_DIR.parent
 VALIDATE_TASKS = REPO_ROOT / "tools" / "validate-tasks.py"
 
+DEFAULT_JUDGE_CMD = ('claude -p "Read the file {prompt_file} and follow its '
+                     'instructions exactly."')
+
 TASK_HEADING_RE = re.compile(r"^#{2,4}\s+T-\d{1,4}\s*:", re.MULTILINE)
 FILE_BULLET_RE = re.compile(
     r"^\s*[-*]\s*`?(?P<path>[^`\s]+)`?\s*(?P<new>\(new\))?\s*(?:[-–—]\s*(?P<desc>.*))?$"
 )
-FILES_FIELD_RE = re.compile(r"^\*\*Files to Modify/Create:\*\*", re.MULTILINE)
 SHARD_REF_RE = re.compile(r"docs/(?:data-model|api-spec|ui-specification)/[A-Za-z0-9/_.-]+?\.md")
+JSON_VERDICT_RE = re.compile(r"\{[^{}]*\"score\"[^{}]*\}", re.DOTALL)
+
+JUDGE_PROMPT_TEMPLATE = """# Eval Judge
+
+You are an impartial judge grading a generated task list against a fixed rubric.
+Read everything below. Do not use any other context. Your entire response must end
+with a single JSON object on its own line — no prose after it.
+
+## Rubric
+
+{rubric}
+
+## Reference output (known-good anchor)
+
+The candidate does NOT need to match this verbatim — it anchors what "good" looks
+like. Judge substance, not wording.
+
+{reference}
+
+## Candidate output (under evaluation)
+
+{candidate}
+
+## Verdict contract
+
+Score the candidate 1-10 against the rubric (use the rubric's own scoring guide).
+Final line, JSON only, exactly this shape:
+{{"score": <integer 1-10>, "reasons": ["<short reason>", "..."]}}
+"""
 
 
 def extract_file_entries(text):
     """Return (path, is_new) for every bullet under a Files to Modify/Create field."""
     entries = []
-    lines = text.splitlines()
     in_field = False
-    for line in lines:
+    for line in text.splitlines():
         if re.match(r"^\*\*Files to Modify/Create:\*\*", line.strip()):
             in_field = True
             continue
@@ -69,9 +108,57 @@ def extract_file_entries(text):
     return entries
 
 
-def run_check(check, case_dir, out_text, out_path):
-    """Return (passed: bool, detail: str)."""
+def run_judge(check, case_dir, out_text, judge_opts):
+    if not judge_opts["enabled"]:
+        return "SKIP", "judge check skipped (enable with --judge)"
+    rubric_path = case_dir / check.get("rubric", "rubric.md")
+    if not rubric_path.is_file():
+        return "FAIL", f"rubric not found: {rubric_path}"
+    rubric = rubric_path.read_text(encoding="utf-8", errors="replace")
+    reference = "None provided."
+    if check.get("reference"):
+        ref_path = case_dir / check["reference"]
+        if not ref_path.is_file():
+            return "FAIL", f"reference not found: {ref_path}"
+        reference = ref_path.read_text(encoding="utf-8", errors="replace")
+
+    prompt = JUDGE_PROMPT_TEMPLATE.format(rubric=rubric, reference=reference,
+                                          candidate=out_text)
+    prompt_file = case_dir / "output" / "judge-prompt.md"
+    prompt_file.parent.mkdir(parents=True, exist_ok=True)
+    prompt_file.write_text(prompt, encoding="utf-8")
+
+    cmd = judge_opts["cmd"].replace("{prompt_file}", str(prompt_file))
+    try:
+        proc = subprocess.run(cmd, shell=True, capture_output=True, text=True,
+                              timeout=judge_opts["timeout"])
+    except subprocess.TimeoutExpired:
+        return "FAIL", f"judge command timed out after {judge_opts['timeout']}s"
+    except OSError as exc:
+        return "FAIL", f"judge command failed to start: {exc}"
+
+    verdicts = JSON_VERDICT_RE.findall(proc.stdout or "")
+    if not verdicts:
+        tail = (proc.stdout or proc.stderr or "").strip().splitlines()[-3:]
+        return "FAIL", "no JSON verdict in judge output: " + " / ".join(tail)
+    try:
+        verdict = json.loads(verdicts[-1])
+        score = int(verdict["score"])
+    except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+        return "FAIL", f"unparseable judge verdict {verdicts[-1]!r}: {exc}"
+
+    min_score = int(check.get("min_score", 7))
+    reasons = "; ".join(str(r) for r in verdict.get("reasons", [])[:3])
+    detail = f"score {score}/{10} (min {min_score})" + (f" — {reasons}" if reasons else "")
+    return ("PASS" if score >= min_score else "FAIL"), detail
+
+
+def run_check(check, case_dir, out_text, out_path, judge_opts):
+    """Return (status: PASS|FAIL|SKIP, detail: str)."""
     ctype = check.get("type")
+
+    if ctype == "judge":
+        return run_judge(check, case_dir, out_text, judge_opts)
 
     if ctype == "validator":
         cmd = [sys.executable, str(VALIDATE_TASKS), str(out_path)]
@@ -83,22 +170,23 @@ def run_check(check, case_dir, out_text, out_path):
             cmd += ["--strict"]
         proc = subprocess.run(cmd, capture_output=True, text=True)
         if proc.returncode == 0:
-            return True, "validator clean"
+            return "PASS", "validator clean"
         tail = "\n".join((proc.stdout or "").strip().splitlines()[-6:])
-        return False, f"validator failed:\n      {tail.replace(chr(10), chr(10) + '      ')}"
+        return "FAIL", f"validator failed:\n      {tail.replace(chr(10), chr(10) + '      ')}"
 
     if ctype == "task_count":
         n = len(TASK_HEADING_RE.findall(out_text))
         lo, hi = check.get("min", 1), check.get("max", 10 ** 6)
         if lo <= n <= hi:
-            return True, f"{n} tasks (allowed {lo}-{hi})"
-        return False, f"{n} tasks, expected {lo}-{hi}"
+            return "PASS", f"{n} tasks (allowed {lo}-{hi})"
+        return "FAIL", f"{n} tasks, expected {lo}-{hi}"
 
     if ctype in ("must_match", "must_not_match"):
         found = re.search(check["pattern"], out_text)
         ok = bool(found) if ctype == "must_match" else not found
         reason = check.get("reason", check["pattern"])
-        return ok, reason if ok else f"{reason} (pattern: {check['pattern']!r})"
+        return ("PASS" if ok else "FAIL"), (
+            reason if ok else f"{reason} (pattern: {check['pattern']!r})")
 
     if ctype == "paths_exist":
         root = case_dir / check.get("root", "input")
@@ -112,8 +200,8 @@ def run_check(check, case_dir, out_text, out_path):
             elif not (root / path).exists():
                 bad.append(path)
         if not bad:
-            return True, "all referenced files exist or are (new)"
-        return False, "unknown paths: " + ", ".join(bad[:8])
+            return "PASS", "all referenced files exist or are (new)"
+        return "FAIL", "unknown paths: " + ", ".join(bad[:8])
 
     if ctype == "shard_refs_resolve":
         root = case_dir / check.get("root", "input")
@@ -128,10 +216,10 @@ def run_check(check, case_dir, out_text, out_path):
                     continue
                 bad.append(ref)
         if not bad:
-            return True, "all shard references resolve"
-        return False, "unresolved shard refs: " + ", ".join(sorted(set(bad))[:8])
+            return "PASS", "all shard references resolve"
+        return "FAIL", "unresolved shard refs: " + ", ".join(sorted(set(bad))[:8])
 
-    return False, f"unknown check type: {ctype!r}"
+    return "FAIL", f"unknown check type: {ctype!r}"
 
 
 def main():
@@ -141,7 +229,16 @@ def main():
     ap.add_argument("--require-all", action="store_true",
                     help="fail if any case has no generated output (CI mode)")
     ap.add_argument("--list", action="store_true", help="list discovered cases and exit")
+    ap.add_argument("--judge", action="store_true",
+                    help="execute judge checks (calls a model; skipped otherwise)")
+    ap.add_argument("--judge-cmd", default=DEFAULT_JUDGE_CMD,
+                    help="judge command template with a {prompt_file} placeholder "
+                         f"(default: {DEFAULT_JUDGE_CMD!r})")
+    ap.add_argument("--judge-timeout", type=int, default=600,
+                    help="judge command timeout in seconds (default 600)")
     args = ap.parse_args()
+    judge_opts = {"enabled": args.judge, "cmd": args.judge_cmd,
+                  "timeout": args.judge_timeout}
 
     cases = sorted(EVALS_DIR.glob("cases/*/*/assertions.json"))
     if args.case:
@@ -168,9 +265,9 @@ def main():
         case_failed = False
         details = []
         for check in spec.get("checks", []):
-            ok, detail = run_check(check, case_dir, out_text, out_path)
-            details.append(f"    {'PASS' if ok else 'FAIL'}  {check['type']}: {detail}")
-            if not ok:
+            status, detail = run_check(check, case_dir, out_text, out_path, judge_opts)
+            details.append(f"    {status:4s}  {check['type']}: {detail}")
+            if status == "FAIL":
                 case_failed = True
         print(f"[{'FAIL' if case_failed else 'PASS'}] {name}")
         for d in details:

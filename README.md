@@ -156,7 +156,8 @@ carestechs-ia-framework/
 │   └── examples/                # Genuinely filled work-item examples ("TaskFlow" sample product)
 ├── tools/                       # Shipped tooling (synced into scaffold/.ai-framework/tools/)
 │   ├── validate-tasks.py        # Task-list schema/DAG/coverage validator (machine gate)
-│   └── validate-specs.py        # Cross-shard consistency + freshness linter
+│   ├── validate-specs.py        # Cross-shard consistency + freshness linter
+│   └── metrics-report.py        # Framework-effectiveness scorecard (see guides/evaluation.md)
 ├── evals/                       # Prompt regression evals (framework-repo only, not shipped)
 │   ├── run-evals.py             # Deterministic assertion runner
 │   └── cases/                   # Golden fixture projects + assertions per prompt
@@ -175,7 +176,8 @@ carestechs-ia-framework/
     ├── getting-started.md       # Full workflow: idea → AI tasks
     ├── context-compilation.md   # CANONICAL context-selection matrix + assembly instructions
     ├── maintenance.md           # Keeping docs in sync with code
-    └── release-lifecycle.md     # Versioned vs continuous development
+    ├── release-lifecycle.md     # Versioned vs continuous development
+    └── evaluation.md            # Measuring framework effectiveness (4 levels, event schema)
 ```
 
 ### Editing the framework

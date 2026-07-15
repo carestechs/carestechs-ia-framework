@@ -2,6 +2,17 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.0] — 2026-07-14
+
+Effectiveness measurement: turn "the framework works" into numbers computed from the repo.
+
+### Added
+- **`guides/evaluation.md`**: the four-level evaluation methodology (compliance → offline prompt evals → online pipeline scorecard → counterfactual ablations), the Level 3 metric definitions (first-pass acceptance, human correction burden, AC leakage, defect attribution, doc drift, cycle time, token cost), the `metrics/events.ndjson` event-log schema for orchestrators, and the measurement cadence.
+- **`tools/metrics-report.py`** (shipped into `.ai-framework/tools/`): prints the effectiveness scorecard from artifacts + git history + the optional event log — per task list: correction burden (diff of first committed vs current version) and amendment count; review verdict acceptance rates; doc health (validate-specs + stamp-age distribution); BUG→FEAT defect attribution; per-step acceptance/duration/token metrics from events. Degrades gracefully without git or events.
+- **`judge` check type** in `evals/run-evals.py`: anchored LLM-judge scoring (rubric + known-good reference + JSON verdict contract), skipped by default so deterministic runs stay CI-safe; `--judge` executes with a configurable command template (Claude Code CLI by default). Case-001 gains `rubric.md` (five-dimension scoring guide) and `reference/tasks.md` (verified anchor output).
+- **`BACKLOG.md`**: documented deferred items — the five pipeline lifecycle gaps (per-task status, implementation record, implementation-review prompt, mandatory closing docs task, brief-closure checklist), team-scale items, and prompt refinements.
+- `validate-tasks.py`: work-item acceptance criteria in `- **AC-n**:` bullet form are now recognized by the coverage cross-check.
+
 ## [2.3.0] — 2026-07-14
 
 Verification harnesses: external-feedback checks at every step, per the self-correction research (models can't reliably self-review; tools and fresh contexts can).

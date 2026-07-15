@@ -35,6 +35,12 @@
       "type": "shard_refs_resolve",
       "root": "input",
       "allow_new": true
+    },
+    {
+      "type": "judge",
+      "rubric": "rubric.md",
+      "reference": "reference/tasks.md",
+      "min_score": 7
     }
   ]
 }

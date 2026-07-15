@@ -44,6 +44,23 @@ Assertion types (see `run-evals.py` docstring for the JSON schema):
 | `must_match` / `must_not_match` | required sections present; stack leaks and forbidden content absent |
 | `paths_exist` | every file a task touches exists in the fixture or is marked `(new)` |
 | `shard_refs_resolve` | every spec-shard reference resolves against the fixture (hallucination check) |
+| `judge` | anchored LLM-judge score against the case's `rubric.md`, with `reference/` as the known-good anchor (skipped unless `--judge`) |
+
+## Judge checks
+
+`judge` checks call a model, so the default run skips them — the deterministic checks
+stay CI-safe. To execute them:
+
+```bash
+python evals/run-evals.py --judge                       # uses the Claude Code CLI by default
+python evals/run-evals.py --judge --judge-cmd '<cmd with {prompt_file}>'
+```
+
+The runner builds a self-contained judge prompt (rubric + reference anchor + candidate,
+JSON verdict contract) at `output/judge-prompt.md` and runs the command template on it.
+Judges are only reliable when anchored: every judge case needs a `rubric.md` with a
+scoring guide and a `reference/` output demonstrating what "good" looks like. Grade
+substance, not wording — the rubric should say so explicitly.
 
 ## Reading the results
 
