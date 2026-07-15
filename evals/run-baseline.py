@@ -37,7 +37,8 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 EVALS_DIR = Path(__file__).resolve().parent
-CHECK_LINE_RE = re.compile(r"^\s+(PASS|FAIL|SKIP)\s+([a-z_]+):", re.MULTILINE)
+CHECK_LINE_RE = re.compile(r"^\s+(PASS|FAIL|SKIP)\s+([a-z_]+):\s*(.*)$", re.MULTILINE)
+JUDGE_SCORE_RE = re.compile(r"score (\d+)/10")
 DEFAULT_GEN_CMD = ('claude -p "Read GENERATE.md in the current directory and follow it '
                    'exactly." --permission-mode acceptEdits --allowedTools "Bash(python *)"')
 
@@ -64,8 +65,9 @@ def check_case(case_name, judge):
     if judge:
         cmd.append("--judge")
     proc = subprocess.run(cmd, capture_output=True, text=True)
-    checks = [(m.group(1), m.group(2)) for m in CHECK_LINE_RE.finditer(proc.stdout or "")]
-    passed = bool(checks) and all(s != "FAIL" for s, _ in checks)
+    checks = [(m.group(1), m.group(2), m.group(3).strip())
+              for m in CHECK_LINE_RE.finditer(proc.stdout or "")]
+    passed = bool(checks) and all(s != "FAIL" for s, _, _ in checks)
     return passed, checks
 
 
@@ -92,7 +94,7 @@ def run_case(case_dir, args, label_dir):
         print(f"[{name}] sample {i}: {'PASS' if passed else 'FAIL'} "
               f"({round(secs)}s)", flush=True)
         results.append({"sample": i, "generated": True, "passed": passed,
-                        "checks": [{"status": s, "type": t} for s, t in checks],
+                        "checks": [{"status": s, "type": t, "detail": d} for s, t, d in checks],
                         "secs": round(secs)})
     return name, results
 
@@ -123,7 +125,7 @@ def rescore(label, judge):
             print(f"[{archived_case.name}] {sample.name}: {'PASS' if passed else 'FAIL'}",
                   flush=True)
             results.append({"sample": sample.name, "generated": True, "passed": passed,
-                            "checks": [{"status": s, "type": t} for s, t in checks]})
+                            "checks": [{"status": s, "type": t, "detail": d} for s, t, d in checks]})
         all_results[archived_case.name] = results
     return all_results, label_dir
 
@@ -162,21 +164,30 @@ def main():
         with ThreadPoolExecutor(max_workers=len(case_dirs)) as pool:
             all_results = dict(pool.map(lambda d: run_case(d, args, label_dir), case_dirs))
 
-    print(f"\n{'case':42s} {'gen ok':>6s} {'passed':>6s} {'rate':>6s}  top failing checks")
+    print(f"\n{'case':42s} {'gen ok':>6s} {'passed':>6s} {'rate':>6s} {'judge':>12s}  top failing checks")
     summary = {}
     for name, results in sorted(all_results.items()):
         generated = [r for r in results if r.get("generated")]
         passed = [r for r in generated if r.get("passed")]
         fail_counts = {}
+        scores = []
         for r in generated:
             for c in r.get("checks", []):
                 if c["status"] == "FAIL":
                     fail_counts[c["type"]] = fail_counts.get(c["type"], 0) + 1
+                if c["type"] == "judge" and c["status"] in ("PASS", "FAIL"):
+                    m = JUDGE_SCORE_RE.search(c.get("detail", ""))
+                    if m:
+                        scores.append(int(m.group(1)))
         rate = f"{100 * len(passed) / len(generated):.0f}%" if generated else "-"
+        judge_col = (f"{sum(scores) / len(scores):.1f} ({min(scores)}-{max(scores)})"
+                     if scores else "-")
         top = ", ".join(f"{t} x{n}" for t, n in
                         sorted(fail_counts.items(), key=lambda kv: -kv[1])[:3]) or "-"
-        print(f"{name:42s} {len(generated):3d}/{len(results):<2d} {len(passed):6d} {rate:>6s}  {top}")
-        summary[name] = {"samples": results, "pass_rate": rate, "failing_checks": fail_counts}
+        print(f"{name:42s} {len(generated):3d}/{len(results):<2d} {len(passed):6d} {rate:>6s} "
+              f"{judge_col:>12s}  {top}")
+        summary[name] = {"samples": results, "pass_rate": rate,
+                         "judge_scores": scores, "failing_checks": fail_counts}
 
     results_path = label_dir / ("results-rescored.json" if args.rescore else "results.json")
     results_path.write_text(json.dumps(

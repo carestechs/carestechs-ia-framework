@@ -12,6 +12,12 @@ First measured baseline, and the eval loop's first catch — a false-positive in
 
 ### Changed
 - `shard_refs_resolve` now sanctions a not-yet-existing shard reference when it is marked `(new)` on the same line, anywhere in the document, or in a `sanctioned_by` doc (typically the work item whose impact tables declare the new shards). Verified against a negative test: genuinely invented shards still fail.
+- `run-baseline.py` now captures per-check detail text (including numeric judge scores) into the results JSON and shows a judge avg/range column in the summary table.
+
+### Judged baseline (v2.4.2, anchored judge over archived samples)
+- feature-tasks: **8.7 avg (8–9)** — judge findings substantive (e.g., one sample flagged a missing dependency between a (new) file and its creating task).
+- bugfix-tasks: **8.3 avg (8–9)** — investigation-first structure and root-cause discipline confirmed across all samples.
+- Deterministic checks: 12/12. These numbers are the quality floor for future prompt/model changes.
 
 ## [2.4.2] — 2026-07-15
 

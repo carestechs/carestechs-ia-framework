@@ -2,7 +2,7 @@
   "label": "v2.4.2",
   "samples_per_case": 0,
   "gen_cmd": "claude -p \"Read GENERATE.md in the current directory and follow it exactly.\" --permission-mode acceptEdits --allowedTools \"Bash(python *)\"",
-  "judge": false,
+  "judge": true,
   "cases": {
     "case-001-task-labels": {
       "samples": [
@@ -13,35 +13,43 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "validator"
+              "type": "validator",
+              "detail": "validator clean"
             },
             {
               "status": "PASS",
-              "type": "task_count"
+              "type": "task_count",
+              "detail": "14 tasks (allowed 6-16)"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "coverage table required"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture (label entity/endpoints/screen shards, code, migrations) \u2014 at least one path must be marked (new)"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "paths_exist"
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             },
             {
-              "status": "SKIP",
-              "type": "judge"
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) \u2014 Single-purpose tasks with one Type each and plausible complexity values; Dependency graph is fully buildable with no forward refs or false parallelism; All 6 ACs covered with plausible, traceable attributions"
             }
           ]
         },
@@ -52,35 +60,43 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "validator"
+              "type": "validator",
+              "detail": "validator clean"
             },
             {
               "status": "PASS",
-              "type": "task_count"
+              "type": "task_count",
+              "detail": "14 tasks (allowed 6-16)"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "coverage table required"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture (label entity/endpoints/screen shards, code, migrations) \u2014 at least one path must be marked (new)"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "paths_exist"
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             },
             {
-              "status": "SKIP",
-              "type": "judge"
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) \u2014 Buildable dependency graph and docs-first ordering with one flaw: T-006 marks src/api/labels.ts as (new) without depending on T-005, which also creates it \u00e2\u20ac\u201d false parallelism on a shared file; All 6 ACs covered with plausible, checkable attribution, and business rules propagated into task-level acceptance criteria; Files and technical notes concrete enough to plan from directly; scope stays within the brief"
             }
           ]
         },
@@ -91,40 +107,53 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "validator"
+              "type": "validator",
+              "detail": "validator clean"
             },
             {
               "status": "PASS",
-              "type": "task_count"
+              "type": "task_count",
+              "detail": "14 tasks (allowed 6-16)"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "coverage table required"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture (label entity/endpoints/screen shards, code, migrations) \u2014 at least one path must be marked (new)"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "paths_exist"
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             },
             {
-              "status": "SKIP",
-              "type": "judge"
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) \u2014 All 14 tasks are single-purpose with one Type and plausible complexity; Dependency graph is fully buildable with no false parallelism or forward references; All 6 ACs covered with plausible endpoint/UI/test attributions"
             }
           ]
         }
       ],
       "pass_rate": "100%",
+      "judge_scores": [
+        9,
+        8,
+        9
+      ],
       "failing_checks": {}
     },
     "case-002-overdue-timezone": {
@@ -136,35 +165,43 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "validator"
+              "type": "validator",
+              "detail": "validator clean"
             },
             {
               "status": "PASS",
-              "type": "task_count"
+              "type": "task_count",
+              "detail": "9 tasks (allowed 4-12)"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "bugfix lists start with Phase 1 investigation tasks \u2014 investigation precedes the fix"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "the tasks must identify the root cause, not patch the symptom"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "paths_exist"
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             },
             {
-              "status": "SKIP",
-              "type": "judge"
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) \u2014 Investigation-first structure intact: all fix work depends on reproduce/trace tasks and targets the confirmed tz-dropped root cause; Regression coverage exceeds the anchor: exact reported scenario, both local-midnight boundary instants, positive-offset zone, DST, default-UTC and invalid-tz paths; Fix tightly scoped to the predicate path (src/db/task.ts, src/api/tasks.ts) with no unrelated refactoring"
             }
           ]
         },
@@ -175,35 +212,43 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "validator"
+              "type": "validator",
+              "detail": "validator clean"
             },
             {
               "status": "PASS",
-              "type": "task_count"
+              "type": "task_count",
+              "detail": "8 tasks (allowed 4-12)"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "bugfix lists start with Phase 1 investigation tasks \u2014 investigation precedes the fix"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "the tasks must identify the root cause, not patch the symptom"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "paths_exist"
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             },
             {
-              "status": "SKIP",
-              "type": "judge"
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) \u2014 Investigation-first structure with fix gated on confirmed root cause; Regression coverage exceeds rubric: exact scenario, both day boundaries, positive offset, DST, repo and API layers; T-002 is the invented producer-contract step the rubric flags \u00e2\u20ac\u201d bug is internal, so its cross-boundary framing is wrong and earns no credit"
             }
           ]
         },
@@ -214,40 +259,53 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "validator"
+              "type": "validator",
+              "detail": "validator clean"
             },
             {
               "status": "PASS",
-              "type": "task_count"
+              "type": "task_count",
+              "detail": "5 tasks (allowed 4-12)"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "bugfix lists start with Phase 1 investigation tasks \u2014 investigation precedes the fix"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "the tasks must identify the root cause, not patch the symptom"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "paths_exist"
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             },
             {
-              "status": "SKIP",
-              "type": "judge"
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) \u2014 Investigation-first structure with fix depending on both investigation tasks and root-cause (not symptom) fix; Fix tightly scoped to the predicate path with explicit no-migration and no-behavior-drift criteria; Regression tests cover the exact reported scenario, both local day-boundary instants, a positive-offset zone, and a DST matrix"
             }
           ]
         }
       ],
       "pass_rate": "100%",
+      "judge_scores": [
+        8,
+        8,
+        9
+      ],
       "failing_checks": {}
     },
     "case-003-review-flawed-tasks": {
@@ -259,31 +317,38 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "the review must reach an explicit verdict"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "four planted semantic defects (dependency inversion, scope creep, type mismatch, AC coverage gap) must force a revise verdict"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "planted defect: T-002 (Frontend dialog) consumes the label endpoints created only in T-004 but depends solely on T-001 \u2014 dependency inversion any competent review must flag"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "planted defect: T-005's label usage analytics export endpoint is outside the work item's Included scope \u2014 scope creep any competent review must flag"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "planted defect: the coverage table omits AC-5 (delete confirmation) \u2014 5 rows for 6 ACs"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             }
           ]
         },
@@ -294,31 +359,38 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "the review must reach an explicit verdict"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "four planted semantic defects (dependency inversion, scope creep, type mismatch, AC coverage gap) must force a revise verdict"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "planted defect: T-002 (Frontend dialog) consumes the label endpoints created only in T-004 but depends solely on T-001 \u2014 dependency inversion any competent review must flag"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "planted defect: T-005's label usage analytics export endpoint is outside the work item's Included scope \u2014 scope creep any competent review must flag"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "planted defect: the coverage table omits AC-5 (delete confirmation) \u2014 5 rows for 6 ACs"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             }
           ]
         },
@@ -329,36 +401,44 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "the review must reach an explicit verdict"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "four planted semantic defects (dependency inversion, scope creep, type mismatch, AC coverage gap) must force a revise verdict"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "planted defect: T-002 (Frontend dialog) consumes the label endpoints created only in T-004 but depends solely on T-001 \u2014 dependency inversion any competent review must flag"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "planted defect: T-005's label usage analytics export endpoint is outside the work item's Included scope \u2014 scope creep any competent review must flag"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "planted defect: the coverage table omits AC-5 (delete confirmation) \u2014 5 rows for 6 ACs"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             }
           ]
         }
       ],
       "pass_rate": "100%",
+      "judge_scores": [],
       "failing_checks": {}
     },
     "case-004-date-logic-extraction": {
@@ -370,31 +450,38 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "validator"
+              "type": "validator",
+              "detail": "validator clean"
             },
             {
               "status": "PASS",
-              "type": "task_count"
+              "type": "task_count",
+              "detail": "10 tasks (allowed 4-14)"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "Phase 0 safety net \u2014 a coverage baseline / characterization tests must precede any restructuring"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "refactor-tasks' Type enum delta \u2014 removing the old duplicated code is a Cleanup-typed task"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "paths_exist"
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             }
           ]
         },
@@ -405,31 +492,38 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "validator"
+              "type": "validator",
+              "detail": "validator clean"
             },
             {
               "status": "PASS",
-              "type": "task_count"
+              "type": "task_count",
+              "detail": "9 tasks (allowed 4-14)"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "Phase 0 safety net \u2014 a coverage baseline / characterization tests must precede any restructuring"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "refactor-tasks' Type enum delta \u2014 removing the old duplicated code is a Cleanup-typed task"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "paths_exist"
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             }
           ]
         },
@@ -440,36 +534,44 @@
           "checks": [
             {
               "status": "PASS",
-              "type": "validator"
+              "type": "validator",
+              "detail": "validator clean"
             },
             {
               "status": "PASS",
-              "type": "task_count"
+              "type": "task_count",
+              "detail": "10 tasks (allowed 4-14)"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "Phase 0 safety net \u2014 a coverage baseline / characterization tests must precede any restructuring"
             },
             {
               "status": "PASS",
-              "type": "must_match"
+              "type": "must_match",
+              "detail": "refactor-tasks' Type enum delta \u2014 removing the old duplicated code is a Cleanup-typed task"
             },
             {
               "status": "PASS",
-              "type": "must_not_match"
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
             },
             {
               "status": "PASS",
-              "type": "paths_exist"
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
             },
             {
               "status": "PASS",
-              "type": "shard_refs_resolve"
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
             }
           ]
         }
       ],
       "pass_rate": "100%",
+      "judge_scores": [],
       "failing_checks": {}
     }
   }
