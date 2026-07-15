@@ -73,6 +73,8 @@ When a task is marked `mockup-first`, its description should note which screen n
 
 **Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` uses the base enum (Backend | Frontend | Database | Testing | DevOps | Documentation) — no deltas for features. In **Files to Modify/Create**, suffix files that don't exist yet with `(new)` — example: `- src/services/label-service.ts (new) - label CRUD logic`.
 
+**Budgets:** respect the output budgets defined in `prompts/base-template.md` — generated task lists are downstream context.
+
 **Grouping:** the canonical scheme — Foundation → Backend → Frontend → Integration → Testing → Documentation & Polish (omit empty groups).
 
 **Summary section** — after all tasks, provide:
@@ -124,6 +126,7 @@ After Claude generates tasks, verify:
 - [ ] No tasks violate stakeholder scope lock
 - [ ] Complexity estimates seem reasonable (full `S | M | L | XL` scale)
 - [ ] Every task block has Acceptance Criteria and all canonical schema fields
+- [ ] Every task respects the output budgets defined in `prompts/base-template.md`
 - [ ] Dependencies form a valid DAG (no cycles)
 - [ ] Critical path is identified and sensible
 - [ ] Task list saved to `tasks/FEAT-XXX-tasks.md` (agents)
@@ -312,3 +315,38 @@ WhatsApp Flows pattern used for single-flavor selection.
 
 </task-generation-request>
 ```
+
+### Anti-Example (would fail review)
+
+A grab-bag task — do **not** generate blocks like this:
+
+```
+### T-003: Implement the labels feature
+
+**Type:** Backend + Frontend
+**Workflow:** standard
+
+**Description:**
+Implement everything needed for labels: entity, endpoints, dialog, board chips, filtering, and tests. Should be straightforward. We can figure out the details during implementation. [3+ more vague sentences...]
+
+**Rationale:**
+Labels are needed.
+
+**Acceptance Criteria:**
+- [ ] Labels work correctly
+
+**Dependencies:** after the API work is done
+**Complexity:** XXL
+
+**Files to Modify/Create:**
+- [various files across the codebase]
+```
+
+**Why it fails** — every item below is a `validate-tasks.py` error or a review finding:
+
+- **Type** carries two values (`Backend + Frontend`) — the canonical schema requires exactly one `Type` per task; split the task
+- **Description** is a grab-bag spanning entity + API + UI + tests and exceeds the Description budget in `prompts/base-template.md` — this is several tasks, not one
+- "Labels work correctly" is not a testable criterion — **Acceptance Criteria** must be independently testable and within the base-template budget
+- **Dependencies** is free text ("after the API work is done") — must be plain task IDs (`T-XXX, T-YYY`) or `None`
+- **Complexity** `XXL` is not in the `S | M | L | XL` enum
+- **Files to Modify/Create** is an unfilled placeholder — list concrete files and what changes in each

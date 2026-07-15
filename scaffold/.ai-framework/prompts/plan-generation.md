@@ -77,6 +77,8 @@ Plan generation has its own context recipe (it operates on a single task, not a 
 
 **Output file:** `plans/plan-T-XXX-short-title.md` — uppercase `T-XXX`, kebab-case short title. Example: `plans/plan-T-035-delivery-fee-service.md`. AI agents write this file.
 
+**Plan budget** (the output budget for plans — a plan is the implementing developer's or agent's context, so verbosity degrades implementation precision): a plan is ≤ ~150 lines and ≤ 10 implementation steps, and each step names concrete files and changes. If a plan wants more, the task is too big — send it back to the task list for splitting.
+
 Generate a markdown file with this structure:
 
 ```markdown
@@ -126,6 +128,7 @@ to implement without ambiguity. Reference patterns from CLAUDE.md.]
 - One plan covers exactly one task — do not merge tasks or plan ahead for future tasks
 - The plan must not expand the task's scope: no steps beyond the task definition's Description and Acceptance Criteria
 - Every file listed in the task's "Files to Modify/Create" must be covered by at least one step
+- Respect the plan budget: ≤ ~150 lines and ≤ 10 implementation steps, each step naming concrete files and changes — a plan that needs more means the task is too big; send it back for splitting
 - Do not generate a plan for a task whose Workflow prerequisites (mockup approval, investigation) are incomplete
 
 ---
@@ -143,6 +146,7 @@ After the AI generates a plan file, verify:
 - [ ] Steps reference CLAUDE.md conventions where applicable
 - [ ] Files Affected table is complete and consistent with the steps
 - [ ] Every acceptance criterion from the task maps to at least one verification item
+- [ ] Plan respects the plan budget (≤ ~150 lines, ≤ 10 steps, concrete files per step) — an oversized plan means the task goes back for splitting
 - [ ] Edge cases and risks are identified (not just a placeholder section)
 
 ---

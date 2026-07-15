@@ -90,6 +90,8 @@ When generating refactoring tasks, consider these safe patterns:
 
 **Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` enum delta: adds `Cleanup`. Every task block in every phase includes Description and Acceptance Criteria. No nested sub-task lists — one T-XXX block per unit of work. In **Files to Modify/Create**, suffix files that don't exist yet with `(new)` — example: `- src/services/label-service.ts (new) - label CRUD logic`.
 
+**Budgets:** respect the output budgets defined in `prompts/base-template.md` — generated task lists are downstream context.
+
 Generate tasks in phases that ensure safety:
 
 ### Phase 0: Preparation (Safety Net)
@@ -323,6 +325,7 @@ Before approving generated refactoring tasks:
 ### Schema Checklist
 
 - [ ] Every task block (all phases) has Description and Acceptance Criteria
+- [ ] Every task respects the output budgets defined in `prompts/base-template.md`
 - [ ] No nested sub-task lists — each unit of work is its own T-XXX block
 - [ ] Complexity uses the full `S | M | L | XL` scale
 - [ ] Dependencies are plain task ID lists (or `None`) forming a valid DAG
@@ -514,3 +517,39 @@ Generate tasks to extract PaymentService and NotificationService from OrderServi
 
 </task-generation-request>
 ```
+
+### Anti-Example (would fail review)
+
+A big-bang rewrite — do **not** generate blocks like this:
+
+```
+### T-001: Rewrite the notification system
+
+**Type:** Backend
+**Workflow:** standard
+
+**Description:**
+Replace the old notification code everywhere with the new service in one pass. Old code will be deleted in the same change.
+
+**Rationale:**
+The current code is messy.
+
+**Acceptance Criteria:**
+- [ ] New system in place
+
+**Dependencies:** [all previous tasks]
+**Complexity:** XL
+
+**Files to Remove/Modify:**
+- src/**/*.ts - everything touching notifications
+```
+
+**Why it fails:**
+
+- No Phase 0 coverage-baseline task precedes it — tests must be written/verified BEFORE refactoring begins, so there is no safety net
+- Big-bang replace + delete in one task — defeats the phased coexistence/migration structure (parallel implementation → migration → cleanup) and the "no big-bang changes" safety rule
+- "New system in place" is not a testable acceptance criterion
+- **Dependencies** `[all previous tasks]` is not a plain task ID list (or `None`) — validator error
+- **Files to Remove/Modify** is not the canonical field name — the schema requires **Files to Modify/Create** everywhere — validator error
+- A glob of everything (`src/**/*.ts`) is not a reviewable file list — name concrete files and what changes in each
+- No rollback consideration in Technical Notes — every significant change needs a rollback strategy

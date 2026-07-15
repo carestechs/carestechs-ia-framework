@@ -131,7 +131,7 @@ or architectural need it addresses]
 [Implementation guidance, patterns to follow, or gotchas to avoid]
 ```
 
-Field rules:
+Field rules — including the **output budgets**. Generated artifacts are the *input* to later pipeline steps (planning, review, implementation), so verbose output degrades downstream precision the same way verbose docs do.
 
 1. **Task ID** — sequential within one task list (T-001, T-002, ...)
 2. **Title** — short, verb-first, action-oriented
@@ -140,15 +140,17 @@ Field rules:
    - **`standard`** — implement directly, no prerequisite artifacts.
    - **`mockup-first`** — generate an HTML mockup for stakeholder approval before implementing. Use for tasks that add or significantly change a user-facing screen.
    - **`investigation-first`** — investigate and document root cause before proposing a fix. Use for bug investigation tasks or any task with ambiguous requirements.
-5. **Description** — what needs to be done
+5. **Description** — what needs to be done, in ≤ 3 sentences
 6. **Rationale** — 1-2 sentences linking to a requirement, business rule, or architectural need
-7. **Acceptance Criteria** — a checklist of testable criteria. **Every task block in every phase gets this field** — no exceptions.
+7. **Acceptance Criteria** — a checklist of 2–5 testable criteria per task, each independently testable. **Every task block in every phase gets this field** — no exceptions.
 8. **Dependencies** — comma-separated task IDs (`T-001, T-002`) or `None`. No free-text annotations.
 9. **Complexity** — `S | M | L | XL` (full scale, always)
-10. **Files to Modify/Create** — exact field name everywhere; list likely files and what changes. Files that don't exist yet are suffixed `(new)` after the path — example: `- src/services/label-service.ts (new) - label CRUD logic`
-11. **Technical Notes** — optional
+10. **Files to Modify/Create** — exact field name everywhere; list likely files and what changes. Files that don't exist yet are suffixed `(new)` after the path — example: `- src/services/label-service.ts (new) - label CRUD logic`. If a task lists more than ~6 files, it is probably doing too much — split it.
+11. **Technical Notes** — optional; when present, ≤ 5 bullets
 
 **No nested sub-task lists inside a task block.** If a task needs sub-tasks, split it into separate T-XXX tasks.
+
+**Task list size:** if a work item needs more than ~15 tasks, split the work item or organize the list into explicitly numbered phases.
 
 ### Task Grouping
 
@@ -166,6 +168,7 @@ Group tasks using the canonical grouping scheme, in this order (omit empty group
 ## Constraints
 
 - One `Type` per task — split tasks that span types
+- Respect the output budgets (Description ≤ 3 sentences, 2–5 Acceptance Criteria, Technical Notes ≤ 5 bullets; split tasks listing more than ~6 files; split or phase task lists beyond ~15 tasks)
 - Dependencies must form a valid DAG (no cycles) and reference only task IDs
 - No tasks outside the stakeholder scope lock
 - No over-engineered solutions beyond the stated requirements
@@ -182,6 +185,7 @@ After generating tasks, verify:
 - [ ] Every task has Acceptance Criteria (no exceptions, in any phase)
 - [ ] Each `Type` is a single value; tasks spanning types were split
 - [ ] `Complexity` uses the full `S | M | L | XL` scale
+- [ ] Every task respects the output budgets (≤3-sentence Description, 2–5 ACs, ≤5 Technical Notes bullets); task list ≤ ~15 tasks or split
 - [ ] Dependencies are plain task ID lists (or `None`) and form a valid DAG
 - [ ] Tasks are grouped per the canonical grouping scheme
 - [ ] No tasks violate the stakeholder scope lock

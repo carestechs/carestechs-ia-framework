@@ -2,6 +2,12 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.1] — 2026-07-14
+
+### Changed
+- **Contrastive anti-examples** in the three task prompts: each `## Example` section now ends with an "Anti-Example (would fail review)" block — a compact bad task with every defect annotated against the rule it violates (grab-bag scope, dual Type, untestable ACs, free-text dependencies, skipped investigation/coverage phases, non-canonical field names). Models follow "not like this, because X" better than rules alone.
+- **Output budgets**, canonical in `base-template.md`: Description ≤ 3 sentences, 2–5 testable ACs, Technical Notes ≤ 5 bullets, ~6 files per task, ~15 tasks per list before splitting; plans ≤ ~150 lines / 10 steps (`plan-generation.md`). Rationale: generated artifacts are the input to later pipeline steps, so verbose output degrades downstream precision the same way verbose docs do. Task prompts reference the canonical budgets; checklists gained matching items.
+
 ## [2.4.0] — 2026-07-14
 
 Effectiveness measurement: turn "the framework works" into numbers computed from the repo.

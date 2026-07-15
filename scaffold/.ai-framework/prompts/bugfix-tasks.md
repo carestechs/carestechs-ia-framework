@@ -69,6 +69,8 @@ Organize tasks into three phases. The `Workflow` field is pre-set by phase:
 
 **Task blocks:** use the canonical task schema from `prompts/base-template.md`, all fields in canonical order — Task ID, Title, Type, Workflow, Description, Rationale, Acceptance Criteria, Dependencies, Complexity (`S | M | L | XL`), Files to Modify/Create, Technical Notes (optional). `Type` enum delta: adds `Investigation`. Every task block in every phase includes Description and Acceptance Criteria. In **Files to Modify/Create**, suffix files that don't exist yet with `(new)` — example: `- src/services/label-service.ts (new) - label CRUD logic`.
 
+**Budgets:** respect the output budgets defined in `prompts/base-template.md` — generated task lists are downstream context.
+
 Phase presets:
 
 > **Cross-system / contract bugs — first investigation step.** When the bug crosses a system boundary (an external API, a protocol, an NDJSON / JSON schema, a file format, an executor's response shape, a message queue payload, an SDK), the first investigation step MUST be **"verify the contract empirically against the producer."** Read the producer's authoritative source (its schema definitions, its own serialization tests, its OpenAPI doc), capture a real sample of the on-the-wire payload, and confirm the code-under-test's reader matches. The whole class of "silent shape mismatch" bugs — where both sides are wrong consistently and existing tests pass against a self-consistent fiction — is invisible without this step. Don't trust comments, type names, or harness fixtures that claim to mirror the producer; verify against the producer itself.
@@ -216,6 +218,7 @@ After Claude generates tasks, verify:
 - [ ] Error messages improved if they were unclear
 - [ ] Monitoring/alerting considered for future detection
 - [ ] Every task block (all three phases) has Description and Acceptance Criteria
+- [ ] Every task respects the output budgets defined in `prompts/base-template.md`
 - [ ] Complexity uses the full `S | M | L | XL` scale; dependencies are plain ID lists
 - [ ] Task list saved to `tasks/BUG-XXX-tasks.md` (agents)
 
@@ -410,3 +413,34 @@ Focus on finding why the $50 threshold isn't being applied correctly.
 
 </task-generation-request>
 ```
+
+### Anti-Example (would fail review)
+
+A fix-first task that skips investigation — do **not** generate blocks like this:
+
+```
+### T-001: Fix the timezone bug by changing the date comparison
+
+**Type:** Backend
+**Workflow:** standard
+
+**Description:**
+The overdue filter is wrong, so change the query to compare dates in the user's timezone. While we're in there, also refactor the date utility module to be cleaner.
+
+**Rationale:**
+The filter is broken.
+
+**Dependencies:** None
+**Complexity:** M
+
+**Files to Modify/Create:**
+- src/api/tasks.ts - change the comparison
+```
+
+**Why it fails:**
+
+- Prescribes a fix with no Phase 1 investigation task and no root cause identified — violates "investigation tasks precede fix tasks" and "identify root cause before proposing solutions"
+- **Acceptance Criteria** field is missing entirely — every task block in every phase includes it (validator error)
+- "also refactor the date utility module" is scope creep into refactoring unrelated code — explicitly forbidden in Guidance
+- The bug crosses a system boundary (timezone handling between client, API, and database), yet there is no "verify the contract empirically against the producer" investigation step
+- No Phase 3 regression-test task follows it — violates "must include a test that would have caught this bug"
