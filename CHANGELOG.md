@@ -2,6 +2,12 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.5] — 2026-07-15
+
+### Added
+- **Spec-fidelity judge dimension**: rubrics gained a sixth dimension (technical details must match project ground truth — routes, envelope, error codes, field names; invented conventions penalized), and the judge check gained a `"context"` key embedding spec excerpts into the judge prompt so fidelity is checkable against ground truth the candidate may never have seen.
+- **EXP-001 addendum**: re-judging the archived A/B samples with the new dimension flipped the verdict — with-docs 9.0 (up from 8.7, fidelity explicitly praised) vs no-docs **7.0 with one failing sample** (down from 8.5; it planned to create spec files that already exist in the ground-truth project). Skipping existing spec docs at generation time costs ~2 judge points and produces plans contradicting project state; the lean-docs position is affirmed, the no-docs and 30-page positions are both unsupported.
+
 ## [2.4.4] — 2026-07-15
 
 ### Added

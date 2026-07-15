@@ -72,6 +72,16 @@ with a single JSON object on its own line — no prose after it.
 
 {rubric}
 
+## Project ground truth (spec and convention excerpts)
+
+The following excerpts are the project's authoritative conventions and contracts.
+Use them to judge spec fidelity: technical details in the candidate (routes, error
+codes, envelopes, field names, constraints) must match these — contradictions and
+invented conventions are penalized. Judge the output, not the process: the candidate
+may not have been shown all of these excerpts.
+
+{ground_truth}
+
 ## Reference output (known-good anchor)
 
 The candidate does NOT need to match this verbatim — it anchors what "good" looks
@@ -123,7 +133,16 @@ def run_judge(check, case_dir, out_text, judge_opts):
             return "FAIL", f"reference not found: {ref_path}"
         reference = ref_path.read_text(encoding="utf-8", errors="replace")
 
+    ground_parts = []
+    for rel in check.get("context", []):
+        p = case_dir / rel
+        if not p.is_file():
+            return "FAIL", f"judge context file not found: {p}"
+        ground_parts.append(f"### {rel}\n\n{p.read_text(encoding='utf-8', errors='replace')}")
+    ground_truth = "\n\n".join(ground_parts) if ground_parts else "None provided."
+
     prompt = JUDGE_PROMPT_TEMPLATE.format(rubric=rubric, reference=reference,
+                                          ground_truth=ground_truth,
                                           candidate=out_text)
     prompt_file = case_dir / "output" / "judge-prompt.md"
     prompt_file.parent.mkdir(parents=True, exist_ok=True)

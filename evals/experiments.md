@@ -63,3 +63,34 @@ orchestrator — it is the measured compliance guarantee. (b) Prioritize brief q
 (dense impact tables) over adding generation-time context — consistent with the
 framework's existing design. (c) Candidate rubric improvement: add a spec-fidelity
 dimension so future runs can see convention drift mechanically.
+
+### Addendum (2026-07-15): re-judged with the spec-fidelity dimension
+
+Action (c) was implemented — rubrics gained a sixth **spec fidelity** dimension and
+the judge prompt now embeds ground-truth spec excerpts (`context` key in the judge
+check). Re-judging the same archived samples:
+
+| | Arm A (with docs) | Arm B (no docs) |
+|---|---|---|
+| Judge, 5 dimensions (no ground truth) | 8.7 (8–9) | 8.5 (8–9) |
+| Judge, 6 dimensions (ground truth embedded) | **9.0 (9–9)** | **7.0 (6–8), 1 of 2 fails** |
+
+**The verdict flips: a 2-point fidelity gap the earlier rubric could not see.**
+Arm A samples are explicitly praised for spec fidelity (correct `/api/v1` base path,
+409/conflict codes per the error catalog). Arm B's failing sample plans to *create*
+spec files that already exist in the ground-truth project (data-model/api-spec
+indexes, `endpoints/tasks.md`, `components.md` marked `(new)`) — in a real pipeline
+that plan would duplicate or overwrite existing documentation.
+
+Two readings, both fair: judged against its own (docless) input, arm B behaved
+correctly; judged against the ground-truth project, its output contradicts reality.
+For the practical question — *should generation load the spec docs when they exist?* —
+the answer is now measured: **yes; skipping them costs ~2 judge points and produces
+plans that contradict the existing project state.** Finding 2's density argument
+stands for what the *brief* should carry; it no longer supports skipping the docs.
+
+**Revised conclusion.** Lean, sharded, retrieval-keyed docs at generation time earn
+their tokens (fidelity); dense briefs are necessary but not sufficient; the
+self-check loop remains the compliance guarantee. The 30-page-documents position
+remains unsupported: everything measured here was achieved with lean contract-style
+shards.

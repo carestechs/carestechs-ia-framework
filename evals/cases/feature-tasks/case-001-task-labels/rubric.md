@@ -1,6 +1,6 @@
 # Judge Rubric — feature task list for FEAT-001 (Task Labels)
 
-Score the candidate task list 1-10 against these five dimensions. The reference output
+Score the candidate task list 1-10 against these six dimensions. The reference output
 shows one known-good decomposition — use it as an anchor for what "good" looks like;
 the candidate does not need to match it verbatim, judge substance.
 
@@ -20,6 +20,12 @@ the candidate does not need to match it verbatim, judge substance.
 5. **Plan-ability.** Files to Modify/Create and Technical Notes are concrete enough
    that a planning session could start from the task block alone without re-deriving
    the feature.
+6. **Spec fidelity.** Technical details match the project ground truth provided
+   (routes including the base path, response envelope, error-catalog codes, entity
+   field names and types, palette/token constraints, naming conventions). Penalize
+   contradictions with the ground truth and invented conventions; details not
+   derivable from any provided context should be flagged as open questions, not
+   guessed.
 
 Scoring guide: 9-10 = accept as-is; 7-8 = minor revisions, structure sound;
 5-6 = one dimension seriously deficient; below 5 = re-generate.

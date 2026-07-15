@@ -9,7 +9,7 @@
         {
           "sample": "sample-1.md",
           "generated": true,
-          "passed": true,
+          "passed": false,
           "checks": [
             {
               "status": "PASS",
@@ -47,9 +47,9 @@
               "detail": "all shard references resolve or are sanctioned (new)"
             },
             {
-              "status": "PASS",
+              "status": "FAIL",
               "type": "judge",
-              "detail": "score 8/10 (min 7) \u2014 Clean single-purpose decomposition with plausible complexity and buildable dependency order; All 6 ACs covered with plausible attribution, but the coverage table is malformed (missing header/separator rows and AC descriptions); File-list inconsistencies: T-007 marks src/db/label.ts as new though T-005 creates it; T-013 re-marks test files already created by T-005/T-006"
+              "detail": "score 6/10 (min 7) \u2014 Spec fidelity seriously deficient: claims no spec docs exist and marks existing data-model/api-spec indexes, endpoints/tasks.md, and components.md as (new), contradicting ground truth; guesses instead of flagging open questions; task_labels table omits mandated UUID id and created_at/updated_at conventions; recreated error catalog drops unauthorized; Decomposition, dependency order, and 6/6 AC coverage are sound; minor flaws: duplicate (new) file listings across tasks, malformed coverage table, missing T-002/T-003 dependency links"
             }
           ]
         },
@@ -96,17 +96,19 @@
             {
               "status": "PASS",
               "type": "judge",
-              "detail": "score 9/10 (min 7) \u2014 Single-purpose tasks with one Type each and plausible complexity across all 13 tasks; Buildable dependency graph: schema\u00e2\u2020\u2019migration\u00e2\u2020\u2019repository\u00e2\u2020\u2019API\u00e2\u2020\u2019UI\u00e2\u2020\u2019tests, with every UI task depending on the endpoint it consumes; All 6 ACs covered with attributions that match actual task content across backend, UI, and tests"
+              "detail": "score 8/10 (min 7) \u2014 Buildable dependency graph with no false parallelism; all 6 ACs covered with plausible, substantiated attributions; Concrete file paths and technical notes make every task plan-able standalone; Spec fidelity mostly exact: /api/v1 base path, envelope+meta, 409 conflict for duplicate names, snake_case plural tables, NNN migration naming"
             }
           ]
         }
       ],
-      "pass_rate": "100%",
+      "pass_rate": "50%",
       "judge_scores": [
-        8,
-        9
+        6,
+        8
       ],
-      "failing_checks": {}
+      "failing_checks": {
+        "judge": 1
+      }
     }
   }
 }

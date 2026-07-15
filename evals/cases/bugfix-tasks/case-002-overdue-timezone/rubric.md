@@ -1,6 +1,6 @@
 # Judge Rubric — bug fix task list for BUG-001 (Overdue Filter Timezone)
 
-Score the candidate task list 1-10 against these five dimensions. The reference output
+Score the candidate task list 1-10 against these six dimensions. The reference output
 shows one known-good decomposition — use it as an anchor for what "good" looks like;
 the candidate does not need to match it verbatim, judge substance.
 
@@ -29,6 +29,12 @@ the candidate does not need to match it verbatim, judge substance.
    budgets respected), concrete fixture file paths in Files to Modify/Create, and a
    Summary Section — enough that a planning session could start from the task blocks
    alone.
+6. **Spec fidelity.** Technical details match the project ground truth provided
+   (routes including the base path, response envelope, error-catalog codes, the
+   Task entity's field names and date semantics, naming conventions). Penalize
+   contradictions with the ground truth and invented conventions; details not
+   derivable from any provided context should be flagged as open questions, not
+   guessed.
 
 Note on the producer-contract step: `prompts/bugfix-tasks.md` mandates a "verify the
 contract empirically against the producer" first investigation step **only for bugs

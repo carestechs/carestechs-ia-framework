@@ -43,7 +43,12 @@
       "type": "judge",
       "rubric": "rubric.md",
       "reference": "reference/tasks.md",
-      "min_score": 7
+      "min_score": 7,
+      "context": [
+        "input/CLAUDE.md",
+        "input/docs/api-spec/index.md",
+        "input/docs/data-model/index.md"
+      ]
     }
   ]
 }

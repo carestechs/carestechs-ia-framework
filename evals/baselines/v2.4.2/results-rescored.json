@@ -49,7 +49,7 @@
             {
               "status": "PASS",
               "type": "judge",
-              "detail": "score 9/10 (min 7) \u2014 Single-purpose tasks with one Type each and plausible complexity values; Dependency graph is fully buildable with no forward refs or false parallelism; All 6 ACs covered with plausible, traceable attributions"
+              "detail": "score 9/10 (min 7) \u2014 Buildable dependency graph with no forward deps or false parallelism; tests correctly terminal; All 6 ACs covered with plausible, verifiable task attributions; Spec fidelity exceeds the reference anchor: /api/v1 base path, conflict-409 for duplicates per catalog, existing route-nesting pattern, naming conventions throughout"
             }
           ]
         },
@@ -96,7 +96,7 @@
             {
               "status": "PASS",
               "type": "judge",
-              "detail": "score 8/10 (min 7) \u2014 Buildable dependency graph and docs-first ordering with one flaw: T-006 marks src/api/labels.ts as (new) without depending on T-005, which also creates it \u00e2\u20ac\u201d false parallelism on a shared file; All 6 ACs covered with plausible, checkable attribution, and business rules propagated into task-level acceptance criteria; Files and technical notes concrete enough to plan from directly; scope stays within the brief"
+              "detail": "score 9/10 (min 7) \u2014 All 6 ACs covered with plausible task attribution and sound, buildable dependency graph; Spec fidelity exceeds the reference anchor: /api/v1 base paths, conflict code for duplicates, plural snake_case tables, correct shard naming and index-update duties; Underivable decisions flagged as open questions instead of guessed"
             }
           ]
         },
@@ -143,7 +143,7 @@
             {
               "status": "PASS",
               "type": "judge",
-              "detail": "score 9/10 (min 7) \u2014 All 14 tasks are single-purpose with one Type and plausible complexity; Dependency graph is fully buildable with no false parallelism or forward references; All 6 ACs covered with plausible endpoint/UI/test attributions"
+              "detail": "score 9/10 (min 7) \u2014 Buildable dependency graph with no false parallelism; critical path verifies against declared deps; High spec fidelity: correct /api/v1 base path, 409 conflict for duplicate names per the error catalog, envelope/meta and snake_case/shard naming all match ground truth; All 6 ACs covered with substantive, plausible task attributions including index/changelog maintenance"
             }
           ]
         }
@@ -151,7 +151,7 @@
       "pass_rate": "100%",
       "judge_scores": [
         9,
-        8,
+        9,
         9
       ],
       "failing_checks": {}
@@ -201,7 +201,7 @@
             {
               "status": "PASS",
               "type": "judge",
-              "detail": "score 8/10 (min 7) \u2014 Investigation-first structure intact: all fix work depends on reproduce/trace tasks and targets the confirmed tz-dropped root cause; Regression coverage exceeds the anchor: exact reported scenario, both local-midnight boundary instants, positive-offset zone, DST, default-UTC and invalid-tz paths; Fix tightly scoped to the predicate path (src/db/task.ts, src/api/tasks.ts) with no unrelated refactoring"
+              "detail": "score 8/10 (min 7) \u2014 Investigation-first structure sound: fix depends on confirmed root cause, not the Section 6 hypothesis or symptom; Regression coverage exceeds the anchor: exact scenario, correct local-midnight boundary instants, positive-offset and DST cases, fail-before/pass-after check; Fix tightly scoped to the predicate path; audit examines and documents without preemptive rewrites"
             }
           ]
         },
@@ -248,7 +248,7 @@
             {
               "status": "PASS",
               "type": "judge",
-              "detail": "score 8/10 (min 7) \u2014 Investigation-first structure with fix gated on confirmed root cause; Regression coverage exceeds rubric: exact scenario, both day boundaries, positive offset, DST, repo and API layers; T-002 is the invented producer-contract step the rubric flags \u00e2\u20ac\u201d bug is internal, so its cross-boundary framing is wrong and earns no credit"
+              "detail": "score 8/10 (min 7) \u2014 Investigation-first structure with fix gated on confirmed root cause; Regression coverage exceeds the reference (boundaries, positive offset, DST, invalid tz, both test layers); T-002 is an invented producer-contract step mischaracterizing an internal bug as boundary-crossing"
             }
           ]
         },
@@ -295,7 +295,7 @@
             {
               "status": "PASS",
               "type": "judge",
-              "detail": "score 9/10 (min 7) \u2014 Investigation-first structure with fix depending on both investigation tasks and root-cause (not symptom) fix; Fix tightly scoped to the predicate path with explicit no-migration and no-behavior-drift criteria; Regression tests cover the exact reported scenario, both local day-boundary instants, a positive-offset zone, and a DST matrix"
+              "detail": "score 9/10 (min 7) \u2014 Investigation-first structure with fix strictly dependent on confirmed root cause, not symptom; Fix tightly scoped to the predicate path with no migrations or unrelated changes; Regression tests cover the exact reported scenario, both local day-boundary instants, and a positive-offset zone"
             }
           ]
         }

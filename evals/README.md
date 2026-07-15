@@ -56,11 +56,16 @@ python evals/run-evals.py --judge                       # uses the Claude Code C
 python evals/run-evals.py --judge --judge-cmd '<cmd with {prompt_file}>'
 ```
 
-The runner builds a self-contained judge prompt (rubric + reference anchor + candidate,
-JSON verdict contract) at `output/judge-prompt.md` and runs the command template on it.
-Judges are only reliable when anchored: every judge case needs a `rubric.md` with a
-scoring guide and a `reference/` output demonstrating what "good" looks like. Grade
-substance, not wording — the rubric should say so explicitly.
+The runner builds a self-contained judge prompt (rubric + ground truth + reference
+anchor + candidate, JSON verdict contract) at `output/judge-prompt.md` and runs the
+command template on it. Judges are only reliable when anchored: every judge case needs
+a `rubric.md` with a scoring guide and a `reference/` output demonstrating what "good"
+looks like. Grade substance, not wording — the rubric should say so explicitly.
+
+The optional `"context": [paths]` key embeds spec/convention excerpts into the judge
+prompt as ground truth, enabling the rubrics' **spec fidelity** dimension: without it
+the judge cannot see convention drift (EXP-001 in `experiments.md` shows this blind
+spot flipping an experiment's verdict).
 
 ## Reading the results
 
