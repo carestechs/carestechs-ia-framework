@@ -44,6 +44,7 @@ Python 3.8+, standard library only.
 import argparse
 import json
 import re
+import statistics
 import subprocess
 import sys
 from pathlib import Path
@@ -149,27 +150,34 @@ def run_judge(check, case_dir, out_text, judge_opts):
     prompt_file.write_text(prompt, encoding="utf-8")
 
     cmd = judge_opts["cmd"].replace("{prompt_file}", str(prompt_file))
-    try:
-        proc = subprocess.run(cmd, shell=True, capture_output=True, text=True,
-                              timeout=judge_opts["timeout"])
-    except subprocess.TimeoutExpired:
-        return "FAIL", f"judge command timed out after {judge_opts['timeout']}s"
-    except OSError as exc:
-        return "FAIL", f"judge command failed to start: {exc}"
+    n_samples = max(1, int(check.get("judge_samples", judge_opts["samples"])))
+    scores, all_reasons = [], []
+    for _ in range(n_samples):
+        try:
+            proc = subprocess.run(cmd, shell=True, capture_output=True, text=True,
+                                  timeout=judge_opts["timeout"])
+        except subprocess.TimeoutExpired:
+            return "FAIL", f"judge command timed out after {judge_opts['timeout']}s"
+        except OSError as exc:
+            return "FAIL", f"judge command failed to start: {exc}"
+        verdicts = JSON_VERDICT_RE.findall(proc.stdout or "")
+        if not verdicts:
+            tail = (proc.stdout or proc.stderr or "").strip().splitlines()[-3:]
+            return "FAIL", "no JSON verdict in judge output: " + " / ".join(tail)
+        try:
+            verdict = json.loads(verdicts[-1])
+            scores.append(int(verdict["score"]))
+        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+            return "FAIL", f"unparseable judge verdict {verdicts[-1]!r}: {exc}"
+        all_reasons.append(verdict.get("reasons", []))
 
-    verdicts = JSON_VERDICT_RE.findall(proc.stdout or "")
-    if not verdicts:
-        tail = (proc.stdout or proc.stderr or "").strip().splitlines()[-3:]
-        return "FAIL", "no JSON verdict in judge output: " + " / ".join(tail)
-    try:
-        verdict = json.loads(verdicts[-1])
-        score = int(verdict["score"])
-    except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
-        return "FAIL", f"unparseable judge verdict {verdicts[-1]!r}: {exc}"
-
+    # median of N runs; near-threshold single scores are noisy (see evals/experiments.md)
+    score = int(statistics.median(scores))
     min_score = int(check.get("min_score", 7))
-    reasons = "; ".join(str(r) for r in verdict.get("reasons", [])[:3])
-    detail = f"score {score}/{10} (min {min_score})" + (f" — {reasons}" if reasons else "")
+    reasons = "; ".join(str(r) for r in (all_reasons[scores.index(score)]
+                                         if score in scores else all_reasons[0])[:3])
+    runs = f" [runs: {', '.join(map(str, scores))}]" if n_samples > 1 else ""
+    detail = f"score {score}/{10} (min {min_score}){runs}" + (f" — {reasons}" if reasons else "")
     return ("PASS" if score >= min_score else "FAIL"), detail
 
 
@@ -271,9 +279,12 @@ def main():
                          f"(default: {DEFAULT_JUDGE_CMD!r})")
     ap.add_argument("--judge-timeout", type=int, default=600,
                     help="judge command timeout in seconds (default 600)")
+    ap.add_argument("--judge-samples", type=int, default=1,
+                    help="judge runs per check, median taken (default 1; "
+                         "per-check 'judge_samples' key overrides)")
     args = ap.parse_args()
     judge_opts = {"enabled": args.judge, "cmd": args.judge_cmd,
-                  "timeout": args.judge_timeout}
+                  "timeout": args.judge_timeout, "samples": args.judge_samples}
 
     cases = sorted(EVALS_DIR.glob("cases/*/*/assertions.json"))
     if args.case:
