@@ -180,3 +180,30 @@ docs earn their context.
 deterministic 18/18 across all 6 cases; judged medians — feature 9.0, bugfix 8.0,
 ablation-arm 8.7, no-docs-arm 6.7. Judge robustness: verdict-line omissions by the
 judge model are now retried (3 attempts) instead of failing the check.
+
+## EXP-003 — Context read-order sensitivity (2026-07-16)
+
+**Question.** Does the ORDER in which a generation session reads its context affect
+output quality? (The pending "U-curve ordering" recommendation from the context-rot
+research — never implemented because never measured.)
+
+**Design.** Control = v2.4.6 case-001 (reads CLAUDE.md → work item → spec shards).
+Variant = case-903: identical fixture, prompt, and procedure; reads inverted — spec
+shards first, CLAUDE.md, work item LAST. Post-access-fix, median-of-3 judging.
+Minor design note: the variant's retrieval keys were pre-resolved to explicit paths
+so the order could be fully specified (same files read; resolution step skipped).
+
+| | Control (n=3) | Inverted order (n=3) |
+|---|---|---|
+| Deterministic | 3/3 | 3/3 |
+| Judge (median-of-3) | 9.0 (9–9) | **9.0 (9–9)** |
+
+**Verdict: no measurable effect for agentic sessions.** Position-bias research
+applies to a single stuffed context window; an agentic session re-reads at will and
+generates immediately after its most recent reads, so read order is not a lever
+worth policing. The pending "U-curve ordering" recommendation is resolved as
+**not applicable to agentic flows** — retained only as a one-line note for
+single-prompt chat assembly, where the research does apply.
+
+**Caveats.** n=3, one case, one strong model, self-check present — order effects may
+exist for weaker models, much longer contexts, or sessions without the validator loop.

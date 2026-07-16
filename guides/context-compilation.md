@@ -531,6 +531,12 @@ Agents have direct file access and don't need XML assembly. Follow these steps:
 
 For copy-paste workflows where you assemble an XML prompt to submit to Claude:
 
+> **Ordering (chat assembly only):** in a single stuffed prompt, models attend best to
+> the start and end of the context — place the request and constraints first, the
+> acceptance criteria last, and bulk reference material in the middle. This applies
+> only to single-prompt assembly: for agentic sessions that read files themselves,
+> read order showed no measurable effect (EXP-003 in the framework's `evals/experiments.md`).
+
 #### Step 1: Identify Task Type
 What kind of task are you generating? One of the 11 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation, Task List Review)
 

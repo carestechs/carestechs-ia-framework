@@ -30,8 +30,9 @@ the orchestrator can detect step completion from the repo.
   work items via MCP, doc-drift detection action. Revisit when a second regular
   contributor joins.
 - **Prompt refinements** (research-backed, not yet applied): contrastive (bad) examples
-  in task prompts; output budgets on generated artifacts; U-curve context ordering
-  guidance for the orchestrator's assembly step.
+  in task prompts; output budgets on generated artifacts. (U-curve context
+  ordering: resolved by EXP-003 — no measurable effect for agentic sessions;
+  chat-assembly note added to context-compilation.md.)
 - **Best-of-N generation** — orchestrator-side: sample N task lists, discard validator
   failures, fresh-context review the survivors, pick/synthesize. Documented in
   `prompts/review-tasks.md`.

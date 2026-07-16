@@ -1,0 +1,157 @@
+{
+  "label": "exp-003-read-order",
+  "samples_per_case": 3,
+  "gen_cmd": "claude -p \"Read GENERATE.md in the current directory and follow it exactly.\" --permission-mode acceptEdits --allowedTools \"Bash(python *)\" --add-dir \"C:\\Users\\carlos.escalona\\Desktop\\Repos\\carestechs\\carestechs-ia-framework\"",
+  "judge": true,
+  "cases": {
+    "case-903-read-order-inverted": {
+      "samples": [
+        {
+          "sample": 1,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture \ufffd at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \ufffd fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            }
+          ],
+          "secs": 551
+        },
+        {
+          "sample": 2,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture \ufffd at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \ufffd fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) [runs: 9, 9, 8] \ufffd Buildable dependency graph with no false parallelism; tests correctly terminal; All 6 ACs covered with plausible, content-backed attributions; High spec fidelity: /api/v1 base path, 409 conflict for duplicates, envelope/pagination, snake_case schema, shard registration per index usage notes"
+            }
+          ],
+          "secs": 518
+        },
+        {
+          "sample": 3,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture \ufffd at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \ufffd fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) [runs: 8, 9, 9] \ufffd Buildable dependency graph with tests last and UI tied to the endpoints it consumes; All 6 ACs covered with substantively accurate attributions; Spec-faithful: /api/v1 base path, envelope, conflict code for duplicates, naming conventions all match ground truth"
+            }
+          ],
+          "secs": 422
+        }
+      ],
+      "pass_rate": "100%",
+      "judge_scores": [
+        9,
+        9
+      ],
+      "failing_checks": {}
+    }
+  }
+}
