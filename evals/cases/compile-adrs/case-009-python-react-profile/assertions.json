@@ -1,0 +1,61 @@
+{
+  "output": "output",
+  "checks": [
+    {
+      "type": "files_exist",
+      "base": "output",
+      "paths": [
+        "claude-md.md",
+        "architecture.md",
+        "data-model-index.md",
+        "api-spec-index.md"
+      ]
+    },
+    {
+      "type": "must_match",
+      "pattern": "### Patterns to Follow",
+      "reason": "CLAUDE.md target heading present verbatim"
+    },
+    {
+      "type": "must_match",
+      "pattern": "### Anti-Patterns to Avoid",
+      "reason": "CLAUDE.md target heading present verbatim"
+    },
+    {
+      "type": "must_match",
+      "pattern": "<!-- from: adrs/",
+      "reason": "HTML-comment traceability with repo-relative ADR paths"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)snake_case",
+      "reason": "content fidelity: database/snake-case-naming.md is frozen - its convention must surface"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)timestamptz",
+      "reason": "content fidelity: database/timestamptz-always.md is frozen - its convention must surface"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)arauco",
+      "reason": "fixture-foreign project leak"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)ngmodule",
+      "reason": "cross-stack leak probe: no Angular ADR is frozen, so any NgModule content is leakage ('angular' itself is unusable - it appears verbatim in the frozen react/functional-components.md Conflicts-with field, which a faithful Step 0 report may echo)"
+    },
+    {
+      "type": "judge",
+      "rubric": "rubric.md",
+      "reference": "reference",
+      "min_score": 7,
+      "context": [
+        "input/adr-repo/profiles/python-react-modular-monolith-docker-compose.md",
+        "input/adr-repo/adrs/database/snake-case-naming.md",
+        "input/adr-repo/adrs/api/rest-envelope.md"
+      ]
+    }
+  ]
+}
