@@ -1,0 +1,60 @@
+{
+  "output": "output/mockup.html",
+  "checks": [
+    {
+      "type": "must_match",
+      "pattern": "(?i)<!doctype html",
+      "reason": "complete standalone document"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)<style",
+      "reason": "embedded CSS required"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)https?://",
+      "reason": "fully self-contained - any external URL (CDN, fonts, icons) breaks the offline guarantee"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)<link\\s|<script\\s+src",
+      "reason": "no external resource tags - single-file mockup"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)loading",
+      "reason": "loading state shown"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)empty",
+      "reason": "empty state shown"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)error",
+      "reason": "error state shown"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)#2563eb",
+      "reason": "design-token fidelity - primary color from the Design System"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)angular|ngmodule|arauco",
+      "reason": "stack leak"
+    },
+    {
+      "type": "judge",
+      "rubric": "rubric.md",
+      "reference": "reference/mockup.html",
+      "min_score": 7,
+      "context": [
+        "../../ui-spec-generation/case-007-ui-spec-from-specs/reference/docs/ui-specification/screens/project-board.md",
+        "../../ui-spec-generation/case-007-ui-spec-from-specs/reference/docs/ui-specification/index.md"
+      ]
+    }
+  ]
+}

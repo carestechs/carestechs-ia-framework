@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>T-031 Project Board Mockup — TaskFlow</title>
+  <!-- Fully self-contained static mockup: no JavaScript, no external requests.
+       Design tokens copied verbatim from docs/ui-specification/index.md Section 2. -->
+  <style>
+    :root {
+      /* 2.1 Brand Colors */
+      --color-primary: #2563EB;
+      --color-primary-dark: #1D4ED8;
+      --color-neutral-50: #F8FAFC;
+      --color-neutral-100: #F1F5F9;
+      --color-neutral-300: #CBD5E1;
+      --color-neutral-700: #334155;
+      --color-neutral-900: #0F172A;
+      --color-success: #16A34A;
+      --color-warning: #D97706;
+      --color-error: #DC2626;
+
+      /* 2.2 Typography Scale (system font stack — the Design System declares no fonts) */
+      --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --text-h1: 1.5rem;
+      --text-h2: 1.125rem;
+      --text-body: 0.875rem;
+      --text-caption: 0.75rem;
+
+      /* 2.3 Spacing Scale (base unit 4px) */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-6: 24px;
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; background: var(--color-neutral-50); color: var(--color-neutral-900); font-family: var(--font-sans); font-size: var(--text-body); }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+    button { font: inherit; cursor: pointer; }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+
+    /* Reviewer header */
+    .reviewer-header { background: var(--color-neutral-900); color: var(--color-neutral-50); padding: var(--space-4) var(--space-6); }
+    .reviewer-header h1 { margin: 0; font-size: var(--text-h1); font-weight: 600; }
+    .reviewer-header h1 span { font-weight: 400; font-size: var(--text-body); color: var(--color-neutral-300); }
+    .reviewer-header p { margin: var(--space-1) 0 0; font-size: var(--text-caption); color: var(--color-neutral-300); }
+
+    /* States grid: one section per state, side-by-side; stacks on small screens */
+    .states-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(30rem, 1fr)); gap: var(--space-6); padding: var(--space-6); }
+    .state h2 { margin: 0 0 var(--space-1); font-size: var(--text-h2); font-weight: 600; }
+    .state-note { margin: 0 0 var(--space-2); font-size: var(--text-caption); color: var(--color-neutral-700); }
+
+    /* Board frame (app-shell main area, index.md Section 4.1) */
+    .board { background: var(--color-neutral-50); border: 1px solid var(--color-neutral-300); border-radius: 8px; overflow: hidden; }
+    .board-toolbar { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-2) var(--space-4); border-bottom: 1px solid var(--color-neutral-300); }
+    .project-name { font-size: var(--text-h2); font-weight: 600; margin-right: auto; }
+    .toolbar-link { color: var(--color-primary); text-decoration: none; padding: var(--space-1) var(--space-2); }
+    .toolbar-link:hover { text-decoration: underline; color: var(--color-primary-dark); }
+    .btn { display: inline-flex; align-items: center; gap: var(--space-1); border-radius: 6px; padding: var(--space-1) var(--space-2); font-size: var(--text-body); }
+    .btn-primary { background: var(--color-primary); color: var(--color-neutral-50); border: 1px solid var(--color-primary); }
+    .btn-primary:hover { background: var(--color-primary-dark); border-color: var(--color-primary-dark); }
+    .btn-ghost { background: var(--color-neutral-50); color: var(--color-neutral-700); border: 1px solid var(--color-neutral-300); }
+    .icon { width: 14px; height: 14px; flex: none; }
+    .board-body { display: flex; }
+    .board-columns { display: flex; flex: 1; gap: var(--space-3); padding: var(--space-4); }
+    .column { flex: 1; min-width: 0; background: var(--color-neutral-100); border-radius: 6px; padding: var(--space-2); }
+    .column h3 { margin: 0 0 var(--space-2); font-size: var(--text-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--color-neutral-700); }
+    .column h3 .count { font-weight: 400; }
+
+    /* TaskCard (screen-specific, per screens/project-board.md) */
+    .task-card { background: var(--color-neutral-50); border: 1px solid var(--color-neutral-300); border-radius: 6px; padding: var(--space-2); margin-bottom: var(--space-3); }
+    .task-card:last-child { margin-bottom: 0; }
+    .task-title { margin: 0 0 var(--space-2); }
+    .task-meta { display: flex; align-items: center; gap: var(--space-2); }
+
+    /* UserBadge, compact (sm): swatch only, id in the title attribute (components.md) */
+    .user-badge { width: 16px; height: 16px; border-radius: 50%; display: inline-block; flex: none; }
+    .swatch-blue { background: var(--color-primary); }
+    .swatch-green { background: var(--color-success); }
+    .swatch-amber { background: var(--color-warning); }
+    .user-badge-unassigned { display: inline-flex; align-items: center; height: 16px; border: 1px dashed var(--color-neutral-300); border-radius: 999px; color: var(--color-neutral-700); font-size: var(--text-caption); padding: 0 var(--space-2); }
+    .due-chip { font-size: var(--text-caption); color: var(--color-neutral-700); border: 1px solid var(--color-neutral-300); border-radius: 999px; padding: 0 var(--space-2); }
+    .due-chip-overdue { color: var(--color-warning); border-color: var(--color-warning); font-weight: 600; }
+
+    /* Keyboard alternative to drag-and-drop (WCAG 2.1 AA decision in the ui-spec) */
+    .btn-move { margin-left: auto; background: none; border: none; color: var(--color-primary); font-size: var(--text-caption); padding: var(--space-1); border-radius: 4px; }
+    .btn-move:hover { color: var(--color-primary-dark); background: var(--color-neutral-100); }
+    .move-menu { margin-top: var(--space-2); border: 1px solid var(--color-neutral-300); border-radius: 6px; background: var(--color-neutral-50); display: flex; flex-direction: column; overflow: hidden; }
+    .move-menu button { text-align: left; background: none; border: none; padding: var(--space-1) var(--space-2); font-size: var(--text-caption); }
+    .move-menu button:hover { background: var(--color-neutral-100); }
+    /* Disabled pattern per index.md 2.5: opacity 0.5 + cursor not-allowed */
+    .move-menu button[aria-disabled="true"] { opacity: 0.5; cursor: not-allowed; color: var(--color-neutral-700); }
+
+    /* Activity Feed drawer, collapsed by default */
+    .activity-rail { border-left: 1px solid var(--color-neutral-300); background: var(--color-neutral-100); padding: var(--space-2) var(--space-1); display: flex; align-items: flex-start; }
+    .activity-toggle-rail { background: none; border: none; color: var(--color-neutral-700); font-size: var(--text-caption); writing-mode: vertical-rl; padding: var(--space-1); }
+
+    /* Loading skeletons (index.md 2.5: match real content dimensions) */
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.45; } }
+    .skeleton { background: var(--color-neutral-300); border-radius: 4px; animation: pulse 1.5s ease-in-out infinite; }
+    .skeleton-title { width: 120px; height: 14px; margin-right: auto; }
+    .skeleton-chip { width: 72px; height: 22px; border-radius: 999px; }
+    .skeleton-card { height: 56px; border-radius: 6px; margin-bottom: var(--space-3); }
+
+    /* EmptyState, default variant (components.md: heading + description + CTA) */
+    .empty-state { flex: 1; text-align: center; padding: var(--space-6); }
+    .empty-state h3 { margin: 0 0 var(--space-1); font-size: var(--text-h2); font-weight: 600; }
+    .empty-state p { margin: 0 0 var(--space-4); color: var(--color-neutral-700); }
+
+    /* ErrorBanner, region variant (components.md: message + retry) */
+    .error-banner { display: flex; align-items: center; gap: var(--space-2); margin: var(--space-4) var(--space-4) 0; border: 1px solid var(--color-error); border-left: 4px solid var(--color-error); border-radius: 6px; background: var(--color-neutral-50); padding: var(--space-2) var(--space-4); }
+    .error-banner .icon { color: var(--color-error); }
+    .error-banner p { margin: 0; }
+    .btn-retry { margin-left: auto; background: var(--color-neutral-50); color: var(--color-error); border: 1px solid var(--color-error); border-radius: 6px; padding: var(--space-1) var(--space-2); font-size: var(--text-caption); font-weight: 600; }
+    .columns-dimmed { opacity: 0.5; }
+
+    /* Responsive: sections and board columns stack on small screens */
+    @media (max-width: 640px) {
+      .states-grid { grid-template-columns: 1fr; padding: var(--space-4); }
+      .board-columns { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="reviewer-header">
+    <h1>T-031 Project Board Mockup <span>— Default, Loading, Empty, Error shown side-by-side</span></h1>
+    <p>TaskFlow · route /projects/:projectId/board · static HTML, no JavaScript, no external requests — works offline from a double-click</p>
+  </header>
+
+  <main class="states-grid">
+
+    <!-- ============ 1. Default ============ -->
+    <section class="state" aria-labelledby="state-default-h">
+      <h2 id="state-default-h">Default</h2>
+      <p class="state-note">Tasks loaded — three columns grouped by status; drawer collapsed. One card shows the "Move to…" keyboard alternative to drag-and-drop with its menu open.</p>
+      <div class="board">
+        <div class="board-toolbar" role="toolbar" aria-label="Board actions">
+          <strong class="project-name">Website Revamp</strong>
+          <button type="button" class="btn btn-ghost" aria-haspopup="listbox">
+            Assignee: All
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <button type="button" class="btn btn-primary">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            New task
+          </button>
+          <a class="toolbar-link" href="#state-default-h">Members</a>
+          <button type="button" class="btn btn-ghost" aria-expanded="false">Activity</button>
+        </div>
+        <div class="board-body">
+          <div class="board-columns">
+            <div class="column">
+              <h3>To Do <span class="count">· 2</span></h3>
+              <article class="task-card">
+                <p class="task-title">Draft new landing page copy</p>
+                <div class="task-meta">
+                  <span class="user-badge swatch-green" title="Assignee 7cd04e11"></span><span class="sr-only">Assignee 7cd04e11</span>
+                  <span class="due-chip">Due 2026-07-24</span>
+                  <button type="button" class="btn-move" aria-haspopup="menu" aria-expanded="false">Move to…</button>
+                </div>
+              </article>
+              <article class="task-card">
+                <p class="task-title">Compress hero images for mobile</p>
+                <div class="task-meta">
+                  <span class="user-badge-unassigned">Unassigned</span>
+                  <span class="due-chip due-chip-overdue" title="Past due">Due 2026-07-10</span>
+                  <button type="button" class="btn-move" aria-haspopup="menu" aria-expanded="false">Move to…</button>
+                </div>
+              </article>
+            </div>
+            <div class="column">
+              <h3>In Progress <span class="count">· 1</span></h3>
+              <article class="task-card">
+                <p class="task-title">Set up staging deploy pipeline</p>
+                <div class="task-meta">
+                  <span class="user-badge swatch-blue" title="Assignee a3f81c92"></span><span class="sr-only">Assignee a3f81c92</span>
+                  <span class="due-chip">Due 2026-07-30</span>
+                  <button type="button" class="btn-move" aria-haspopup="menu" aria-expanded="true">Move to…</button>
+                </div>
+                <div class="move-menu" role="menu" aria-label="Move task to column">
+                  <button type="button" role="menuitem">To Do</button>
+                  <button type="button" role="menuitem" aria-disabled="true">In Progress (current)</button>
+                  <button type="button" role="menuitem">Done</button>
+                </div>
+              </article>
+            </div>
+            <div class="column">
+              <h3>Done <span class="count">· 1</span></h3>
+              <article class="task-card">
+                <p class="task-title">Audit legacy nav links</p>
+                <div class="task-meta">
+                  <span class="user-badge swatch-amber" title="Assignee 5b2e9dd0"></span><span class="sr-only">Assignee 5b2e9dd0</span>
+                  <button type="button" class="btn-move" aria-haspopup="menu" aria-expanded="false">Move to…</button>
+                </div>
+              </article>
+            </div>
+          </div>
+          <div class="activity-rail">
+            <button type="button" class="activity-toggle-rail" aria-expanded="false">Activity ▸</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 2. Loading ============ -->
+    <section class="state" aria-labelledby="state-loading-h">
+      <h2 id="state-loading-h">Loading</h2>
+      <p class="state-note">Board queries in flight — skeleton placeholders matching the content layout (shown ≥ 200 ms to avoid flicker).</p>
+      <div class="board">
+        <p class="sr-only" role="status">Loading board…</p>
+        <div class="board-toolbar" aria-hidden="true">
+          <span class="skeleton skeleton-title"></span>
+          <span class="skeleton skeleton-chip"></span>
+          <span class="skeleton skeleton-chip"></span>
+        </div>
+        <div class="board-body" aria-hidden="true">
+          <div class="board-columns">
+            <div class="column">
+              <h3>To Do</h3>
+              <div class="skeleton skeleton-card"></div>
+              <div class="skeleton skeleton-card"></div>
+            </div>
+            <div class="column">
+              <h3>In Progress</h3>
+              <div class="skeleton skeleton-card"></div>
+              <div class="skeleton skeleton-card"></div>
+            </div>
+            <div class="column">
+              <h3>Done</h3>
+              <div class="skeleton skeleton-card"></div>
+            </div>
+          </div>
+          <div class="activity-rail">
+            <button type="button" class="activity-toggle-rail" aria-expanded="false" tabindex="-1">Activity ▸</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. Empty ============ -->
+    <section class="state" aria-labelledby="state-empty-h">
+      <h2 id="state-empty-h">Empty</h2>
+      <p class="state-note">Project has no tasks — board-wide EmptyState with CTA (a single empty column would use the inline variant instead; never a blank region).</p>
+      <div class="board">
+        <div class="board-toolbar" role="toolbar" aria-label="Board actions">
+          <strong class="project-name">Website Revamp</strong>
+          <button type="button" class="btn btn-ghost" aria-haspopup="listbox">
+            Assignee: All
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <button type="button" class="btn btn-primary">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            New task
+          </button>
+          <a class="toolbar-link" href="#state-empty-h">Members</a>
+          <button type="button" class="btn btn-ghost" aria-expanded="false">Activity</button>
+        </div>
+        <div class="board-body">
+          <div class="board-columns">
+            <div class="empty-state">
+              <h3>No tasks yet</h3>
+              <p>Create the first task to start planning this project.</p>
+              <button type="button" class="btn btn-primary">
+                <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                New task
+              </button>
+            </div>
+          </div>
+          <div class="activity-rail">
+            <button type="button" class="activity-toggle-rail" aria-expanded="false">Activity ▸</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. Error ============ -->
+    <section class="state" aria-labelledby="state-error-h">
+      <h2 id="state-error-h">Error</h2>
+      <p class="state-note">Board query failed — ErrorBanner with retry above the columns; human-readable message, never raw error codes.</p>
+      <div class="board">
+        <div class="board-toolbar" role="toolbar" aria-label="Board actions">
+          <strong class="project-name">Website Revamp</strong>
+          <button type="button" class="btn btn-ghost" aria-haspopup="listbox">
+            Assignee: All
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+          <button type="button" class="btn btn-primary">
+            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            New task
+          </button>
+          <a class="toolbar-link" href="#state-error-h">Members</a>
+          <button type="button" class="btn btn-ghost" aria-expanded="false">Activity</button>
+        </div>
+        <div class="error-banner" role="alert">
+          <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.2" r="0.9" fill="currentColor"/></svg>
+          <p>We couldn't load the board. Check your connection and try again.</p>
+          <button type="button" class="btn-retry">Retry</button>
+        </div>
+        <div class="board-body columns-dimmed" aria-hidden="true">
+          <div class="board-columns">
+            <div class="column"><h3>To Do</h3></div>
+            <div class="column"><h3>In Progress</h3></div>
+            <div class="column"><h3>Done</h3></div>
+          </div>
+          <div class="activity-rail">
+            <button type="button" class="activity-toggle-rail" aria-expanded="false" tabindex="-1">Activity ▸</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+</body>
+</html>
