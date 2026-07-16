@@ -102,6 +102,29 @@ Final line, JSON only, exactly this shape:
 """
 
 
+def read_output(out_path):
+    """Return the output's text, or None if missing.
+
+    `output` may be a single file, or a DIRECTORY (multi-output prompts like
+    spec-generation): every .md file under it is concatenated with
+    `<!-- FILE: relpath -->` headers so text checks and the judge see the whole
+    tree. judge-prompt.md is excluded (runner-owned scratch).
+    """
+    if out_path.is_file():
+        return out_path.read_text(encoding="utf-8", errors="replace")
+    if out_path.is_dir():
+        parts = []
+        for f in sorted(out_path.rglob("*.md")):
+            if f.name in ("judge-prompt.md", ".gitkeep"):
+                continue
+            rel = f.relative_to(out_path).as_posix()
+            parts.append(f"<!-- FILE: {rel} -->\n"
+                         + f.read_text(encoding="utf-8", errors="replace"))
+        if parts:
+            return "\n\n".join(parts)
+    return None
+
+
 def extract_file_entries(text):
     """Return (path, is_new) for every bullet under a Files to Modify/Create field."""
     entries = []
@@ -131,9 +154,9 @@ def run_judge(check, case_dir, out_text, judge_opts):
     reference = "None provided."
     if check.get("reference"):
         ref_path = case_dir / check["reference"]
-        if not ref_path.is_file():
+        reference = read_output(ref_path)
+        if reference is None:
             return "FAIL", f"reference not found: {ref_path}"
-        reference = ref_path.read_text(encoding="utf-8", errors="replace")
 
     ground_parts = []
     for rel in check.get("context", []):
@@ -211,6 +234,28 @@ def run_check(check, case_dir, out_text, out_path, judge_opts):
             return "PASS", "validator clean"
         tail = "\n".join((proc.stdout or "").strip().splitlines()[-6:])
         return "FAIL", f"validator failed:\n      {tail.replace(chr(10), chr(10) + '      ')}"
+
+    if ctype == "spec_validator":
+        root = case_dir / check.get("root", "output")
+        cmd = [sys.executable, str(REPO_ROOT / "tools" / "validate-specs.py"),
+               "--root", str(root)]
+        if check.get("strict"):
+            cmd.append("--strict")
+        if check.get("max_age"):
+            cmd += ["--max-age", str(check["max_age"])]
+        proc = subprocess.run(cmd, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace")
+        if proc.returncode == 0:
+            return "PASS", "validate-specs clean"
+        tail = "\n".join((proc.stdout or proc.stderr or "").strip().splitlines()[-6:])
+        return "FAIL", f"validate-specs failed:\n      {tail.replace(chr(10), chr(10) + '      ')}"
+
+    if ctype == "files_exist":
+        base = case_dir / check.get("base", "output")
+        missing_files = [p for p in check.get("paths", []) if not (base / p).is_file()]
+        if not missing_files:
+            return "PASS", f"all {len(check.get('paths', []))} expected files present"
+        return "FAIL", "missing expected files: " + ", ".join(missing_files[:8])
 
     if ctype == "task_count":
         n = len(TASK_HEADING_RE.findall(out_text))
@@ -313,11 +358,11 @@ def main():
         name = case_dir.relative_to(EVALS_DIR / "cases")
         spec = json.loads(assertions_path.read_text(encoding="utf-8"))
         out_path = case_dir / spec["output"]
-        if not out_path.is_file():
+        out_text = read_output(out_path)
+        if out_text is None:
             print(f"[MISSING] {name} — no {spec['output']} (generate it per GENERATE.md)")
             missing += 1
             continue
-        out_text = out_path.read_text(encoding="utf-8", errors="replace")
         case_failed = False
         details = []
         for check in spec.get("checks", []):

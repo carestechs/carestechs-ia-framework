@@ -51,18 +51,48 @@ DEFAULT_GEN_CMD = (f'claude -p "Read GENERATE.md in the current directory and fo
 def generate_once(case_dir, cmd, timeout):
     spec = json.loads((case_dir / "assertions.json").read_text(encoding="utf-8"))
     out_path = case_dir / spec["output"]
-    if out_path.exists():
-        out_path.unlink()
+    remove_output(out_path)
     t0 = time.time()
     try:
         proc = subprocess.run(cmd, shell=True, cwd=str(case_dir),
                               capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout)
     except subprocess.TimeoutExpired:
         return False, f"generation timed out ({timeout}s)", time.time() - t0
-    if not out_path.is_file():
+    if not output_present(out_path):
         tail = " / ".join((proc.stdout or proc.stderr or "").strip().splitlines()[-3:])
         return False, f"no output produced (exit {proc.returncode}): {tail}", time.time() - t0
     return True, "", time.time() - t0
+
+
+def output_present(out_path):
+    if out_path.is_file():
+        return True
+    return out_path.is_dir() and any(f.name not in ("judge-prompt.md", ".gitkeep")
+                                     for f in out_path.rglob("*.md"))
+
+
+def remove_output(out_path):
+    if out_path.is_file():
+        out_path.unlink()
+    elif out_path.is_dir():
+        shutil.rmtree(out_path)
+
+
+def archive_output(out_path, archive_base):
+    """Archive a file output as <base>.md, a directory output as <base>/."""
+    archive_base.parent.mkdir(parents=True, exist_ok=True)
+    if out_path.is_file():
+        shutil.copy2(out_path, archive_base.with_suffix(".md"))
+    else:
+        shutil.copytree(out_path, archive_base,
+                        ignore=shutil.ignore_patterns("judge-prompt.md"))
+
+
+def restore_output(sample, out_path):
+    if sample.is_file():
+        shutil.copy2(sample, out_path)
+    else:
+        shutil.copytree(sample, out_path)
 
 
 def check_case(case_name, judge, judge_samples=1):
@@ -89,10 +119,8 @@ def run_case(case_dir, args, label_dir):
                             "secs": round(secs)})
             continue
         passed, checks = check_case(name, args.judge, args.judge_samples)
-        archive = label_dir / name / f"sample-{i}.md"
-        archive.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(out_path, archive)
-        out_path.unlink()
+        archive_output(out_path, label_dir / name / f"sample-{i}")
+        remove_output(out_path)
         judge_prompt = case_dir / "output" / "judge-prompt.md"
         if judge_prompt.exists():
             judge_prompt.unlink()
@@ -120,10 +148,10 @@ def rescore(label, judge, judge_samples=1):
         spec = json.loads((case_dir / "assertions.json").read_text(encoding="utf-8"))
         out_path = case_dir / spec["output"]
         results = []
-        for sample in sorted(archived_case.glob("sample-*.md")):
-            shutil.copy2(sample, out_path)
+        for sample in sorted(archived_case.glob("sample-*")):
+            restore_output(sample, out_path)
             passed, checks = check_case(archived_case.name, judge, judge_samples)
-            out_path.unlink()
+            remove_output(out_path)
             judge_prompt = case_dir / "output" / "judge-prompt.md"
             if judge_prompt.exists():
                 judge_prompt.unlink()
