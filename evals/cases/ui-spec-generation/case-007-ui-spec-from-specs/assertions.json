@@ -1,0 +1,55 @@
+{
+  "output": "output",
+  "checks": [
+    {
+      "type": "spec_validator",
+      "root": "output",
+      "strict": true,
+      "overlay": ["input"]
+    },
+    {
+      "type": "files_exist",
+      "base": "output",
+      "paths": [
+        "docs/ui-specification/index.md",
+        "docs/ui-specification/components.md"
+      ]
+    },
+    {
+      "type": "must_match",
+      "pattern": "kind: screen",
+      "reason": "screen shards carry frontmatter"
+    },
+    {
+      "type": "must_match",
+      "pattern": "### 2\\.5 State Patterns",
+      "reason": "numbered design system required (DDR compilation targets these numbers)"
+    },
+    {
+      "type": "must_match",
+      "pattern": "Last verified against code",
+      "reason": "freshness stamps present"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)angular|ngmodule|arauco",
+      "reason": "stack leak - fixture is React/Express"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)screens/label|label-management|notification-center",
+      "reason": "excluded scope (labels, notifications) must not gain screens"
+    },
+    {
+      "type": "judge",
+      "rubric": "rubric.md",
+      "reference": "reference",
+      "min_score": 7,
+      "context": [
+        "../../spec-generation/case-005-data-model-from-strategy/input/docs/stakeholder-definition.md",
+        "input/docs/api-spec/index.md",
+        "../../spec-generation/case-005-data-model-from-strategy/input/CLAUDE.md"
+      ]
+    }
+  ]
+}

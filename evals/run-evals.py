@@ -47,6 +47,8 @@ import re
 import statistics
 import subprocess
 import sys
+import tempfile
+import shutil
 from pathlib import Path
 
 EVALS_DIR = Path(__file__).resolve().parent
@@ -237,6 +239,21 @@ def run_check(check, case_dir, out_text, out_path, judge_opts):
 
     if ctype == "spec_validator":
         root = case_dir / check.get("root", "output")
+        # "overlay": additional roots whose docs/ are merged with the output's docs/
+        # into a temp tree before linting — lets a generated spec cross-reference
+        # shards that live in the input fixture (e.g., ui-spec -> api-spec endpoints).
+        tmp_ctx = None
+        if check.get("overlay"):
+            tmp_ctx = tempfile.TemporaryDirectory()
+            merged = Path(tmp_ctx.name)
+            for extra in check["overlay"]:
+                src = case_dir / extra / "docs"
+                if src.is_dir():
+                    shutil.copytree(src, merged / "docs", dirs_exist_ok=True)
+            out_docs = root / "docs"
+            if out_docs.is_dir():
+                shutil.copytree(out_docs, merged / "docs", dirs_exist_ok=True)
+            root = merged
         cmd = [sys.executable, str(REPO_ROOT / "tools" / "validate-specs.py"),
                "--root", str(root),
                # frozen fixtures must not age: staleness off unless a case opts in
@@ -245,8 +262,10 @@ def run_check(check, case_dir, out_text, out_path, judge_opts):
             cmd.append("--strict")
         proc = subprocess.run(cmd, capture_output=True, text=True,
                               encoding="utf-8", errors="replace")
+        if tmp_ctx is not None:
+            tmp_ctx.cleanup()
         if proc.returncode == 0:
-            return "PASS", "validate-specs clean"
+            return "PASS", "validate-specs clean" + (" (merged overlay root)" if check.get("overlay") else "")
         tail = "\n".join((proc.stdout or proc.stderr or "").strip().splitlines()[-6:])
         return "FAIL", f"validate-specs failed:\n      {tail.replace(chr(10), chr(10) + '      ')}"
 
