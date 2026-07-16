@@ -1,0 +1,49 @@
+{
+  "output": "output/plan.md",
+  "checks": [
+    {
+      "type": "line_count",
+      "min": 30,
+      "max": 160
+    },
+    {
+      "type": "must_match",
+      "pattern": "# Implementation Plan: T-002",
+      "reason": "plan is anchored to its task via the prompt's prescribed header"
+    },
+    {
+      "type": "must_match",
+      "pattern": "## Acceptance Verification",
+      "reason": "the prompt's Output Format requires an Acceptance Verification section"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)angular|ngmodule|arauco",
+      "reason": "stack leak — fixture is React/Express"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "T-00[4-7]:",
+      "reason": "plans exactly one task — step headings for other tasks are scope creep"
+    },
+    {
+      "type": "shard_refs_resolve",
+      "root": "../../feature-tasks/case-001-task-labels/input",
+      "allow_new": true,
+      "sanctioned_by": [
+        "input/tasks/FEAT-001-tasks.md"
+      ]
+    },
+    {
+      "type": "judge",
+      "rubric": "rubric.md",
+      "reference": "reference/plan.md",
+      "min_score": 7,
+      "context": [
+        "../../feature-tasks/case-001-task-labels/input/CLAUDE.md",
+        "../../feature-tasks/case-001-task-labels/input/docs/api-spec/index.md",
+        "input/tasks/FEAT-001-tasks.md"
+      ]
+    }
+  ]
+}

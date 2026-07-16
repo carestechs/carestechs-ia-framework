@@ -38,7 +38,7 @@ Write the tree under `output/docs/data-model/` (relative to this directory): `ou
 Run, from this directory:
 
 ```
-python ../../../../tools/validate-specs.py --root output --strict
+python ../../../../tools/validate-specs.py --root output --strict --max-age 0
 ```
 
 and fix **every error and every warning** it reports (`--strict` promotes warnings to failures).

@@ -98,6 +98,11 @@ def parse_frontmatter(text, path, rep):
 
 
 def check_stamp(text, path, rep, max_age, today):
+    if int(max_age) <= 0:  # 0 disables staleness checking (frozen eval fixtures)
+        m = STAMP_RE.search(text)
+        if not m:
+            rep.warn(path, "missing freshness stamp ('> **Last verified against code:** ...')")
+        return
     m = STAMP_RE.search(text)
     if not m:
         rep.warn(path, "missing freshness stamp ('> **Last verified against code:** ...')")
@@ -205,7 +210,8 @@ def main():
     ap.add_argument("--root", type=Path, default=Path("."),
                     help="project root containing docs/ (default: cwd)")
     ap.add_argument("--max-age", type=int, default=30,
-                    help="max stamp age in days before a staleness warning (default 30)")
+                    help="max stamp age in days before a staleness warning "
+                         "(default 30; 0 disables — frozen fixtures)")
     ap.add_argument("--strict", action="store_true", help="treat warnings as failures")
     args = ap.parse_args()
 

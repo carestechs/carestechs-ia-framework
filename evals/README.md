@@ -85,7 +85,7 @@ spot flipping an experiment's verdict).
 ## Adding a case
 
 1. Copy an existing case directory; keep `input/` small but **internally consistent**
-   (it should pass `python tools/validate-specs.py --root <case>/input` with 0 errors).
+   (it should pass `python tools/validate-specs.py --root <case>/input --max-age 0` with 0 errors — `--max-age 0` because frozen fixtures must not fail on stamp age).
 2. Write `GENERATE.md` with exact relative paths (fixture root, prompt file, output file).
 3. Encode what "good" means in `assertions.json` — prefer checks that catch
    *hallucination* and *schema drift*; avoid asserting exact wording.

@@ -238,11 +238,11 @@ def run_check(check, case_dir, out_text, out_path, judge_opts):
     if ctype == "spec_validator":
         root = case_dir / check.get("root", "output")
         cmd = [sys.executable, str(REPO_ROOT / "tools" / "validate-specs.py"),
-               "--root", str(root)]
+               "--root", str(root),
+               # frozen fixtures must not age: staleness off unless a case opts in
+               "--max-age", str(check.get("max_age", 0))]
         if check.get("strict"):
             cmd.append("--strict")
-        if check.get("max_age"):
-            cmd += ["--max-age", str(check["max_age"])]
         proc = subprocess.run(cmd, capture_output=True, text=True,
                               encoding="utf-8", errors="replace")
         if proc.returncode == 0:
@@ -263,6 +263,14 @@ def run_check(check, case_dir, out_text, out_path, judge_opts):
         if lo <= n <= hi:
             return "PASS", f"{n} tasks (allowed {lo}-{hi})"
         return "FAIL", f"{n} tasks, expected {lo}-{hi}"
+
+    if ctype == "line_count":
+        n = len(out_text.splitlines())
+        lo, hi = check.get("min", 1), check.get("max", 10 ** 6)
+        if lo <= n <= hi:
+            return "PASS", f"{n} lines (allowed {lo}-{hi})"
+        return "FAIL", f"{n} lines, expected {lo}-{hi} — output budgets exist because " \
+                       f"generated artifacts are downstream context"
 
     if ctype in ("must_match", "must_not_match"):
         found = re.search(check["pattern"], out_text)
