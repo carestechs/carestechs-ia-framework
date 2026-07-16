@@ -1,0 +1,151 @@
+{
+  "label": "v2.4.6-ui-spec-gen",
+  "samples_per_case": 3,
+  "gen_cmd": "claude -p \"Read GENERATE.md in the current directory and follow it exactly.\" --permission-mode acceptEdits --allowedTools \"Bash(python *)\" --add-dir \"C:\\Users\\carlos.escalona\\Desktop\\Repos\\carestechs\\carestechs-ia-framework\"",
+  "judge": true,
+  "cases": {
+    "case-007-ui-spec-from-specs": {
+      "samples": [
+        {
+          "sample": 1,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "spec_validator",
+              "detail": "validate-specs clean (merged overlay root)"
+            },
+            {
+              "status": "PASS",
+              "type": "files_exist",
+              "detail": "all 2 expected files present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "screen shards carry frontmatter"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "numbered design system required (DDR compilation targets these numbers)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "freshness stamps present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak - fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "excluded scope (labels, notifications) must not gain screens"
+            }
+          ],
+          "secs": 749
+        },
+        {
+          "sample": 2,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "spec_validator",
+              "detail": "validate-specs clean (merged overlay root)"
+            },
+            {
+              "status": "PASS",
+              "type": "files_exist",
+              "detail": "all 2 expected files present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "screen shards carry frontmatter"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "numbered design system required (DDR compilation targets these numbers)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "freshness stamps present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak - fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "excluded scope (labels, notifications) must not gain screens"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) [runs: 9, 9, 9] \ufffd All flow phases covered across 5 consistent screens; Scope Lock exclusions absent everywhere; Every API mapping uses real routes/verbs; no invented endpoints and explicit notes on non-existent ones; frontmatter endpoint arrays accurate; All four states concrete and screen-specific with strong edge handling (conflicts, unassignment warning, error-code mapping)"
+            }
+          ],
+          "secs": 756
+        },
+        {
+          "sample": 3,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "spec_validator",
+              "detail": "validate-specs clean (merged overlay root)"
+            },
+            {
+              "status": "PASS",
+              "type": "files_exist",
+              "detail": "all 2 expected files present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "screen shards carry frontmatter"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "numbered design system required (DDR compilation targets these numbers)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "freshness stamps present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak - fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "excluded scope (labels, notifications) must not gain screens"
+            }
+          ],
+          "secs": 840
+        }
+      ],
+      "pass_rate": "100%",
+      "judge_scores": [
+        9
+      ],
+      "failing_checks": {}
+    }
+  }
+}

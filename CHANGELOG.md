@@ -2,6 +2,12 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.9] — 2026-07-16
+
+### Added
+- **case-007-ui-spec-from-specs** — ui-spec-generation measured for the first time, completing the spec-generation chain (strategy → data model → API spec → UI spec) in the shared TaskFlow fixture world. Results: **3/3 deterministic (merged-overlay strict lint clean), judge 9.0 (9–9)** — full user-flow coverage, zero excluded-scope screens, all component→API mappings use real endpoints (the deliberate no-task-delete hallucination trap caught nobody). **Prompt coverage: 7/11.**
+- `spec_validator` **overlay** option: merges input-fixture docs with the generated tree into a temp root before linting, enabling downstream-spec cases whose outputs cross-reference fixture shards.
+
 ## [2.4.8] — 2026-07-16
 
 ### Added
