@@ -2,6 +2,11 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.11] — 2026-07-16
+
+### Added
+- **case-009-python-react-profile** — compile-adrs measured for the first time, against a fixture frozen from the organization's REAL ADR repo (18 ADRs, closed Requires chains, profile edited to match): **3/3 deterministic, judge 8.7 (8–9)** — every ADR represented exactly once, constraints faithfully derived, traceability comments resolving, no invented content, no cross-profile leakage. **Prompt coverage: 9/11** (remaining: compile-ddrs — needs a DDR repo; review-implementation — not yet written).
+
 ## [2.4.10] — 2026-07-16
 
 ### Added
