@@ -1,0 +1,54 @@
+{
+  "output": "output/tasks.md",
+  "checks": [
+    {
+      "type": "validator",
+      "work_item": "../case-001-task-labels/input/docs/work-items/FEAT-001-task-labels.md",
+      "root": "../case-001-task-labels/input"
+    },
+    {
+      "type": "task_count",
+      "min": 6,
+      "max": 16
+    },
+    {
+      "type": "must_match",
+      "pattern": "## Acceptance Criteria Coverage",
+      "reason": "coverage table required"
+    },
+    {
+      "type": "must_match",
+      "pattern": "\\(new\\)",
+      "reason": "the feature creates files that do not exist in the fixture — at least one path must be marked (new)"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)angular|ngmodule|arauco",
+      "reason": "stack leak — fixture is React/Express"
+    },
+    {
+      "type": "paths_exist",
+      "root": "../case-001-task-labels/input",
+      "allow_new": true
+    },
+    {
+      "type": "shard_refs_resolve",
+      "root": "../case-001-task-labels/input",
+      "allow_new": true,
+      "sanctioned_by": [
+        "../case-001-task-labels/input/docs/work-items/FEAT-001-task-labels.md"
+      ]
+    },
+    {
+      "type": "judge",
+      "rubric": "../case-001-task-labels/rubric.md",
+      "reference": "../case-001-task-labels/reference/tasks.md",
+      "min_score": 7,
+      "context": [
+        "../case-001-task-labels/input/CLAUDE.md",
+        "../case-001-task-labels/input/docs/api-spec/index.md",
+        "../case-001-task-labels/input/docs/data-model/index.md"
+      ]
+    }
+  ]
+}
