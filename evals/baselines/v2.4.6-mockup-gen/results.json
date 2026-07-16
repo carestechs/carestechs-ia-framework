@@ -1,0 +1,193 @@
+{
+  "label": "v2.4.6-mockup-gen",
+  "samples_per_case": 3,
+  "gen_cmd": "claude -p \"Read GENERATE.md in the current directory and follow it exactly.\" --permission-mode acceptEdits --allowedTools \"Bash(python *)\" --add-dir \"C:\\Users\\carlos.escalona\\Desktop\\Repos\\carestechs\\carestechs-ia-framework\"",
+  "judge": true,
+  "cases": {
+    "case-008-project-board-mockup": {
+      "samples": [
+        {
+          "sample": 1,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "complete standalone document"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "embedded CSS required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "fully self-contained - any external URL (CDN, fonts, icons) breaks the offline guarantee"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "no external resource tags - single-file mockup"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "loading state shown"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "empty state shown"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "error state shown"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "design-token fidelity - primary color from the Design System"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) [runs: 8, 8, 8] \ufffd Layout matches the shard: toolbar (name, filter, New task, Members, Activity), three status columns, drawer collapsed by default, TaskCards with UserBadge/Unassigned and warning-colored overdue chip; All four states side-by-side, each following Design System patterns (layout-matched skeletons, EmptyState with CTA, ErrorBanner with retry); Design tokens declared as CSS custom properties with exact published values; system font stack; swatch colors are the sanctioned exception"
+            }
+          ],
+          "secs": 458
+        },
+        {
+          "sample": 2,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "complete standalone document"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "embedded CSS required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "fully self-contained - any external URL (CDN, fonts, icons) breaks the offline guarantee"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "no external resource tags - single-file mockup"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "loading state shown"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "empty state shown"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "error state shown"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "design-token fidelity - primary color from the Design System"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) [runs: 8, 8, 8] \ufffd Layout matches the shard: full toolbar, three status columns, collapsed activity drawer, opaque-UUID badges, overdue warning chips; All four states present as distinct labeled sections in a side-by-side grid, each following the Design System patterns; Design tokens declared verbatim as CSS custom properties; system font stack; no invented palette"
+            }
+          ],
+          "secs": 470
+        },
+        {
+          "sample": 3,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "complete standalone document"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "embedded CSS required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "fully self-contained - any external URL (CDN, fonts, icons) breaks the offline guarantee"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "no external resource tags - single-file mockup"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "loading state shown"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "empty state shown"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "error state shown"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "design-token fidelity - primary color from the Design System"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) [runs: 8, 8, 8] \ufffd Layout matches the shard: toolbar, three status columns, collapsed activity drawer, UUID-only badges, overdue warning chip; All four states side-by-side and pattern-correct; skeletons mirror content layout, EmptyState and ErrorBanner follow the design system; Design tokens verbatim as CSS custom properties with system font stack; fully self-contained single file, no external requests or JS"
+            }
+          ],
+          "secs": 525
+        }
+      ],
+      "pass_rate": "100%",
+      "judge_scores": [
+        8,
+        8,
+        8
+      ],
+      "failing_checks": {}
+    }
+  }
+}

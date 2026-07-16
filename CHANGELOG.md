@@ -2,6 +2,11 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.10] — 2026-07-16
+
+### Added
+- **case-008-project-board-mockup** — mockup-generation measured for the first time: **3/3 deterministic, judge 8.0 (8–8, fully stable)**. The v2.1 "fully self-contained HTML" guarantee is now mechanically asserted (no external URLs, no `<link>`/`<script src>`, embedded CSS, design-token hex fidelity, four states side-by-side) and held in every sample. **Prompt coverage: 8/11** — everything except the two compile prompts (which need ADR/DDR fixture repos) and the not-yet-written review-implementation prompt.
+
 ## [2.4.9] — 2026-07-16
 
 ### Added
