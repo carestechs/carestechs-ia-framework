@@ -2,6 +2,15 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.8] — 2026-07-16
+
+### Added
+- **case-006-plan-label-endpoints** — plan-generation measured for the first time: plans T-002 from case-001's golden task list. Results: **3/3 deterministic, judge 9.0 (9–9)**, all plans 74–78 lines (half the ≤150 budget), exact single-task scope, conventions fidelity confirmed. **Prompt coverage: 6/11.**
+- `line_count` check type — the v2.4.1 plan/output budgets are now mechanically enforceable in evals.
+
+### Fixed
+- **Frozen-fixture staleness time-bomb**: `validate-specs --max-age 0` disables stamp-age checking (presence still verified); `spec_validator` eval checks default to it. Without this, every strict fixture lint would have started failing ~30 days after its fixed stamp date.
+
 ## [2.4.7] — 2026-07-16
 
 ### Added
