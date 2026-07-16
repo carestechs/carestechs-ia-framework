@@ -18,6 +18,10 @@ evals/cases/<prompt>/<case>/
 └── output/            # generated artifacts land here (disposable, not reviewed content)
 ```
 
+`output` in assertions.json may name a single file or a **directory** (multi-output
+prompts like spec-generation): every `.md` under it is concatenated with
+`<!-- FILE: relpath -->` headers for text and judge checks, and archived as a tree.
+
 The loop has two steps, deliberately separated:
 
 1. **Generate** (needs an agent + model — non-deterministic):
@@ -45,6 +49,8 @@ Assertion types (see `run-evals.py` docstring for the JSON schema):
 | `paths_exist` | every file a task touches exists in the fixture or is marked `(new)` |
 | `shard_refs_resolve` | every spec-shard reference resolves against the fixture (hallucination check); a not-yet-existing shard is sanctioned when marked `(new)` on the same line, anywhere in the document, or in a doc listed in `sanctioned_by` (typically the work item) |
 | `judge` | anchored LLM-judge score against the case's `rubric.md`, with `reference/` as the known-good anchor (skipped unless `--judge`) |
+| `spec_validator` | `tools/validate-specs.py` passes on the output tree — frontmatter, cross-references, stamps (multi-output cases) |
+| `files_exist` | expected files present under the output directory |
 
 ## Judge checks
 

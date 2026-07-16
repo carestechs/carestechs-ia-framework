@@ -76,6 +76,9 @@ def remove_output(out_path):
         out_path.unlink()
     elif out_path.is_dir():
         shutil.rmtree(out_path)
+        # whole-dir outputs: keep the tracked output/ anchor alive
+        out_path.mkdir(parents=True, exist_ok=True)
+        (out_path / ".gitkeep").touch()
 
 
 def archive_output(out_path, archive_base):

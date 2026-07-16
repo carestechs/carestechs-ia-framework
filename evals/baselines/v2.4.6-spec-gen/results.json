@@ -1,0 +1,148 @@
+{
+  "label": "v2.4.6-spec-gen",
+  "samples_per_case": 3,
+  "gen_cmd": "claude -p \"Read GENERATE.md in the current directory and follow it exactly.\" --permission-mode acceptEdits --allowedTools \"Bash(python *)\" --add-dir \"C:\\Users\\carlos.escalona\\Desktop\\Repos\\carestechs\\carestechs-ia-framework\"",
+  "judge": true,
+  "cases": {
+    "case-005-data-model-from-strategy": {
+      "samples": [
+        {
+          "sample": 1,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "spec_validator",
+              "detail": "validate-specs clean"
+            },
+            {
+              "status": "PASS",
+              "type": "files_exist",
+              "detail": "all 3 expected files present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "entity shards carry frontmatter"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "freshness stamps present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "Scope Lock excludes labels - an entity shard for them is scope creep"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) [runs: 8, 8, 8] \ufffd Scope coverage exact: all four included entities, no excluded features, no stored event log; Sharding and frontmatter fully compliant; conventions fidelity strong (plural snake_case, UUID id PKs, timestamptz UTC, hard deletes, no local User); Ownership modeled only via member role with no rule preventing owner removal/demotion \ufffd possible ownerless project"
+            }
+          ],
+          "secs": 304
+        },
+        {
+          "sample": 2,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "spec_validator",
+              "detail": "validate-specs clean"
+            },
+            {
+              "status": "PASS",
+              "type": "files_exist",
+              "detail": "all 3 expected files present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "entity shards carry frontmatter"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "freshness stamps present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "Scope Lock excludes labels - an entity shard for them is scope creep"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) [runs: 8, 8, 9] \ufffd All Scope Lock inclusions modeled and no excluded feature or stored event/log entity appears anywhere; Relationships complete with explicit FKs, cascade behavior, and member-removal unassignment handled; sharding, frontmatter, and freshness stamps fully conform; Ownership-via-role (no owner_id) is a consistent, documented, acceptable variation"
+            }
+          ],
+          "secs": 392
+        },
+        {
+          "sample": 3,
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "spec_validator",
+              "detail": "validate-specs clean"
+            },
+            {
+              "status": "PASS",
+              "type": "files_exist",
+              "detail": "all 3 expected files present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "entity shards carry frontmatter"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "freshness stamps present"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "Scope Lock excludes labels - an entity shard for them is scope creep"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) [runs: 9, 9, 9] \ufffd All Scope Lock inclusions modeled, zero scope creep, activity feed correctly derived on read with no event table; Full conventions fidelity: plural snake_case tables, UUID v4 id PKs, timestamptz UTC audit columns, explicit varchar limits, hard deletes, single Core module, no local User entity; Sharding fully correct: cross-cutting content only in index.md, one entity per shard, well-formed frontmatter, kebab-case singular filenames, freshness stamps under every H1"
+            }
+          ],
+          "secs": 279
+        }
+      ],
+      "pass_rate": "100%",
+      "judge_scores": [
+        8,
+        8,
+        9
+      ],
+      "failing_checks": {}
+    }
+  }
+}

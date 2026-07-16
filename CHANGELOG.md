@@ -2,6 +2,16 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.7] — 2026-07-16
+
+### Added
+- **Multi-output eval support**: `output` in assertions.json may be a directory (concatenated with `<!-- FILE: … -->` headers for text/judge checks, archived/restored as trees); new `spec_validator` and `files_exist` check types; judge reference anchors accept trees.
+- **case-005-data-model-from-strategy** — spec-generation covered at last: strategy-stage fixture (stakeholder + architecture, no specs), hand-written 4-entity reference tree, six-dimension rubric. First results: **3/3 deterministic (validate-specs --strict clean on every generated tree), judge 8.3 (8–9)** — exact scope coverage, zero scope creep. **Prompt coverage: 5/5.**
+- **EXP-003 (read-order sensitivity)**: inverted context read order scored identically to control (9.0 vs 9.0) — read order is not a lever for agentic sessions; a chat-assembly-only ordering note was added to context-compilation.md and the pending U-curve recommendation resolved.
+
+### Fixed
+- Whole-directory output cleanup no longer deletes the tracked `output/.gitkeep` anchor.
+
 ## [2.4.6] — 2026-07-16
 
 Access-confound fix, judge robustness, and the post-fix canonical baseline.
