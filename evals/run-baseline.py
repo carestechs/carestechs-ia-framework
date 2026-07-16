@@ -85,7 +85,7 @@ def archive_output(out_path, archive_base):
     """Archive a file output as <base>.md, a directory output as <base>/."""
     archive_base.parent.mkdir(parents=True, exist_ok=True)
     if out_path.is_file():
-        shutil.copy2(out_path, archive_base.with_suffix(".md"))
+        shutil.copy2(out_path, archive_base.with_suffix(out_path.suffix or ".md"))
     else:
         shutil.copytree(out_path, archive_base,
                         ignore=shutil.ignore_patterns("judge-prompt.md"))
