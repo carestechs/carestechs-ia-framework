@@ -1,0 +1,884 @@
+{
+  "label": "v2.4.6",
+  "samples_per_case": 0,
+  "gen_cmd": "claude -p \"Read GENERATE.md in the current directory and follow it exactly.\" --permission-mode acceptEdits --allowedTools \"Bash(python *)\" --add-dir \"C:\\Users\\carlos.escalona\\Desktop\\Repos\\carestechs\\carestechs-ia-framework\"",
+  "judge": true,
+  "cases": {
+    "case-001-task-labels": {
+      "samples": [
+        {
+          "sample": "sample-1.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture (label entity/endpoints/screen shards, code, migrations) \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) [runs: 9, 9, 8] \u2014 re-judged after retry-hardening; see task bcny3ripy"
+            }
+          ]
+        },
+        {
+          "sample": "sample-2.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "14 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture (label entity/endpoints/screen shards, code, migrations) \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) [runs: 9, 9, 9] \u2014 re-judged after retry-hardening; see task bcny3ripy"
+            }
+          ]
+        },
+        {
+          "sample": "sample-3.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture (label entity/endpoints/screen shards, code, migrations) \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) [runs: 9, 9, 9] \u2014 Clean single-purpose decomposition with buildable dependency graph and no false parallelism; All 6 ACs covered with plausible, traceable attributions; High spec fidelity: /api/v1 base path, catalog-correct 409 conflict for duplicates, envelope/pagination/naming conventions all honored"
+            }
+          ]
+        }
+      ],
+      "pass_rate": "100%",
+      "judge_scores": [
+        9,
+        9,
+        9
+      ],
+      "failing_checks": {}
+    },
+    "case-002-overdue-timezone": {
+      "samples": [
+        {
+          "sample": "sample-1.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "9 tasks (allowed 4-12)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "bugfix lists start with Phase 1 investigation tasks \u2014 investigation precedes the fix"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the tasks must identify the root cause, not patch the symptom"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) [runs: 8, 7, 8] \u2014 Investigation-first structure sound: fixes gated on confirmed root cause, fix confined to the predicate path; T-002 is the rubric-flagged invented producer-contract step, misclassifying an internal bug as boundary-crossing; Regression coverage exceeds requirements: exact scenario, local-midnight boundary, positive offset, DST, dropped-param API tests"
+            }
+          ]
+        },
+        {
+          "sample": "sample-2.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "7 tasks (allowed 4-12)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "bugfix lists start with Phase 1 investigation tasks \u2014 investigation precedes the fix"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the tasks must identify the root cause, not patch the symptom"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) [runs: 8, 8, 8] \u2014 Invented producer-contract task T-002 on a bug the evidence shows is internal, contradicting the prompt's cross-boundary condition and sitting on the fix's dependency path; Investigation-first structure, root-cause-scoped fix, and dependency ordering are all correct; Regression coverage exceeds the rubric: exact scenario, correct PDT boundary instants, positive offset, DST, default/exclusion/invalid-tz cases"
+            }
+          ]
+        },
+        {
+          "sample": "sample-3.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "8 tasks (allowed 4-12)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "bugfix lists start with Phase 1 investigation tasks \u2014 investigation precedes the fix"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the tasks must identify the root cause, not patch the symptom"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) [runs: 8, 8, 8] \u2014 All six rubric dimensions substantively met: investigation-first ordering, fix gated on confirmed root cause, scoped to the predicate path; Regression coverage exceeds the anchor: exact scenario, three-zone local-midnight boundaries, positive-offset early-flip, done/null exclusions, fails-before-fix proof, plus route-layer integration tests; Spec fidelity strong: /api/v1 routes, envelope with meta, catalog-only error codes, correct date-only UTC due_date semantics, parameter-bound tz predicate matching the overdue rule"
+            }
+          ]
+        }
+      ],
+      "pass_rate": "100%",
+      "judge_scores": [
+        8,
+        8,
+        8
+      ],
+      "failing_checks": {}
+    },
+    "case-003-review-flawed-tasks": {
+      "samples": [
+        {
+          "sample": "sample-1.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the review must reach an explicit verdict"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "four planted semantic defects (dependency inversion, scope creep, type mismatch, AC coverage gap) must force a revise verdict"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect: T-002 (Frontend dialog) consumes the label endpoints created only in T-004 but depends solely on T-001 \u2014 dependency inversion any competent review must flag"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect: T-005's label usage analytics export endpoint is outside the work item's Included scope \u2014 scope creep any competent review must flag"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect: the coverage table omits AC-5 (delete confirmation) \u2014 5 rows for 6 ACs"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            }
+          ]
+        },
+        {
+          "sample": "sample-2.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the review must reach an explicit verdict"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "four planted semantic defects (dependency inversion, scope creep, type mismatch, AC coverage gap) must force a revise verdict"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect: T-002 (Frontend dialog) consumes the label endpoints created only in T-004 but depends solely on T-001 \u2014 dependency inversion any competent review must flag"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect: T-005's label usage analytics export endpoint is outside the work item's Included scope \u2014 scope creep any competent review must flag"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect: the coverage table omits AC-5 (delete confirmation) \u2014 5 rows for 6 ACs"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            }
+          ]
+        },
+        {
+          "sample": "sample-3.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the review must reach an explicit verdict"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "four planted semantic defects (dependency inversion, scope creep, type mismatch, AC coverage gap) must force a revise verdict"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect: T-002 (Frontend dialog) consumes the label endpoints created only in T-004 but depends solely on T-001 \u2014 dependency inversion any competent review must flag"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect: T-005's label usage analytics export endpoint is outside the work item's Included scope \u2014 scope creep any competent review must flag"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect: the coverage table omits AC-5 (delete confirmation) \u2014 5 rows for 6 ACs"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            }
+          ]
+        }
+      ],
+      "pass_rate": "100%",
+      "judge_scores": [],
+      "failing_checks": {}
+    },
+    "case-004-date-logic-extraction": {
+      "samples": [
+        {
+          "sample": "sample-1.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "9 tasks (allowed 4-14)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "Phase 0 safety net \u2014 a coverage baseline / characterization tests must precede any restructuring"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "refactor-tasks' Type enum delta \u2014 removing the old duplicated code is a Cleanup-typed task"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            }
+          ]
+        },
+        {
+          "sample": "sample-2.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "9 tasks (allowed 4-14)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "Phase 0 safety net \u2014 a coverage baseline / characterization tests must precede any restructuring"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "refactor-tasks' Type enum delta \u2014 removing the old duplicated code is a Cleanup-typed task"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            }
+          ]
+        },
+        {
+          "sample": "sample-3.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "10 tasks (allowed 4-14)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "Phase 0 safety net \u2014 a coverage baseline / characterization tests must precede any restructuring"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "refactor-tasks' Type enum delta \u2014 removing the old duplicated code is a Cleanup-typed task"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            }
+          ]
+        }
+      ],
+      "pass_rate": "100%",
+      "judge_scores": [],
+      "failing_checks": {}
+    },
+    "case-901-task-labels-minimal-context": {
+      "samples": [
+        {
+          "sample": "sample-1.md",
+          "generated": true,
+          "passed": false,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "14 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "FAIL",
+              "type": "judge",
+              "detail": "score 6/10 (min 7) [runs: 6, 7, 6] \u2014 Spec fidelity seriously deficient: asserts the project has no spec documentation and marks existing docs/data-model/index.md, docs/api-spec/index.md, and components.md as (new), contradicting provided ground truth that was derivable from CLAUDE.md; should have been an open question, not a guess; Same false premise drives three bootstrap Documentation tasks (scope creep) and re-creation of existing Error Catalog rows; also invents an .ai-framework/prompts/ path CLAUDE.md contradicts; Technical contract details otherwise excellent and better than the reference anchor: /api/v1 base path, 409 conflict for duplicates per catalog, plural snake_case tables, correct envelope, shard and migration naming"
+            }
+          ]
+        },
+        {
+          "sample": "sample-2.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 7/10 (min 7) [runs: 7, 7, 7] \u2014 Falsely asserts no spec docs exist and marks existing index/components files as (new), recreating authoritative documents (spec/scope-fidelity penalty); Invented framework path .ai-framework/prompts/ contradicts CLAUDE.md's prompt location; Otherwise strong: correct /api/v1 routes, envelope, conflict/validation-error catalog usage, naming conventions, buildable dependencies, full 6-AC coverage, highly concrete plan-ability"
+            }
+          ]
+        },
+        {
+          "sample": "sample-3.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 7/10 (min 7) [runs: 7, 7, 7] \u2014 Excellent granularity, buildable dependency graph, full AC coverage, and concrete plan-ability; core contracts (base path /api/v1, envelope+meta, 409 conflict for duplicates, naming conventions) match ground truth; False premise that no spec docs exist: T-001/T-003/T-008 recreate existing data-model/api-spec/ui-spec indexes and re-seed the existing Error Catalog while dropping unauthorized \u2014 contradicts ground truth and exceeds scope; Minor spec gaps: migration ACs omit required created_at/updated_at timestamptz columns; PUT used where the project's demonstrated update pattern is PATCH"
+            }
+          ]
+        }
+      ],
+      "pass_rate": "67%",
+      "judge_scores": [
+        6,
+        7,
+        7
+      ],
+      "failing_checks": {
+        "judge": 1
+      }
+    },
+    "case-902-ablation-no-antiexample": {
+      "samples": [
+        {
+          "sample": "sample-1.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) [runs: 9, 9, 9] \u2014 Buildable dependency graph with docs-first sequencing and no false parallelism; All 6 ACs covered with plausible, content-backed attributions; High spec fidelity: /api/v1 base path, envelope+meta, catalog-only error codes (409 conflict for duplicates), plural snake_case tables, kebab-case shards, index/changelog discipline"
+            }
+          ]
+        },
+        {
+          "sample": "sample-2.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 9/10 (min 7) [runs: 9, 9, 9] \u2014 All six ACs covered with plausible task attributions and a coherent, buildable dependency graph; Spec fidelity is strong: /api/v1 base path, envelope and meta usage, conflict code for duplicates, and all naming conventions match ground truth; Highly plannable: concrete file lists and technical notes (23505 handling, EXISTS subquery, batched hydration)"
+            }
+          ]
+        },
+        {
+          "sample": "sample-3.md",
+          "generated": true,
+          "passed": true,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "validator",
+              "detail": "validator clean"
+            },
+            {
+              "status": "PASS",
+              "type": "task_count",
+              "detail": "15 tasks (allowed 6-16)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "coverage table required"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the feature creates files that do not exist in the fixture \u2014 at least one path must be marked (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \u2014 fixture is React/Express"
+            },
+            {
+              "status": "PASS",
+              "type": "paths_exist",
+              "detail": "all referenced files exist or are (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "shard_refs_resolve",
+              "detail": "all shard references resolve or are sanctioned (new)"
+            },
+            {
+              "status": "PASS",
+              "type": "judge",
+              "detail": "score 8/10 (min 7) [runs: 9, 8, 8] \u2014 All 6 ACs covered with plausible attributions; dependency graph fully buildable with no false parallelism; Strong spec fidelity: /api/v1 base paths, envelope+meta, only existing error codes with duplicate-name correctly mapped to 409 conflict; Highly plannable: concrete files, indexes, Zod and query details per task; scope additions flagged as open questions"
+            }
+          ]
+        }
+      ],
+      "pass_rate": "100%",
+      "judge_scores": [
+        9,
+        9,
+        8
+      ],
+      "failing_checks": {}
+    }
+  }
+}

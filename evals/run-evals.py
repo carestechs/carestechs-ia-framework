@@ -154,22 +154,31 @@ def run_judge(check, case_dir, out_text, judge_opts):
     n_samples = max(1, int(check.get("judge_samples", judge_opts["samples"])))
     scores, all_reasons = [], []
     for _ in range(n_samples):
-        try:
-            proc = subprocess.run(cmd, shell=True, capture_output=True, text=True,
-                                  timeout=judge_opts["timeout"])
-        except subprocess.TimeoutExpired:
-            return "FAIL", f"judge command timed out after {judge_opts['timeout']}s"
-        except OSError as exc:
-            return "FAIL", f"judge command failed to start: {exc}"
-        verdicts = JSON_VERDICT_RE.findall(proc.stdout or "")
-        if not verdicts:
-            tail = (proc.stdout or proc.stderr or "").strip().splitlines()[-3:]
-            return "FAIL", "no JSON verdict in judge output: " + " / ".join(tail)
-        try:
-            verdict = json.loads(verdicts[-1])
-            scores.append(int(verdict["score"]))
-        except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
-            return "FAIL", f"unparseable judge verdict {verdicts[-1]!r}: {exc}"
+        verdict = None
+        last_problem = ""
+        for _attempt in range(3):  # judges occasionally omit the JSON line — retry
+            try:
+                proc = subprocess.run(cmd, shell=True, capture_output=True, text=True,
+                                      encoding="utf-8", errors="replace",
+                                      timeout=judge_opts["timeout"])
+            except subprocess.TimeoutExpired:
+                return "FAIL", f"judge command timed out after {judge_opts['timeout']}s"
+            except OSError as exc:
+                return "FAIL", f"judge command failed to start: {exc}"
+            verdicts = JSON_VERDICT_RE.findall(proc.stdout or "")
+            if not verdicts:
+                tail = (proc.stdout or proc.stderr or "").strip().splitlines()[-3:]
+                last_problem = "no JSON verdict in judge output: " + " / ".join(tail)
+                continue
+            try:
+                verdict = json.loads(verdicts[-1])
+                scores.append(int(verdict["score"]))
+                break
+            except (json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+                last_problem = f"unparseable judge verdict {verdicts[-1]!r}: {exc}"
+                verdict = None
+        if verdict is None:
+            return "FAIL", f"{last_problem} (after 3 attempts)"
         all_reasons.append(verdict.get("reasons", []))
 
     # median of N runs; near-threshold single scores are noisy (see evals/experiments.md)
@@ -197,7 +206,7 @@ def run_check(check, case_dir, out_text, out_path, judge_opts):
             cmd += ["--root", str(case_dir / check["root"])]
         if check.get("strict"):
             cmd += ["--strict"]
-        proc = subprocess.run(cmd, capture_output=True, text=True)
+        proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
         if proc.returncode == 0:
             return "PASS", "validator clean"
         tail = "\n".join((proc.stdout or "").strip().splitlines()[-6:])

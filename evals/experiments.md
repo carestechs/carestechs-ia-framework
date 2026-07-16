@@ -151,3 +151,32 @@ probing agents discovered).
 
 **Status**: pending re-run — requires a fresh post-fix baseline for the control arm
 plus 3 variant samples, so both arms read their prompts verbatim.
+
+## EXP-002 — Anti-example ablation, RUN 2 (2026-07-15/16): completed under fixed access
+
+**Setup.** Post-access-fix baseline `v2.4.6` (all agents read their prompts verbatim,
+verified; `--add-dir` in the gen command; median-of-3 judging throughout). Control =
+case-001 (full feature-tasks prompt); variant = case-902 (identical except the
+Anti-Example section stripped, budgets retained).
+
+| | Control (with anti-example) | Variant (without) |
+|---|---|---|
+| Deterministic | 3/3 | 3/3 |
+| Judge (median-of-3 per sample) | **9.0** — 9 [9,9,8], 9 [9,9,9], 9 [9,9,9] | **8.7** — 9 [9,9,9], 9 [9,9,9], 8 [9,8,8] |
+
+**Verdict: no measurable effect at n=3** — scores overlap, deterministic identical.
+The contrastive anti-example neither helps nor harms this model on this case. By the
+framework's own "every element earns its place" standard the anti-examples are on
+probation: kept for now as cheap insurance (~350 tokens; the research evidence is
+strongest for weaker models and noisier contexts), re-test on the next model change.
+
+**Bonus: EXP-001 replicated under correct access.** The same baseline regenerated the
+no-docs arm (case-901): judge **6.7 (6–7), one sample failing at median 6** vs
+control 9.0. The docs gap *widened* from ~1.3–2 to ~2.3 points once all agents
+actually read the prompts — the strongest confirmation yet that the sharded spec
+docs earn their context.
+
+**v2.4.6 is the canonical regression floor** (old baselines carry the access caveat):
+deterministic 18/18 across all 6 cases; judged medians — feature 9.0, bugfix 8.0,
+ablation-arm 8.7, no-docs-arm 6.7. Judge robustness: verdict-line omissions by the
+judge model are now retried (3 attempts) instead of failing the check.

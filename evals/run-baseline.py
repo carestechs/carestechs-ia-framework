@@ -56,7 +56,7 @@ def generate_once(case_dir, cmd, timeout):
     t0 = time.time()
     try:
         proc = subprocess.run(cmd, shell=True, cwd=str(case_dir),
-                              capture_output=True, text=True, timeout=timeout)
+                              capture_output=True, text=True, encoding="utf-8", errors="replace", timeout=timeout)
     except subprocess.TimeoutExpired:
         return False, f"generation timed out ({timeout}s)", time.time() - t0
     if not out_path.is_file():
@@ -65,11 +65,11 @@ def generate_once(case_dir, cmd, timeout):
     return True, "", time.time() - t0
 
 
-def check_case(case_name, judge):
+def check_case(case_name, judge, judge_samples=1):
     cmd = [sys.executable, str(EVALS_DIR / "run-evals.py"), "--case", case_name]
     if judge:
-        cmd.append("--judge")
-    proc = subprocess.run(cmd, capture_output=True, text=True)
+        cmd += ["--judge", "--judge-samples", str(judge_samples)]
+    proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", errors="replace")
     checks = [(m.group(1), m.group(2), m.group(3).strip())
               for m in CHECK_LINE_RE.finditer(proc.stdout or "")]
     passed = bool(checks) and all(s != "FAIL" for s, _, _ in checks)
@@ -88,7 +88,7 @@ def run_case(case_dir, args, label_dir):
             results.append({"sample": i, "generated": False, "error": err,
                             "secs": round(secs)})
             continue
-        passed, checks = check_case(name, args.judge)
+        passed, checks = check_case(name, args.judge, args.judge_samples)
         archive = label_dir / name / f"sample-{i}.md"
         archive.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(out_path, archive)
@@ -104,7 +104,7 @@ def run_case(case_dir, args, label_dir):
     return name, results
 
 
-def rescore(label, judge):
+def rescore(label, judge, judge_samples=1):
     label_dir = EVALS_DIR / "baselines" / label
     if not label_dir.is_dir():
         print(f"no baseline named {label!r} under evals/baselines/", file=sys.stderr)
@@ -122,7 +122,7 @@ def rescore(label, judge):
         results = []
         for sample in sorted(archived_case.glob("sample-*.md")):
             shutil.copy2(sample, out_path)
-            passed, checks = check_case(archived_case.name, judge)
+            passed, checks = check_case(archived_case.name, judge, judge_samples)
             out_path.unlink()
             judge_prompt = case_dir / "output" / "judge-prompt.md"
             if judge_prompt.exists():
@@ -146,12 +146,14 @@ def main():
     ap.add_argument("--timeout", type=int, default=900,
                     help="per-generation timeout in seconds (default 900)")
     ap.add_argument("--judge", action="store_true", help="also run judge checks per sample")
+    ap.add_argument("--judge-samples", type=int, default=1,
+                    help="judge runs per check, median taken (default 1)")
     ap.add_argument("--rescore", default="",
                     help="re-check archived samples of this baseline label (no generation)")
     args = ap.parse_args()
 
     if args.rescore:
-        all_results, label_dir = rescore(args.rescore, args.judge)
+        all_results, label_dir = rescore(args.rescore, args.judge, args.judge_samples)
         if all_results is None:
             return 1
         args.samples = 0  # informational only in the JSON

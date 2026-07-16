@@ -2,6 +2,20 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.4.6] — 2026-07-16
+
+Access-confound fix, judge robustness, and the post-fix canonical baseline.
+
+### Fixed
+- **Headless eval generation agents were permission-blocked from reading the framework prompts** (cwd = case dir); they had been reverse-engineering the schema via validator probing and a `Bash(python *)` sandbox bypass, sharing findings through project auto-memory. Gen command now passes `--add-dir <repo root>` (verified); the schema-bearing memory was purged. EXP-002 run 1 was aborted as invalid; the old baselines carry an access caveat.
+- Judge verdict-line omissions are retried (3 attempts) instead of failing the check; subprocess captures forced to UTF-8; validator no longer parses `---` separators as file entries.
+
+### Added
+- **`judge_samples` / `--judge-samples`**: median-of-N judging, validated to stabilize near-threshold scores (a 6↔8 flip-flop sample settled at 7).
+- **Baseline `v2.4.6`** — the canonical post-fix regression floor: 18/18 deterministic across all 6 cases; judged medians (median-of-3): feature 9.0, bugfix 8.0, ablation arm 8.7, no-docs arm 6.7.
+- **EXP-002 run 2 (anti-example ablation) completed**: control 9.0 vs variant 8.7 — no measurable effect at n=3; anti-examples kept as cheap insurance, on probation per the "every element earns its place" standard.
+- **EXP-001 replicated under correct access**: docs gap widened to ~2.3 points (9.0 vs 6.7, one no-docs sample failing) — strongest confirmation that the sharded spec docs earn their context.
+
 ## [2.4.5] — 2026-07-15
 
 ### Added

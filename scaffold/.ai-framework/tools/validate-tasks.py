@@ -189,7 +189,7 @@ def check_schema(path, tasks, rep, root):
             parsed = []
             for ln, text in bullets:
                 m = FILE_BULLET_RE.match(text)
-                if m and m.group("path"):
+                if m and m.group("path") and set(m.group("path")) - set("-*_"):
                     parsed.append((ln, m.group("path"), bool(m.group("new"))))
             if not parsed:
                 rep.error(path, t.fields["Files to Modify/Create"][0],
