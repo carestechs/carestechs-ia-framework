@@ -109,3 +109,45 @@ predicts. Arm A's tight 9–9 range was stable across passes. Practical rule ado
 treat single judge scores within ±1 of `min_score` as inconclusive; for gating
 decisions, run the judge 3× and take the median. Candidate runner improvement:
 a `judge_samples` key automating this.
+
+### Addendum 3 (2026-07-15): median-of-3 judging validated
+
+With `judge_samples` (median of N): arm B samples score **7 [7,7,7], 8 [7,8,8],
+7 [8,7,7]** — the sample that flip-flopped 6↔8 across single passes now sits stably
+at 7. Adopted: `--judge-samples 3` for any score that gates a decision.
+
+## EXP-002 — Anti-example ablation (2026-07-15): RUN 1 ABORTED — access confound
+
+**Question.** Do the contrastive Anti-Example blocks (v2.4.1) earn their tokens?
+**Design.** case-902: identical fixture to case-001 via sibling refs; prompt variant
+with only the Anti-Example section stripped (1,456 chars; budgets retained).
+
+**Aborted** mid-run when project memory surfaced an infrastructure fact that
+invalidates the comparison: headless generation agents (cwd = case dir) were
+**permission-blocked from reading the framework prompts** all along. Verified
+empirically: a Read of `prompts/base-template.md` from a case dir hangs on an
+unanswerable permission request; with `--add-dir <repo root>` it succeeds. Agents had
+been reverse-engineering the schema by probing `validate-tasks.py` (the stray
+`probe.md` was evidence) and later reading files via a `Bash(python *)` sandbox
+bypass, then sharing the recovered schema through project auto-memory across runs.
+
+Consequences:
+- **EXP-002 run 1 invalid**: the control arm (baseline) never reliably read the full
+  prompt (anti-example included), while the variant arm's prompt sat readable inside
+  its case dir — the arms differed in ACCESS, not just content. Partial samples
+  discarded.
+- **Baseline v2.4.2 caveat**: its samples measure the pipeline under degraded prompt
+  access (GENERATE.md restatements + validator feedback carried the schema). Still
+  valid as a regression floor for that configuration, but not comparable to runs made
+  after the access fix.
+- **EXP-001 remains internally valid**: both arms ran under the same access handicap,
+  and its variable (spec docs in the fixture) was unaffected — fixture files live
+  inside the case dirs.
+
+**Fixes applied**: `run-baseline.py` default gen command now passes `--add-dir
+"<repo root>"`; the schema-bearing memory was purged and replaced with the access
+lesson; validator no longer parses `---` separators as file entries (a gotcha the
+probing agents discovered).
+
+**Status**: pending re-run — requires a fresh post-fix baseline for the control arm
+plus 3 variant samples, so both arms read their prompts verbatim.

@@ -115,7 +115,8 @@ def extract_file_entries(text):
                 in_field = False
                 continue
             m = FILE_BULLET_RE.match(line)
-            if m and m.group("path") and not line.strip().startswith("- ["):
+            if m and m.group("path") and not line.strip().startswith("- [") \
+                    and set(m.group("path")) - set("-*_"):
                 entries.append((m.group("path"), bool(m.group("new"))))
     return entries
 

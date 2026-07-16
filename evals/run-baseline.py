@@ -37,10 +37,15 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 EVALS_DIR = Path(__file__).resolve().parent
+REPO_ROOT = EVALS_DIR.parent
 CHECK_LINE_RE = re.compile(r"^\s+(PASS|FAIL|SKIP)\s+([a-z_]+):\s*(.*)$", re.MULTILINE)
 JUDGE_SCORE_RE = re.compile(r"score (\d+)/10")
-DEFAULT_GEN_CMD = ('claude -p "Read GENERATE.md in the current directory and follow it '
-                   'exactly." --permission-mode acceptEdits --allowedTools "Bash(python *)"')
+# --add-dir is REQUIRED: headless agents with cwd = case dir are otherwise
+# permission-blocked from reading the framework prompts the case exercises
+# (discovered 2026-07-15; without it agents reverse-engineer the schema).
+DEFAULT_GEN_CMD = (f'claude -p "Read GENERATE.md in the current directory and follow it '
+                   f'exactly." --permission-mode acceptEdits --allowedTools "Bash(python *)" '
+                   f'--add-dir "{REPO_ROOT}"')
 
 
 def generate_once(case_dir, cmd, timeout):
