@@ -1,0 +1,206 @@
+{
+  "label": "v2.4.6-review-impl",
+  "samples_per_case": 3,
+  "gen_cmd": "claude -p \"Read GENERATE.md in the current directory and follow it exactly.\" --permission-mode acceptEdits --allowedTools \"Bash(python *)\" --add-dir \"C:\\Users\\carlos.escalona\\Desktop\\Repos\\carestechs\\carestechs-ia-framework\"",
+  "judge": false,
+  "cases": {
+    "case-010-review-t002-impl": {
+      "samples": [
+        {
+          "sample": 1,
+          "generated": true,
+          "passed": false,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "line_count",
+              "detail": "34 lines (allowed 1-130)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the review must reach an explicit verdict section (prompt Output Format)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "five planted defects \ufffd one CONFIRMED high and three CONFIRMED medium \ufffd must force a revise verdict per the Step 4 rules"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the review is anchored to the task under review"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 1 (AC violation, high): duplicate label names are created with 201 \ufffd no uniqueness check, no Error Catalog 409 conflict; any competent review names the missing conflict/409 behavior"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 2 (spec sync, medium): the diff adds endpoints/labels.md but never touches docs/api-spec/index.md; plan Step 8 requires Endpoint Summary rows AND a Changelog entry, so a competent review names at least one. Tightened from '(?i)index\\.md|endpoint summary': 'index.md' self-matches via the mandatory evidence quote in the review header and via Error Catalog citations in other findings"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 3 (scope creep, medium): GET /api/v1/labels/export (CSV) appears in no task and no plan"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 4 (undocumented plan deviation, medium): the plan prescribes PATCH /api/v1/labels/{id}, the diff ships PUT with no deviation note. Case-SENSITIVE on purpose: '(?i)PUT' matches 'input'/'output' in any header, and '(?i)deviat' matches a clean-point remark like 'no deviations found' from a review that missed it; a review that flags the swap must name the PUT verb"
+            },
+            {
+              "status": "FAIL",
+              "type": "must_match",
+              "detail": "planted defect 5 (convention drift, low/PLAUSIBLE): name-normalization business logic sits inline in the route handler module instead of the repository/service layer (pattern: '(?i)route handler|service')"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "findings must carry the prompt's CONFIRMED/PLAUSIBLE classification \ufffd defects 1-4 are mechanically verifiable against the diff, plan, task, and frozen evidence"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \ufffd fixture is React/Express"
+            }
+          ],
+          "secs": 172
+        },
+        {
+          "sample": 2,
+          "generated": true,
+          "passed": false,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "line_count",
+              "detail": "31 lines (allowed 1-130)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the review must reach an explicit verdict section (prompt Output Format)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "five planted defects \ufffd one CONFIRMED high and three CONFIRMED medium \ufffd must force a revise verdict per the Step 4 rules"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the review is anchored to the task under review"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 1 (AC violation, high): duplicate label names are created with 201 \ufffd no uniqueness check, no Error Catalog 409 conflict; any competent review names the missing conflict/409 behavior"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 2 (spec sync, medium): the diff adds endpoints/labels.md but never touches docs/api-spec/index.md; plan Step 8 requires Endpoint Summary rows AND a Changelog entry, so a competent review names at least one. Tightened from '(?i)index\\.md|endpoint summary': 'index.md' self-matches via the mandatory evidence quote in the review header and via Error Catalog citations in other findings"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 3 (scope creep, medium): GET /api/v1/labels/export (CSV) appears in no task and no plan"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 4 (undocumented plan deviation, medium): the plan prescribes PATCH /api/v1/labels/{id}, the diff ships PUT with no deviation note. Case-SENSITIVE on purpose: '(?i)PUT' matches 'input'/'output' in any header, and '(?i)deviat' matches a clean-point remark like 'no deviations found' from a review that missed it; a review that flags the swap must name the PUT verb"
+            },
+            {
+              "status": "FAIL",
+              "type": "must_match",
+              "detail": "planted defect 5 (convention drift, low/PLAUSIBLE): name-normalization business logic sits inline in the route handler module instead of the repository/service layer (pattern: '(?i)route handler|service')"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "findings must carry the prompt's CONFIRMED/PLAUSIBLE classification \ufffd defects 1-4 are mechanically verifiable against the diff, plan, task, and frozen evidence"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \ufffd fixture is React/Express"
+            }
+          ],
+          "secs": 204
+        },
+        {
+          "sample": 3,
+          "generated": true,
+          "passed": false,
+          "checks": [
+            {
+              "status": "PASS",
+              "type": "line_count",
+              "detail": "27 lines (allowed 1-130)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the review must reach an explicit verdict section (prompt Output Format)"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "five planted defects \ufffd one CONFIRMED high and three CONFIRMED medium \ufffd must force a revise verdict per the Step 4 rules"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "the review is anchored to the task under review"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 1 (AC violation, high): duplicate label names are created with 201 \ufffd no uniqueness check, no Error Catalog 409 conflict; any competent review names the missing conflict/409 behavior"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 2 (spec sync, medium): the diff adds endpoints/labels.md but never touches docs/api-spec/index.md; plan Step 8 requires Endpoint Summary rows AND a Changelog entry, so a competent review names at least one. Tightened from '(?i)index\\.md|endpoint summary': 'index.md' self-matches via the mandatory evidence quote in the review header and via Error Catalog citations in other findings"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 3 (scope creep, medium): GET /api/v1/labels/export (CSV) appears in no task and no plan"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "planted defect 4 (undocumented plan deviation, medium): the plan prescribes PATCH /api/v1/labels/{id}, the diff ships PUT with no deviation note. Case-SENSITIVE on purpose: '(?i)PUT' matches 'input'/'output' in any header, and '(?i)deviat' matches a clean-point remark like 'no deviations found' from a review that missed it; a review that flags the swap must name the PUT verb"
+            },
+            {
+              "status": "FAIL",
+              "type": "must_match",
+              "detail": "planted defect 5 (convention drift, low/PLAUSIBLE): name-normalization business logic sits inline in the route handler module instead of the repository/service layer (pattern: '(?i)route handler|service')"
+            },
+            {
+              "status": "PASS",
+              "type": "must_match",
+              "detail": "findings must carry the prompt's CONFIRMED/PLAUSIBLE classification \ufffd defects 1-4 are mechanically verifiable against the diff, plan, task, and frozen evidence"
+            },
+            {
+              "status": "PASS",
+              "type": "must_not_match",
+              "detail": "stack leak \ufffd fixture is React/Express"
+            }
+          ],
+          "secs": 154
+        }
+      ],
+      "pass_rate": "0%",
+      "judge_scores": [],
+      "failing_checks": {
+        "must_match": 3
+      }
+    }
+  }
+}

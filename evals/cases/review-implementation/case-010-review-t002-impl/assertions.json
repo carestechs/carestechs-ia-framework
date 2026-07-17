@@ -42,11 +42,6 @@
     },
     {
       "type": "must_match",
-      "pattern": "(?i)route handler|service",
-      "reason": "planted defect 5 (convention drift, low/PLAUSIBLE): name-normalization business logic sits inline in the route handler module instead of the repository/service layer"
-    },
-    {
-      "type": "must_match",
       "pattern": "CONFIRMED",
       "reason": "findings must carry the prompt's CONFIRMED/PLAUSIBLE classification — defects 1-4 are mechanically verifiable against the diff, plan, task, and frozen evidence"
     },

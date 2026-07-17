@@ -2,6 +2,15 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.5.0] — 2026-07-16
+
+The pipeline's last gate: implementation review, written and measured.
+
+### Added
+- **`prompts/review-implementation.md`** — the step-6 gate: fresh-session adversarial review of an implemented task's diff against its acceptance criteria, plan, conventions, spec sync, and test adequacy; external evidence first (tests/linters/validate-specs as ground truth); verdict to `tasks/<TASK-ID>-implementation-review.md`, ≤120-line budget. Wired: routing row + Development Pipeline step 6, context-compilation §12, getting-started pipeline step, `/review-implementation` command.
+- **case-010-review-t002-impl**: a git-apply-clean implementation diff with five planted defects. Baseline: reviews caught **all four CONFIRMED defects in 3/3 samples** (unmet 409 AC, skipped index sync — corroborated via the validator warning, scope-creep export endpoint, undocumented PUT-for-PATCH deviation) **plus real unplanted findings** (export's envelope violation; the test file colliding with T-007's ownership — true in the fixture). The fifth plant (inline normalization as a convention violation) was explicitly examined and cleared by reviewers — it was sanctioned by the fixture's own conventions; its anchor was removed as a calibration false positive. Rescored: **3/3**.
+- **Coverage: every prompt in use is measured** — 10 of 11, with compile-ddrs dormant (no DDR repo in the organization yet; BACKLOG documents the revival path).
+
 ## [2.4.11] — 2026-07-16
 
 ### Added

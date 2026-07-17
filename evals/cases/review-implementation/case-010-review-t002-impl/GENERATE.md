@@ -39,3 +39,5 @@ Follow `../../../../prompts/review-implementation.md` **end-to-end** — Require
 ## Output
 
 Write the complete review to `output/review.md` (relative to this directory). The file **is** the deliverable — not chat output. The framework's usual `tasks/T-002-implementation-review.md` location does not apply inside the eval harness; `output/review.md` replaces it.
+
+> **Calibration note (2026-07-16):** planted defect 5 (inline name-normalization as a convention violation) proved borderline — the fixture's own CLAUDE.md sanctions validation beside handlers, and baseline reviewers explicitly examined and cleared it. Its anchor was removed from assertions; flagging it remains acceptable but is not required.
