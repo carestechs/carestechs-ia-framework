@@ -1,0 +1,59 @@
+{
+  "output": "output/review.md",
+  "checks": [
+    {
+      "type": "line_count",
+      "max": 130
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)## verdict",
+      "reason": "the review must reach an explicit verdict section (prompt Output Format)"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)revise",
+      "reason": "five planted defects — one CONFIRMED high and three CONFIRMED medium — must force a revise verdict per the Step 4 rules"
+    },
+    {
+      "type": "must_match",
+      "pattern": "T-002",
+      "reason": "the review is anchored to the task under review"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)409|conflict",
+      "reason": "planted defect 1 (AC violation, high): duplicate label names are created with 201 — no uniqueness check, no Error Catalog 409 conflict; any competent review names the missing conflict/409 behavior"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)endpoint summary|changelog",
+      "reason": "planted defect 2 (spec sync, medium): the diff adds endpoints/labels.md but never touches docs/api-spec/index.md; plan Step 8 requires Endpoint Summary rows AND a Changelog entry, so a competent review names at least one. Tightened from '(?i)index\\.md|endpoint summary': 'index.md' self-matches via the mandatory evidence quote in the review header and via Error Catalog citations in other findings"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)export",
+      "reason": "planted defect 3 (scope creep, medium): GET /api/v1/labels/export (CSV) appears in no task and no plan"
+    },
+    {
+      "type": "must_match",
+      "pattern": "PUT",
+      "reason": "planted defect 4 (undocumented plan deviation, medium): the plan prescribes PATCH /api/v1/labels/{id}, the diff ships PUT with no deviation note. Case-SENSITIVE on purpose: '(?i)PUT' matches 'input'/'output' in any header, and '(?i)deviat' matches a clean-point remark like 'no deviations found' from a review that missed it; a review that flags the swap must name the PUT verb"
+    },
+    {
+      "type": "must_match",
+      "pattern": "(?i)route handler|service",
+      "reason": "planted defect 5 (convention drift, low/PLAUSIBLE): name-normalization business logic sits inline in the route handler module instead of the repository/service layer"
+    },
+    {
+      "type": "must_match",
+      "pattern": "CONFIRMED",
+      "reason": "findings must carry the prompt's CONFIRMED/PLAUSIBLE classification — defects 1-4 are mechanically verifiable against the diff, plan, task, and frozen evidence"
+    },
+    {
+      "type": "must_not_match",
+      "pattern": "(?i)angular|ngmodule|arauco",
+      "reason": "stack leak — fixture is React/Express"
+    }
+  ]
+}
