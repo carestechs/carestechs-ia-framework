@@ -2,6 +2,11 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.5.1] — 2026-07-16
+
+### Added
+- **`guides/orchestrator-integration.md`** — the per-step contract for driving the pipeline from an external orchestrator: the session contract (spawn flags, --add-dir requirement, timeouts, retry policy), per-step specifications for all ten pipeline steps (preconditions, session prompts, outputs, gate commands, commit conventions, event emissions, revise loops), mechanical parsing contracts (verdicts, dependency DAG, file-set conflict scheduling), the orchestrator-owned state boundary, and auto-accept calibration from the measured baselines.
+
 ## [2.5.0] — 2026-07-16
 
 The pipeline's last gate: implementation review, written and measured.

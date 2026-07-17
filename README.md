@@ -177,7 +177,8 @@ carestechs-ia-framework/
     ├── context-compilation.md   # CANONICAL context-selection matrix + assembly instructions
     ├── maintenance.md           # Keeping docs in sync with code
     ├── release-lifecycle.md     # Versioned vs continuous development
-    └── evaluation.md            # Measuring framework effectiveness (4 levels, event schema)
+    ├── evaluation.md            # Measuring framework effectiveness (4 levels, event schema)
+    └── orchestrator-integration.md  # Per-step contract for driving the pipeline externally
 ```
 
 ### Editing the framework
