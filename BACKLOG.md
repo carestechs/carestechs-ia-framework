@@ -14,7 +14,7 @@ are all in the state/lifecycle layer.
 |---|-----|-----------------|--------------|
 | 1 | Task blocks have no `Status:` / `Assignee:` field — per-task state lives only in the orchestrator | Optional `Status: pending \| planned \| in-progress \| implemented \| reviewed \| done` in the canonical schema; each step's session updates it as its last action; orchestrator stays authoritative, file is the human-readable mirror; validator checks the enum | State drift between orchestrator and files causes a real mistake, or a human can't tell pipeline position from artifacts |
 | 2 | No implementation record — nothing links a completed task to its branch/commit/PR | Convention: implementing session appends `**Implemented in:** <ref>` to the task block | First time a review session has to hunt for the diff |
-| 3 | No implementation-review prompt — `review-tasks.md` reviews task lists pre-implementation, not code | Sibling prompt `review-implementation.md`: fresh session, input = task block + plan + diff + ACs + CLAUDE.md; run tests/validators first; verdict to `tasks/T-XXX-implementation-review.md` | Step 6 of the pipeline starts running regularly |
+| 3 | ~~No implementation-review prompt~~ **Resolved 2026-07-16**: `prompts/review-implementation.md` written, wired (routing row, command, guides), and measured (case-010) | — | — |
 | 4 | Closing documentation task is not mandated by the task prompts | Require a final Documentation task in every generated task list, with Files to Modify/Create derived from the work item's impact tables and `validate-specs.py` passing as its acceptance criterion | Batch-at-end docs updates start missing changes |
 | 5 | No brief-closure checklist | Closure step in maintenance.md (+ optional `/close-brief` command): all tasks done, docs task done, validate-specs clean, work item Status → Completed with date, traceability updated | First brief reaches step 9 |
 
@@ -41,3 +41,5 @@ the orchestrator can detect step completion from the repo.
   within ±1 of `min_score` are noisy (same sample scored 6 and 8 across passes).
   Automate median-of-N judging for gating decisions. Revisit when a judge score
   gates a real decision.
+
+- **compile-ddrs eval coverage — DORMANT**: no DDR repo exists in the organization yet (confirmed 2026-07-16). The prompt stays shipped but unmeasured; build its eval case the way case-009 froze the real ADR repo, when a DDR repo exists.

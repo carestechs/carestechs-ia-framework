@@ -474,6 +474,60 @@ Before judging semantics, the reviewer runs the external validators — `python 
 
 ---
 
+### 12. Implementation Review
+
+**Goal**: Adversarially review an implemented task's code changes — after implementation, before the task is marked complete — verify AC satisfaction, plan adherence, scope fidelity, convention compliance, spec sync, and test adequacy.
+
+**Prompt:** `.ai-framework/prompts/review-implementation.md` — writes the review to `tasks/<TASK-ID>-implementation-review.md` (verdict + findings table).
+
+| Priority | Document | Include When | What to Include |
+|----------|----------|--------------|-----------------|
+| Required | Task Block | Always | The single `T-XXX` block under review from `tasks/<WORK-ITEM-ID>-tasks.md` — not the whole task list |
+| Required | Implementation Plan | Always | The full `plans/plan-T-XXX-short-title.md` the implementation was supposed to follow |
+| Required | Implementation Diff | Always | The diff or changed-file set, as provided by the requester (e.g., `git diff <base>..<head>` output, or a branch to inspect) |
+| Required | CLAUDE.md | Always | Full document |
+| Required | Spec Shards | Task references entities/endpoints/screens | Each spec's `index.md` + only the shards the task names, mapped via the retrieval-key naming rule |
+
+That list is exhaustive — nothing else goes into the reviewer's context. Two rules are absolute for this task type:
+
+1. **Run in a FRESH context.** Never include the implementing agent's conversation transcript or reasoning — the reviewer must not be the session that implemented the task. Same-session self-review is unreliable; the reviewer must see only the artifacts listed above.
+2. **Never include `docs/rationale/`.** As with every recipe in this guide, rationale files stay out of context.
+
+Before judging the diff, the reviewer gathers **external evidence** and treats it as ground truth: the project's test suite and linters, plus `python .ai-framework/tools/validate-specs.py` when the task touched spec shards (see the prompt's Guidance).
+
+**Example Assembly**:
+```xml
+<context>
+  <task-block>
+    [The single T-XXX task block from tasks/<WORK-ITEM-ID>-tasks.md]
+  </task-block>
+
+  <implementation-plan>
+    [Full plans/plan-T-XXX-short-title.md]
+  </implementation-plan>
+
+  <implementation-diff>
+    [git diff <base>..<head> output, or the full content of each changed file]
+  </implementation-diff>
+
+  <code-conventions>
+    [Full CLAUDE.md]
+  </code-conventions>
+
+  <spec-shards>
+    [Each spec's index.md + only the shards the task references]
+  </spec-shards>
+
+  <evidence>
+    [Raw test / linter / validate-specs.py output — pasted by the orchestrator/human]
+  </evidence>
+
+  <!-- NOTHING ELSE: no implementer transcript, no reasoning, no docs/rationale/ -->
+</context>
+```
+
+---
+
 ## Context Size Management
 
 ### Guideline: Quality Over Quantity
@@ -521,7 +575,7 @@ For this task, only the Order Service is relevant.
 
 Agents have direct file access and don't need XML assembly. Follow these steps:
 
-1. **Identify the task type** from the user's request — one of the 11 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation, Task List Review)
+1. **Identify the task type** from the user's request — one of the 12 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation, Task List Review, Implementation Review)
 2. **Read the files** listed in the CLAUDE.md routing table for that task type
 3. **For the sharded spec docs**, read each spec's `index.md` plus only the shards named by the work item's impact tables — e.g., for a task about the `TaskLabel` entity and the `/api/task-labels` resource, read `docs/data-model/index.md` + `docs/data-model/entities/task-label.md` and `docs/api-spec/index.md` + `docs/api-spec/endpoints/task-labels.md`. Never read whole spec directories, and never read `docs/rationale/`
 4. **Read the prompt template** from `.ai-framework/prompts/` — use the **Output Format** section as your deliverable structure, and apply the **Guidance**, **Constraints**, and **Post-Generation Checklist**
@@ -538,7 +592,7 @@ For copy-paste workflows where you assemble an XML prompt to submit to Claude:
 > read order showed no measurable effect (EXP-003 in the framework's `evals/experiments.md`).
 
 #### Step 1: Identify Task Type
-What kind of task are you generating? One of the 11 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation, Task List Review)
+What kind of task are you generating? One of the 12 task types above (New Feature, Bug Fix, Refactoring, Testing, Integration, Prioritization, UI Mockup, Release Transition, ADR Compilation, DDR Compilation, Task List Review, Implementation Review)
 
 #### Step 2: Check Required Documents
 Consult the task-type tables above for your task type. Gather required documents.
@@ -598,12 +652,13 @@ Include the specific request, constraints, and output format requirements.
 | ADR Compilation | ADR files | `.ai-framework/templates/` |
 | DDR Compilation | DDR files (+ optional profile) | `.ai-framework/templates/` |
 | Task List Review‡ | Task list + Work Item + Data Model† + API Spec† + UI Spec† + CLAUDE.md | — (nothing else) |
+| Implementation Review‡ | Task block + Plan + Implementation diff + CLAUDE.md + referenced spec shards† | — (nothing else) |
 
 \* No dedicated prompt — use `prompts/base-template.md` with this context recipe.
 
-† Sharded spec — include the spec's `index.md` plus ONLY the shards named by the work item's impact tables (see Retrieval Keys). Never load the whole directory; never load `docs/rationale/`.
+† Sharded spec — include the spec's `index.md` plus ONLY the shards named by the work item's impact tables (see Retrieval Keys) — for Implementation Review, the shards the task itself references. Never load the whole directory; never load `docs/rationale/`.
 
-‡ Runs in a FRESH context via `.ai-framework/prompts/review-tasks.md` — never include the generator's transcript or reasoning, never `docs/rationale/`. Output: `tasks/<WORK-ITEM-ID>-review.md`.
+‡ Runs in a FRESH context — never include the generating/implementing session's transcript or reasoning, never `docs/rationale/`. Task List Review: `.ai-framework/prompts/review-tasks.md` → `tasks/<WORK-ITEM-ID>-review.md`. Implementation Review: `.ai-framework/prompts/review-implementation.md` → `tasks/<TASK-ID>-implementation-review.md`.
 
 ---
 

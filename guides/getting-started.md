@@ -435,6 +435,7 @@ Task generation is not just chat output — it produces files that feed the next
 3. **Review the task list (recommended).** In a NEW agent session — one with no generation history in context — run [`review-tasks.md`](../prompts/review-tasks.md) per the CLAUDE.md routing row "Task list review". The reviewer re-runs `python .ai-framework/tools/validate-tasks.py` and `python .ai-framework/tools/validate-specs.py` as ground truth, then judges the tasks against the work item and spec shards, writing its verdict and findings to `tasks/<WORK-ITEM-ID>-review.md`. Recommended for L/XL work items, or when an orchestrator samples multiple candidate task lists — review each validator-clean candidate, then pick or synthesize the best.
 4. **Plan each task before implementing.** For each task `T-XXX` in the list, run [`plan-generation.md`](../prompts/plan-generation.md) to produce `plans/plan-T-XXX-short-title.md` — a concrete implementation plan an agent can execute.
 5. **Execute under Workflow Enforcement.** The **Workflow Enforcement** section in your project's CLAUDE.md defines how agents move through the pipeline (which workflow each task follows, when mockups or investigation come first, and how status gets updated).
+6. **Review the implementation (recommended for M+ complexity).** After a task is implemented, in a NEW agent session — one that did NOT implement the task — run [`review-implementation.md`](../prompts/review-implementation.md) per the CLAUDE.md routing row "Implementation review". The reviewer first gathers external evidence as ground truth — the project's test suite and linters, plus `python .ai-framework/tools/validate-specs.py` when the task touched spec shards — then judges the diff against the task's acceptance criteria, its plan, and CLAUDE.md conventions, writing its verdict and findings to `tasks/<TASK-ID>-implementation-review.md`. Address every required change before marking the task complete.
 
 ### Assemble Context
 
@@ -562,6 +563,7 @@ For full maintenance guidance, see [`.ai-framework/guides/maintenance.md`](maint
 5.   Write work items (Feature/Bug/Improvement)        →  Phase 2.5
 6.   Pick prompt template + add context                →  Phase 3
 7.   Generate tasks → tasks/, validate, review, plans/ →  Phase 3
+7.5  Implement, then implementation review (M+)        →  Phase 3
 8.   Keep docs updated                                 →  Phase 4
 ```
 
