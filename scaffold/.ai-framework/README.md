@@ -12,7 +12,7 @@ This folder contains a local copy of the **AI Task Generation Documentation Fram
 ├── README.md                  # This file
 ├── templates/                 # Full reference templates (detailed guidance)
 │   ├── persona.md
-│   ├── stakeholder.md
+│   ├── stakeholder-definition.md
 │   ├── architecture.md
 │   ├── claude-md.md
 │   ├── data-model.md
@@ -109,7 +109,7 @@ your-project/
 | Template (`.ai-framework/templates/`) | Your project doc |
 |---------------------------------------|------------------|
 | `persona.md` | `docs/personas/primary-user.md` |
-| `stakeholder.md` | `docs/stakeholder-definition.md` |
+| `stakeholder-definition.md` | `docs/stakeholder-definition.md` (1:1) |
 | `claude-md.md` | `CLAUDE.md` (project root) |
 | `architecture.md` | `docs/ARCHITECTURE.md` |
 | `data-model.md` | `docs/data-model/` (`index.md` + `entities/*.md`, starter shard: `TEMPLATE-entity.md`) |

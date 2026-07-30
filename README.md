@@ -144,7 +144,7 @@ carestechs-ia-framework/
 │   └── mockups/                 # HTML mockups (mockups/T-XXX-screen-name.html)
 ├── templates/                   # SOURCE OF TRUTH — 10 core templates
 │   ├── persona.md               # → docs/personas/primary-user.md
-│   ├── stakeholder.md           # → docs/stakeholder-definition.md
+│   ├── stakeholder-definition.md # → docs/stakeholder-definition.md (1:1)
 │   ├── architecture.md          # → docs/ARCHITECTURE.md
 │   ├── claude-md.md             # → CLAUDE.md (project root)
 │   ├── data-model.md            # → docs/data-model/ (index + entities/*.md)

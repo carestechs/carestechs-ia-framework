@@ -2,6 +2,11 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.5.3] — 2026-07-30
+
+### Changed
+- **`templates/stakeholder.md` renamed to `templates/stakeholder-definition.md`** so the template↔doc pair matches 1:1. The old asymmetry was inherited wording, not design; the doc side (68 references + every consuming project's existing file) was the expensive direction, the template side had zero path references. The remaining name differences in the mapping all have real justifications: `claude-md.md` → `CLAUDE.md` (naming the template `CLAUDE.md` would make Claude Code load it as live instructions inside the framework repo), `persona.md` → `personas/primary-user.md` (one template, many instances), `architecture.md` → `ARCHITECTURE.md` (repo-level docs convention, case only).
+
 ## [2.5.2] — 2026-07-29
 
 ### Fixed
