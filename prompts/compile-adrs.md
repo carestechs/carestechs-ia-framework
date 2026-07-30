@@ -108,8 +108,8 @@ Only produce rows when the ADR explicitly describes naming rules. Do not invent 
 
 Before compiling, check each ADR's `Requires` and `Conflicts with` fields:
 
-1. **Missing dependencies**: If an ADR lists a `Requires` that is NOT in the selected ADR set, emit a **warning** at the top of the output: `⚠ [adr-file] requires [missing-adr] which is not in the selected set. Include it or remove the dependent ADR.`
-2. **Conflicting ADRs**: If two selected ADRs list each other in `Conflicts with`, emit an **error** at the top of the output: `❌ [adr-a] conflicts with [adr-b]. Remove one before compiling.`
+1. **Missing dependencies**: If an ADR lists a `Requires` that is NOT in the selected ADR set, emit a **warning** at the top of the output. A `Requires` entry may list alternatives separated by `|` — the requirement is satisfied when any one alternative is in the selected set. Warning format: `⚠ [adr-file] requires [missing-adr] which is not in the selected set. Include it or remove the dependent ADR.`
+2. **Conflicting ADRs**: If either of two selected ADRs lists the other in `Conflicts with` (declarations should be symmetric, but a one-way declaration still counts as a conflict), emit an **error** at the top of the output: `❌ [adr-a] conflicts with [adr-b]. Remove one before compiling.`
 3. **If using a stack profile**: Read the stack profile to determine which ADRs are Required/Recommended/Optional. Warn if any Required ADR from the profile is missing from the selected set.
 
 Proceed with compilation only after listing all warnings/errors. If there are errors (conflicts), stop and ask the user to resolve them. Warnings (missing dependencies) can proceed but should be surfaced.
@@ -135,10 +135,11 @@ Each ADR file in the ADR repo follows this generic structure. The compilation pr
 ```markdown
 # [Decision Title]
 
-**Category:** dotnet | python | angular | react | database | api | ai
+**Category:** dotnet | python | typescript | angular | react | database | api | ai | deployment
+**Stack:** dotnet | python | typescript | angular | react | any
 **Status:** Active
-**Requires:** [ADR file paths this decision depends on — omit if none]
-**Conflicts with:** [ADR file paths that are mutually exclusive — omit if none]
+**Requires:** [ADR file paths this decision depends on — `|` separates alternatives where any one suffices; — if none]
+**Conflicts with:** [ADR file paths that are mutually exclusive — declared symmetrically; — if none]
 
 ## Decision
 
@@ -154,6 +155,8 @@ Each ADR file in the ADR repo follows this generic structure. The compilation pr
 - [Hard rule 1 — the AI must never violate this]
 - [Hard rule 2]
 ```
+
+The `Stack` field states which technology stack the ADR's constraints assume (`any` = cross-stack). When selecting ADRs without a profile, filter by the project's stack: include ADRs whose Stack matches the project's languages plus all `any` ADRs; skip other-stack variants (they conflict with their counterparts by design). Skip ADRs whose Status is Deprecated or Superseded — follow a `Superseded by` pointer to the replacement.
 
 The derivation rules use Category to determine target documents and Constraint phrasing (MUST/NEVER) to determine whether content becomes a Pattern or Anti-Pattern.
 

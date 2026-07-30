@@ -153,7 +153,7 @@ Format as constraint comments within the layout descriptions.
 Before compiling, check each DDR's `Requires` and `Conflicts with` fields:
 
 1. **Missing dependencies**: If a DDR lists a `Requires` that is NOT in the selected DDR set, emit a **warning** at the top of the output: `⚠ [ddr-file] requires [missing-ddr] which is not in the selected set. Include it or remove the dependent DDR.`
-2. **Conflicting DDRs**: If two selected DDRs list each other in `Conflicts with`, emit an **error** at the top of the output: `❌ [ddr-a] conflicts with [ddr-b]. Remove one before compiling.`
+2. **Conflicting DDRs**: If either of two selected DDRs lists the other in `Conflicts with` (declarations should be symmetric, but a one-way declaration still counts as a conflict), emit an **error** at the top of the output: `❌ [ddr-a] conflicts with [ddr-b]. Remove one before compiling.`
 3. **If using a profile**: Read the profile to determine which DDRs are included. Warn if any DDR listed in the profile is missing from the DDR repo.
 
 Proceed with compilation only after listing all warnings/errors. If there are errors (conflicts), stop and ask the user to resolve them. Warnings (missing dependencies) can proceed but should be surfaced.
