@@ -192,6 +192,8 @@ scripts/sync-scaffold.sh --check  # verify no drift (use in CI / pre-commit)
 
 `scaffold/.ai-framework/README.md` and `VERSION` are maintained by hand and are not overwritten by the sync.
 
+**Scaffold parity rule** (when editing a template or its scaffold counterpart): scaffold docs match their template **heading-for-heading at every `##` level**, numbered identically. Subsections (`###`+) may be *condensed* — merged into a list or table — only when their content is fully preserved in condensed form; a template subsection whose content has no scaffold counterpart is drift and must be added. When in doubt, run the heading diff: template headings absent from the scaffold need either a heading or a documented condensation.
+
 ---
 
 ## Context Compilation by Task Type

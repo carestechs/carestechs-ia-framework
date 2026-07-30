@@ -23,11 +23,20 @@
 
 ## 3. Product Philosophy
 
+### 3.1 Guiding Principles
+
 <!-- TODO: What are 3-5 guiding principles that drive every decision? -->
 
 1. **[Principle Name]:** <!-- e.g., "Simplicity over features — every screen should have one obvious action" -->
 2. **[Principle Name]:** <!-- e.g., "Reliability over speed — users trust us because it always works" -->
 3. **[Principle Name]:** <!-- e.g., "Convention over configuration — sane defaults, minimal setup" -->
+
+### 3.2 What We Intentionally Avoid in [Version]
+
+<!-- TODO: The anti-scope at philosophy level — approaches or ambitions deliberately ruled out for this version, so AI never suggests them. Distinct from the Scope Lock (§10): that lists features; this lists directions. -->
+
+- <!-- e.g., "No real-time collaboration — single-user editing keeps v1 simple" -->
+- <!-- e.g., "No plugin system — we own the whole experience until the core is proven" -->
 
 ## 4. [Dominant Stakeholder Concern] Strategy (Optional)
 
@@ -35,6 +44,7 @@
 
 - **The concern:** <!-- What stakeholders worry about and why -->
 - **The approach in [version]:** <!-- The deliberate choice, incl. what was ruled out -->
+- **Why this works:** <!-- 1-3 rationale points, e.g., "matches the actual scale of first customers" -->
 
 ## 5. UX Strategy Overview
 

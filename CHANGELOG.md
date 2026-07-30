@@ -2,6 +2,14 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.5.4] — 2026-07-30
+
+### Fixed
+- **Scaffold stakeholder §3 now mirrors the template's 3.1/3.2 split** — `### 3.2 What We Intentionally Avoid in [Version]` had no counterpart content in the scaffold (the philosophy-level anti-scope was simply absent; distinct from the Scope Lock's feature list). Missed by v2.5.2, which swept top-level headings only. The §4 stub also gains the "Why this works" line for content parity with template §4.2.
+
+### Changed
+- **Scaffold parity rule codified** (README, "Editing the framework"): scaffold docs match templates heading-for-heading at every `##` level; subsections may be condensed only when their content is fully preserved. A full heading audit found §3.2 to be the only content gap; the remaining differences are documented condensations: stakeholder §4.1/4.2, §5.1, §7 phases → bullets; ARCHITECTURE §2.1–2.4 → one stack table, component/flow subsections → lean lists, §7.1/7.2 → two bullets; persona alternative-segment subsections → one table.
+
 ## [2.5.3] — 2026-07-30
 
 ### Changed
