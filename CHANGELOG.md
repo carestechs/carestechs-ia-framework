@@ -2,6 +2,11 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.5.2] — 2026-07-29
+
+### Fixed
+- **Scaffold docs no longer ship silent section gaps.** The "strict subset" rule from the v2.1 convergence let scaffold docs omit template sections while keeping template numbering — producing visibly discontinuous numbering (stakeholder-definition jumped §3 → §7) with no in-file explanation, indistinguishable from an authoring error. The omissions bought nothing measurable: the scaffold's leanness lives in shorter guidance, not absent sections, and no cross-reference depended on the gaps. All omitted sections are restored as lean fill-in stubs, preserving the template's "(Optional — delete if not applicable)" markers: `stakeholder-definition.md` gains §4, §5 (UX Strategy — never marked optional in the template; its omission was an inherited oversight), §6, §11; `ARCHITECTURE.md` gains §5.2, §7, §8; `data-model/index.md` gains §5.2. Every scaffold doc now numbers contiguously and matches its template heading-for-heading.
+
 ## [2.5.1] — 2026-07-16
 
 ### Added

@@ -29,6 +29,25 @@
 2. **[Principle Name]:** <!-- e.g., "Reliability over speed — users trust us because it always works" -->
 3. **[Principle Name]:** <!-- e.g., "Convention over configuration — sane defaults, minimal setup" -->
 
+## 4. [Dominant Stakeholder Concern] Strategy (Optional)
+
+<!-- TODO: If one concern dominates (compliance, performance, cost, privacy, reliability), rename this heading to it and describe the chosen approach + why it works. DELETE this section if no single concern dominates. -->
+
+- **The concern:** <!-- What stakeholders worry about and why -->
+- **The approach in [version]:** <!-- The deliberate choice, incl. what was ruled out -->
+
+## 5. UX Strategy Overview
+
+<!-- TODO: The interaction model a stakeholder cares about — not screen detail (that lives in the UI Specification). -->
+
+- **How users get things done:** <!-- Core interaction pattern, e.g., "a single board with drag-and-drop" -->
+- **Why this model fits the persona:** <!-- e.g., "non-technical users need one linear path" -->
+- **Key UX commitments:** <!-- 2-4 experience promises, e.g., "no core action takes more than 3 taps" — these become constraints on UI tasks -->
+
+## 6. [Asset/Resource] Strategy (Optional)
+
+<!-- TODO: If the product depends on shared assets (image libraries, content templates, seeded catalogs), rename this heading and describe what is provided, its categories, and governance. DELETE this section if not applicable. -->
+
 ## 7. Complete User Flow
 
 <!-- TODO: Describe the core user journey in 4-6 steps -->
@@ -72,6 +91,14 @@
 - <!-- Thing you won't build yet and why -->
 
 > **Note — Continuous Development Model:** The structure above uses the **versioned model** (default for initial launch). After the first version ships, projects may switch to the **continuous model** — features flow through a lifecycle (Not Planned → Under Consideration → Current Work → Released) instead of version-scoped releases. See `.ai-framework/guides/release-lifecycle.md` for the transition process.
+
+## 11. Final Note to Stakeholders
+
+This product is designed to do **one thing exceptionally well**:
+
+> <!-- TODO: Single-sentence value proposition that captures the essence -->
+
+This document represents the **agreed foundation** for development and launch.
 
 ## Usage Notes for AI Task Generation
 

@@ -83,6 +83,16 @@
 | <!-- e.g., Active --> | <!-- e.g., Currently active --> |
 | <!-- e.g., Archived --> | <!-- e.g., Soft-archived, hidden from default views --> |
 
+### 5.2 Value Objects
+
+<!-- TODO: Complex types without their own identity (not separate tables), shared across entities — e.g., Money, Address. DELETE this subsection if you have none. -->
+
+#### [ValueObjectName]
+
+| Property | Type | Description |
+|----------|------|-------------|
+| <!-- e.g., amount --> | <!-- e.g., decimal --> | <!-- e.g., Always in minor units --> |
+
 ## Usage Notes for AI Task Generation
 
 - **Shard loading**: Read this `index.md` plus ONLY the entity shards named by the work item's impact tables — do not read the whole `entities/` directory

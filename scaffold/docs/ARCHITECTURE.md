@@ -83,6 +83,14 @@
 
 *If none yet, write "None planned for v1" and move on.*
 
+### 5.2 Internal Communication
+
+<!-- TODO: How do your own components talk to each other? For a single-process app, write "In-process calls only" and move on. -->
+
+| From | To | Protocol | Pattern |
+|------|-----|----------|---------|
+| <!-- e.g., API --> | <!-- e.g., Worker --> | <!-- e.g., Queue --> | <!-- e.g., Async --> |
+
 ## 6. Security & Observability
 
 ### 6.1 Authentication
@@ -108,6 +116,26 @@
 | Metrics | <!-- e.g., Prometheus + Grafana --> | <!-- e.g., RED metrics per endpoint --> |
 | Tracing | <!-- e.g., OpenTelemetry --> | <!-- e.g., Propagate trace ID --> |
 | Alerting | <!-- e.g., PagerDuty on error-rate threshold --> | <!-- e.g., Alert on symptoms, not causes --> |
+
+## 7. Scalability Considerations
+
+<!-- TODO: Rough expected load and the scaling approach. For an early-stage product, honest small numbers beat aspirational ones. -->
+
+- **Expected load:** <!-- e.g., ~50 concurrent users, <10 req/s, <1 GB data in year 1 -->
+- **Scaling strategy:** <!-- e.g., Single instance until X; then horizontal on the API, read replica on the DB -->
+
+## 8. Development & Deployment
+
+### 8.1 Repository Structure
+
+<!-- TODO: Top-level layout — where frontend, backend, shared code, and infrastructure live. -->
+
+### 8.2 Environment Strategy
+
+| Environment | Purpose | Data | Access |
+|-------------|---------|------|--------|
+| <!-- e.g., dev --> | <!-- Local development --> | <!-- Seeded/fake --> | <!-- All devs --> |
+| <!-- e.g., production --> | <!-- Live traffic --> | <!-- Real --> | <!-- Restricted --> |
 
 ## Usage Notes for AI Task Generation
 
