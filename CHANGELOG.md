@@ -2,6 +2,11 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.5.5] — 2026-08-02
+
+### Changed
+- **`prompts/compile-adrs.md` synced to the ADR repo's current metadata format.** The prompt still documented the pre-migration bold-line metadata; ADRs have since moved to YAML frontmatter and grown `family`, `last_reviewed`, `superseded_by`, and `verify_against` keys. The Format Reference now shows the frontmatter (with selection semantics: one member per `family` matching the project stack; Superseded files are tombstones — follow `superseded_by` to the replacement; freshness keys are maintenance metadata, not derivation inputs). Step 0 gains the family-exclusivity error and a note to run the ADR repo's validator as a preflight when one ships. The Stack Profile Format now matches real profiles (tiered tables with ADR-path rows, ignorable generation markers, optional Golden Skeleton reference implementations). Compiled output now records the ADR repo version tag. Rule 2 gains explicit `typescript` and `deployment` rows; the appendix examples use frontmatter.
+
 ## [2.5.4] — 2026-07-30
 
 ### Fixed
