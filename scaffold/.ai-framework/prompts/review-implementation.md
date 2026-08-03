@@ -84,8 +84,12 @@ Severity:
 
 ### Step 4 — Reach a verdict
 
-- **revise** — any CONFIRMED finding of high or medium severity, any failing test or linter/validator error, or any unmet acceptance criterion.
-- **approve** — everything else. Low-severity and PLAUSIBLE findings may accompany an `approve` verdict as advisory notes; the implementer decides.
+Blocking is an **outcome test**, not a severity label:
+
+- **revise** — any failing test, linter/validator error, or unmet acceptance criterion; or any CONFIRMED finding meaning the change as shipped is **wrong** (contradicts the task, the plan's contract, or a spec shard), **unverified** (behavior an AC demands proof of that no test covers), or leaves **spec shards out of sync** with the merged code.
+- **approve** — everything else, including CONFIRMED findings whose cost is convention, style, sizing, or polish: record them under `## Advisories`. PLAUSIBLE findings never block on their own, whatever their severity.
+
+(Code+tests reviews converge measurably faster than prose reviews, but the same outcome-anchored bar applies so both review prompts share one blocking rule.)
 
 Do not fix the code yourself. The review file is the deliverable; fixes happen in a separate step (typically the implementer's session) against the required-changes checklist, followed by a re-review of the changed areas.
 
@@ -99,7 +103,7 @@ Structure:
 
 **Header** — the task reviewed (ID + task-list file), the plan file, what diff was reviewed (ref range, branch, or file list), review date, and the **evidence summary**: test results (passed/failed counts), linter results, and `validate-specs.py` results when run.
 
-**`## Verdict`** — `approve` or `revise`, followed by a 1–3 sentence justification naming the decisive findings.
+**`## Verdict`** — `approve` or `revise`, followed by a 1–3 sentence justification naming the decisive findings. An `approve` may carry advisories — the verdict word stays exactly `approve` (the orchestrator contract's verdict regex is unchanged).
 
 **`## Findings`** — one table, one row per finding:
 
@@ -115,7 +119,7 @@ Structure:
 - `Finding`: what is wrong and why — a **pointer into the diff** (file, function/hunk) plus the evidence; CONFIRMED findings cite tool output, a shard, the task, the plan, or CLAUDE.md; PLAUSIBLE findings state the reasoning.
 - `Required Change`: the concrete edit that resolves the finding — described, not written out as code.
 
-**`## Required Changes Before Completion`** — present when verdict = `revise`: a checklist distilled from the findings that block approval (all CONFIRMED high/medium items, every failing test, every unmet AC), phrased as actionable edits:
+**`## Required Changes Before Completion`** — present when verdict = `revise`: a checklist distilled from the findings that block approval (every finding that met the Step 4 blocking bar, every failing test, every unmet AC), phrased as actionable edits:
 
 ```markdown
 ## Required Changes Before Completion
@@ -124,7 +128,7 @@ Structure:
 - [ ] R-2: [actionable edit]
 ```
 
-PLAUSIBLE and low-severity findings stay in the table as advisory input; include them in the checklist only when the reviewer judges them blocking (and say why in the finding).
+**`## Advisories`** — present under either verdict when non-blocking findings exist: a short list distilled from the findings that did not meet the blocking bar. Disposition contract: advisories are never silently dropped — they stay recorded in this committed review; the implementer/acceptor may fold cheap ones in before completion; substantial ones become new work items. A PLAUSIBLE or low finding may be promoted into the blocking checklist only with an explicit reason stated in the finding.
 
 ---
 
@@ -148,8 +152,9 @@ After writing the review, verify:
 - [ ] External evidence was gathered first (test suite, linters, `validate-specs.py` when the task touched spec shards) and appears in the header; every tool failure surfaced as a CONFIRMED finding, quoted verbatim
 - [ ] All six rubric points were examined
 - [ ] Every finding has ID, severity, CONFIRMED/PLAUSIBLE class, an AC/plan/convention reference, a pointer into the diff, and a required change
-- [ ] The verdict follows the Step 4 rules (any CONFIRMED high/medium, failing test, or unmet AC ⇒ `revise`)
+- [ ] The verdict follows the Step 4 rules (a finding meets the outcome-anchored blocking bar, a failing test, or an unmet AC ⇒ `revise`; otherwise `approve`)
 - [ ] Verdict = `revise` ⇒ the Required Changes Before Completion checklist is present and covers every blocking finding
+- [ ] Non-blocking findings (whatever their severity) are recorded under `## Advisories`, not silently dropped and not smuggled into the blocking checklist
 - [ ] The review is ≤ ~120 lines and contains no rewritten code
 - [ ] No implementer transcript or rationale file was loaded during the review
 - [ ] Review saved to `tasks/<TASK-ID>-implementation-review.md` (agents)

@@ -2,6 +2,11 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.8.0] — 2026-08-03
+
+### Changed
+- **Review verdicts are outcome-anchored: the approve-with-advisories tier.** Both review prompts' Step 4 previously blocked on "any CONFIRMED medium+" — and since reviewers rate nearly every real observation medium while fresh reviews are non-exhaustive, revise loops ratcheted instead of converging (measured three times: three disjoint-finding revise rounds in each worker-model arm, two in the /orchestrate fixture; the Opus arm's final round blocked on one medium with everything else explicitly advisory — the BACKLOG trigger). New rule: `revise` only when a CONFIRMED finding means the artifact as written yields **wrong**, **unbuildable**, or **unverified-against-AC** software (implementation reviews add failing tests, unmet ACs, and spec desync — unchanged); severity alone no longer blocks, and PLAUSIBLE findings never block alone. Non-blocking findings — whatever their severity — go in a structured `## Advisories` section with a disposition contract: never silently dropped; recorded in the committed review, cherry-picked at acceptance, or parked as new work items. The §2 verdict regex and every consumer (next-step, runners, /orchestrate) are unchanged: `approve` with advisories parses as `approve`. Expected effect (honest): trims the ratchet's tail, not its head — genuinely blocking rounds still revise; the terminal advisory-grade round now terminates. Evaluation guide notes that first-pass accept rates rise by definition from this version.
+
 ## [2.7.1] — 2026-08-03
 
 ### Fixed

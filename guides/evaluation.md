@@ -81,6 +81,11 @@ metrics/events.ndjson`).
 | `cost_usd` | no | session cost in USD as reported by the runner — NOTIONAL under subscription auth (no dollars charged); real only for API-key runs |
 | `detail` | no | free text: verdict, commit sha, reviewer note |
 
+> **Cross-version note:** v2.8.0 outcome-anchored the review verdict bar
+> (approve-with-advisories) — first-pass `accepted` rates rise by definition from
+> that version. Annotate cross-run comparisons with the framework version each
+> run executed under.
+
 Example:
 
 ```

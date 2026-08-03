@@ -24,14 +24,14 @@ the orchestrator can detect step completion from the repo.
 
 ## Other deferred items
 
-- **Approve-with-advisories verdict tier** (from the 2026-08-03 autonomous live run):
-  three consecutive fresh task-list reviews returned `revise` with DISJOINT finding
-  sets — fresh review is non-exhaustive, so the revise loop ratchets instead of
-  converging (implementation reviews, judged against code+tests, converged in 1–2
-  loops on the same run). Suggested shape: review prompts allow `approve` plus an
-  "Advisories" section when no CONFIRMED medium+ finding exists, reserving `revise`
-  for blocking findings; the §2 verdict regex is unchanged. Revisit when another
-  brief hits the revise cap on low/advisory-grade findings.
+- ~~**Approve-with-advisories verdict tier**~~ **Resolved 2026-08-03 (v2.8.0)** —
+  trigger fired: the all-Opus control arm's third review round blocked on one
+  medium with everything else explicitly advisory (ratchet replicated three times
+  total across worker models and the /orchestrate fixture). Shipped as an
+  outcome-anchored blocking bar in both review prompts' Step 4 (`revise` only for
+  CONFIRMED wrong/unbuildable/unverified-as-written findings; severity alone no
+  longer blocks) plus a structured `## Advisories` section with a
+  never-silently-dropped disposition contract. The §2 verdict regex is unchanged.
 
 - **LICENSE** — needs an owner decision (proprietary vs open source).
 - **Team-scale items** (deferred 2026-07-14): AGENTS.md canonicalization for mixed-tool

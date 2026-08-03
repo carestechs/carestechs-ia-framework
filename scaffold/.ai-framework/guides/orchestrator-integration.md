@@ -94,7 +94,12 @@ step=planning wi=FEAT-001 task=T-004 event=accepted tokens=5312 model=sonnet`.
 - **Review files** (`tasks/*-review.md`, `tasks/*-implementation-review.md`) contain a
   `## Verdict` heading whose section body is `approve` or `revise` (match
   `(?i)verdict[^a-z]*(approve|revise)` against the file). `revise` ⇒ loop back with
-  the review file added to the regenerating/fixing session's context.
+  the review file added to the regenerating/fixing session's context. Since v2.8.0,
+  `revise` is reserved for outcome-blocking CONFIRMED findings (the review prompts'
+  Step 4 bar: wrong, unbuildable, or unverified as written) and an `approve` may
+  carry an `## Advisories` section — the verdict word and this regex are unchanged.
+  Advisories are never silently dropped: they stay in the committed review, may be
+  cherry-picked at acceptance, and substantial ones are parked as new work items.
 - **Task lists**: task blocks match `^#{2,4}\s+T-\d+\s*:`; fields are `**Field:** value`
   lines. `**Dependencies:**` is a comma-separated `T-XXX` list or `None` — build the
   scheduling DAG from it. `**Files to Modify/Create:**` bullets (suffix `(new)` for
