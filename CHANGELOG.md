@@ -2,6 +2,17 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.6.0] — 2026-08-02
+
+### Added
+- **`tools/next-step.py` — the pipeline's sequencing gate.** Derives pipeline position per work item from artifacts alone (orchestrator-integration.md rule 1) and prints the next legal step(s) with the session prompt and the exact gate command — sequencing stops being a model judgment call, the same mechanical-beats-prose lever that made the validators work. Evidence ladder per task (first hit wins): progress overlay > implementation-review verdict (approve ⇒ done, revise ⇒ needs-fix, via the guide's §2 verdict regex verbatim) > git commit evidence (a commit referencing `T-XXX` whose type prefix is not plan/review/tasks/docs/close) > plan file exists > pending. Understands workflow gates (`mockup-first` requires the mockup before planning surfaces), the step-7 S-complexity review skip rule, step-9 docs-only detection, step-10 closure, dependency-DAG readiness, and file-set conflict warnings for parallel candidates. Read-only except `--mark`; `--json` for machine use; ASCII-only output; stdlib-only; task parsing mirrors `validate-tasks.py` (the validator stays the schema gate).
+- **Per-work-item progress overlay** (`tasks/<WI>-progress.json`) — §6's orchestrator-owned state in repo form, written only by `next-step.py --mark T-XXX=<status> [--note ...]` (plus `task-review=accepted`). Exists precisely for the states artifacts cannot express: S-task completions without a review, reviews accepted after their revise loop, external blockers. Everything artifacts CAN express is derived, never duplicated; accepted artifacts stay immutable.
+- **`/orchestrate` scaffold command** — the slim in-repo driver loop: run next-step.py, execute exactly ONE step by spawning a subagent with the printed prompt (`[FRESH SESSION]` steps get clean context by construction), run the printed gate, commit, re-run, stop. The orchestrating session's context stays process-only, which is what keeps long pipelines from drifting.
+- **orchestrator-integration.md §8** — documents the in-repo solo/attended mode (evidence ladder, overlay semantics, what the tooling deliberately does not do) and when to graduate to an external orchestrator. Validated against a real 15-task project: derived state matched known reality for all 15 tasks, and immediately surfaced a genuine drift (a task-list review whose file still said `revise` after its changes were applied and accepted only conversationally — exactly the overlay's job).
+
+### Fixed
+- **The 2.5.5 release never reached the scaffold** — it edited root `prompts/compile-adrs.md` but ran neither `scripts/sync-scaffold.sh` (the scaffold's copy was still the pre-2.5.5 text) nor the hand-maintained `scaffold/.ai-framework/VERSION` bump (still 2.5.4). Both fixed by this release's sync; VERSION is now 2.6.0. A `--check` in CI or pre-commit would have caught this — noted in BACKLOG's team-scale items.
+
 ## [2.5.5] — 2026-08-02
 
 ### Changed

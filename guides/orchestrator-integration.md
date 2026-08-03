@@ -6,9 +6,11 @@ enough to implement against. Written for the manual/orchestrated operating model
 **every step runs as an independent session** that shares nothing with other steps
 except committed artifacts.
 
-Framework version: 2.5.0. Everything here is derived from the shipped conventions
+Framework version: 2.6.0. Everything here is derived from the shipped conventions
 (CLAUDE.md routing table, canonical task schema, validators) — when this guide and a
-prompt template disagree, the prompt template wins.
+prompt template disagree, the prompt template wins. For solo/attended use, §8 ships
+this contract's state derivation as an in-repo tool (`next-step.py` + `/orchestrate`)
+so no external orchestrator is needed.
 
 ---
 
@@ -273,3 +275,53 @@ Orchestrator-internal checklist (no session needed; a session may do the mechani
   than expanding scope mid-task).
 - Never strip the self-check instruction from a generation prompt to save time —
   it is the measured difference between 100% and 0% schema compliance.
+
+---
+
+## 8. In-repo mode: `next-step.py` + `/orchestrate` (solo / attended)
+
+The main body of this guide assumes an external orchestrator process. For solo-dev
+and attended use, the framework ships the same state machine as in-repo tooling —
+same rules, no infrastructure:
+
+- **`tools/next-step.py`** is the transition function. It derives pipeline position
+  from artifacts alone (rule 1) and prints the next legal step(s) with the session
+  prompt and the exact gate command from §5. Sequencing stops being a model judgment
+  call — the same lever that made the validators work: prose rules drift, mechanical
+  ones don't. The tool is read-only except `--mark`, never runs gates, and parses
+  task lists with the validator's contracts (run the validator first; the tool
+  assumes a clean list).
+- **`/orchestrate`** (scaffold command) is the slim driver loop for a Claude Code
+  session: run the tool, execute exactly one step by spawning a subagent with the
+  printed prompt, run the printed gate, commit, re-run the tool, stop. Subagents are
+  the "independent sessions" of §2 — `[FRESH SESSION]` steps get a subagent with no
+  generation history by construction. The orchestrating session's context stays
+  process-only, which is what keeps long pipelines from drifting.
+
+Per-task state is derived down this evidence ladder (first hit wins):
+
+| Source | Derived state |
+|---|---|
+| `tasks/<WI>-progress.json` overlay entry | as recorded (`done`, `blocked`, ...) |
+| `tasks/T-XXX-implementation-review.md` verdict | `approve` ⇒ done, `revise` ⇒ needs-fix |
+| git commit referencing `T-XXX` (type prefix not plan/review/tasks/docs/close) | implemented |
+| `plans/plan-T-XXX-*.md` exists | planned |
+| nothing | pending |
+
+The **overlay** (`tasks/<WI>-progress.json`) is §6's orchestrator-owned state in repo
+form — one JSON file per work item, written only by
+`next-step.py --wi <WI> --mark T-XXX=<status> [--note "..."]` (plus the special
+`task-review=accepted` for a review accepted after its revise loop, and for S-task
+review skips per step 7's skip rule). It exists precisely for the states artifacts
+cannot express; everything artifacts CAN express is derived, never duplicated.
+Artifacts stay immutable after acceptance — state corrections go to the overlay,
+never into accepted files.
+
+What in-repo mode deliberately does NOT do: run gates (the orchestrator runs the
+printed command and never trusts a session's claim — rule 3), schedule parallel work
+(it prints file-set conflict warnings; assignment stays with the driver), allocate
+work-item IDs, or write the event log (add `metrics/events.ndjson` entries yourself
+if you want the §7 measurements). When a project grows past attended solo use —
+parallel task execution, unattended runs, a team — graduate to an external
+orchestrator implementing the full contract above; the artifacts and the overlay
+carry over unchanged.

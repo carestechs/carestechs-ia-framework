@@ -119,7 +119,7 @@ carestechs-ia-framework/
 ├── scaffold/                    # Ready-to-copy project structure
 │   ├── CLAUDE.md                # Fill-in-ready code conventions (with AI framework routing)
 │   ├── .claude/
-│   │   └── commands/            # Claude Code slash commands (/feature-tasks, /plan-generation, ...)
+│   │   └── commands/            # Claude Code slash commands (/orchestrate, /feature-tasks, ...)
 │   ├── .ai-framework/           # Bundled framework reference (GENERATED — edit root copies instead)
 │   │   ├── VERSION              # Framework version for upgrade tracking
 │   │   ├── README.md            # Scaffold usage guide + template↔doc mapping
@@ -157,7 +157,8 @@ carestechs-ia-framework/
 ├── tools/                       # Shipped tooling (synced into scaffold/.ai-framework/tools/)
 │   ├── validate-tasks.py        # Task-list schema/DAG/coverage validator (machine gate)
 │   ├── validate-specs.py        # Cross-shard consistency + freshness linter
-│   └── metrics-report.py        # Framework-effectiveness scorecard (see guides/evaluation.md)
+│   ├── metrics-report.py        # Framework-effectiveness scorecard (see guides/evaluation.md)
+│   └── next-step.py             # Pipeline-position derivation + next legal step (sequencing gate)
 ├── evals/                       # Prompt regression evals (framework-repo only, not shipped)
 │   ├── run-evals.py             # Deterministic assertion runner
 │   └── cases/                   # Golden fixture projects + assertions per prompt
@@ -178,7 +179,7 @@ carestechs-ia-framework/
     ├── maintenance.md           # Keeping docs in sync with code
     ├── release-lifecycle.md     # Versioned vs continuous development
     ├── evaluation.md            # Measuring framework effectiveness (4 levels, event schema)
-    └── orchestrator-integration.md  # Per-step contract for driving the pipeline externally
+    └── orchestrator-integration.md  # Per-step contract for driving the pipeline (external + in-repo §8)
 ```
 
 ### Editing the framework
@@ -247,4 +248,4 @@ Testing, Integration, and Prioritization have context recipes in the guide but n
 
 ## Version History
 
-See [`CHANGELOG.md`](CHANGELOG.md). Highlights of the v2 line: 10 core templates across 6 layers (v1 had 4), work-item templates and prompts with dual agent/chat usage, ADR/DDR compilation, release lifecycle guide. v2.1 adds defined output locations (`tasks/`, `plans/`, `mockups/`), a canonical task schema, Claude Code slash commands in the scaffold, stack-neutral prompts, and the scaffold sync script. v2.2 shards the spec docs for retrieval-key context loading, splits contract from rationale, adds freshness stamps, and ships the `validate-tasks.py` output gate. v2.3 adds the verification harnesses: shard frontmatter, the `validate-specs.py` cross-shard linter, the fresh-context task-list review prompt, and the `evals/` golden-set regression harness.
+See [`CHANGELOG.md`](CHANGELOG.md). Highlights of the v2 line: 10 core templates across 6 layers (v1 had 4), work-item templates and prompts with dual agent/chat usage, ADR/DDR compilation, release lifecycle guide. v2.1 adds defined output locations (`tasks/`, `plans/`, `mockups/`), a canonical task schema, Claude Code slash commands in the scaffold, stack-neutral prompts, and the scaffold sync script. v2.2 shards the spec docs for retrieval-key context loading, splits contract from rationale, adds freshness stamps, and ships the `validate-tasks.py` output gate. v2.3 adds the verification harnesses: shard frontmatter, the `validate-specs.py` cross-shard linter, the fresh-context task-list review prompt, and the `evals/` golden-set regression harness. v2.6 ships the sequencing gate: `next-step.py` derives pipeline position from artifacts (plus a per-work-item progress overlay for states artifacts can't express) and prints the next legal step with its gate command, driven in-repo by the `/orchestrate` command — orchestrator-integration.md §8.
