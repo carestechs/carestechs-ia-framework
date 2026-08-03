@@ -333,7 +333,16 @@ Closure guard: `next-step.py` trusts a closed work-item Status only when every
 task has completion evidence AND a `close(<WI>)` commit exists. A docs task that
 flips the Status early (a measured failure mode) gets a warning and the frontier
 continues; an evidence-complete work item without a close commit still gets the
-step-10 closure step. When a project grows past attended solo use —
+step-10 closure step.
+
+Re-review detection: a revise verdict goes stale the moment its fixes land, and a
+stale verdict must not keep emitting revision/fix steps (measured live: a
+one-step-per-invocation orchestrator had to escalate to the human purely to ask
+"re-review now?"). `next-step.py` detects the applied fix mechanically — commits
+touching the task list (or, for implementation loops, fix commits referencing the
+task) AFTER the newest commit touching the review file — and emits the fresh
+re-review step itself. Commits are the boundary (rule 2): uncommitted edits
+deliberately do not count. When a project grows past attended solo use —
 parallel task execution, unattended runs, a team — graduate to an external
 orchestrator implementing the full contract above; the artifacts and the overlay
 carry over unchanged.

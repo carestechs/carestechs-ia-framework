@@ -221,6 +221,35 @@ def git_commit_subjects(root):
     return proc.stdout.splitlines()
 
 
+def last_commit_hash(root, rel_path):
+    """Hash of the newest commit touching rel_path, or None."""
+    try:
+        proc = subprocess.run(
+            ["git", "-C", str(root), "log", "-1", "--format=%H", "--", rel_path],
+            capture_output=True, text=True, encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.strip() or None
+
+
+def commit_subjects_since(root, since_hash, rel_path=None):
+    """Subjects of commits after since_hash (exclusive), optionally path-limited;
+    None on git failure."""
+    cmd = ["git", "-C", str(root), "log", "--format=%s", f"{since_hash}..HEAD"]
+    if rel_path:
+        cmd += ["--", rel_path]
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace")
+    except OSError:
+        return None
+    if proc.returncode != 0:
+        return None
+    return proc.stdout.splitlines()
+
+
 def has_impl_commit(subjects, tid):
     tag_re = re.compile(rf"\bT-{tid:03d}\b")
     for subject in subjects:
@@ -319,6 +348,35 @@ def compute_work_item(root, wi, subjects):
                 fresh=True,
                 note="Skip rule: S-complexity adhoc lists only; if skipped, record it: " + mark_cmd))
             return result
+        # Re-review detection (measured gap from the /orchestrate live test): once
+        # a revision lands, the stale revise verdict must not keep emitting
+        # revisions. Mechanical signal: commits touching the task list AFTER the
+        # newest commit touching the review file. Commits are the step boundary
+        # (guide rule 2) - uncommitted edits deliberately do not count.
+        if subjects is not None:
+            review_head = last_commit_hash(root, f"tasks/{wi_id}-review.md")
+            if review_head:
+                later = commit_subjects_since(root, review_head,
+                                              f"tasks/{wi_id}-tasks.md")
+                if later:
+                    result["position"] = ("step 3: revision applied - task list "
+                                          "awaiting fresh re-review")
+                    result["next_steps"].append(step(
+                        "task-review",
+                        f"FRESH REVIEW - you did not generate or revise this. Read "
+                        f"CLAUDE.md. Re-review tasks/{wi_id}-tasks.md per the routing "
+                        f"row 'Task list review'; the previous review's required "
+                        f"changes have been applied - verify them and review the "
+                        f"whole list. Run both validators first and treat their "
+                        f"output as ground truth. OVERWRITE tasks/{wi_id}-review.md "
+                        f"with your review.",
+                        f"parse '## Verdict' in tasks/{wi_id}-review.md "
+                        f"(approve => accepted)",
+                        fresh=True,
+                        note="Detected mechanically: the task list was committed "
+                             "after the current review file. Cap 2 revise loops, "
+                             "then human. If already accepted, record it: " + mark_cmd))
+                    return result
         result["position"] = "step 3: task-list review verdict is 'revise'"
         result["next_steps"].append(step(
             "task-list-revision",
@@ -391,14 +449,39 @@ def compute_work_item(root, wi, subjects):
         slug = "<slug>"
         state = states[tid]
         if state == "needs-fix":
-            result["next_steps"].append(step(
-                "implementation-fix",
-                f"Apply every required change from tasks/{tag}-implementation-review.md "
-                f"for {tag}, then request re-review.",
-                f"tests green, then fresh re-review of {tag} (cap 2 loops, then human)",
-                task=tag,
-                note="If the fixes were already applied and accepted, record it: "
-                     + mark_hint.replace("T-XXX", tag)))
+            # Same re-review detection as the task-list loop: fix commits that
+            # landed after the revise verdict mean the next step is a fresh
+            # re-review, not another fix.
+            rereview_due = False
+            if subjects is not None:
+                review_head = last_commit_hash(
+                    root, f"tasks/{tag}-implementation-review.md")
+                if review_head:
+                    later = commit_subjects_since(root, review_head)
+                    rereview_due = bool(later) and has_impl_commit(later, tid)
+            if rereview_due:
+                result["next_steps"].append(step(
+                    "implementation-review",
+                    f"FRESH REVIEW - you did not implement or fix this. Read CLAUDE.md. "
+                    f"Re-review the implementation of {tag} per the routing row "
+                    f"'Implementation review', focusing on whether the previous review's "
+                    f"required changes were properly applied. Gather evidence first (run "
+                    f"tests, linters, validate-specs) and treat it as ground truth. "
+                    f"OVERWRITE tasks/{tag}-implementation-review.md with your review.",
+                    f"parse '## Verdict' in tasks/{tag}-implementation-review.md",
+                    fresh=True, task=tag,
+                    note="Detected mechanically: fix commits referencing " + tag +
+                         " landed after the current revise verdict. If already "
+                         "accepted, record it: " + mark_hint.replace("T-XXX", tag)))
+            else:
+                result["next_steps"].append(step(
+                    "implementation-fix",
+                    f"Apply every required change from tasks/{tag}-implementation-review.md "
+                    f"for {tag}, then request re-review.",
+                    f"tests green, then fresh re-review of {tag} (cap 2 loops, then human)",
+                    task=tag,
+                    note="If the fixes were already applied and accepted, record it: "
+                         + mark_hint.replace("T-XXX", tag)))
         elif state == "implemented":
             if task["complexity"] == "S":
                 result["next_steps"].append(step(

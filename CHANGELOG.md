@@ -2,6 +2,11 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.7.1] — 2026-08-03
+
+### Fixed
+- **`next-step.py` detects applied fixes and emits the fresh re-review step itself** — at both loop levels. A revise verdict goes stale the moment its fixes are committed, but the tool kept emitting revision/fix steps because it only read the verdict file. Measured live in the Opus-as-orchestrator test: a one-step-per-invocation driver ran the revision correctly, then had to escalate to the human purely to ask "re-review now?". Mechanical signal, no new state: commits touching `tasks/<WI>-tasks.md` (or, for implementation loops, fix-type commits referencing `T-XXX`) after the newest commit touching the corresponding review file ⇒ emit the fresh re-review step instead. Verified against three historical fixtures (the exact trapped states from the live runs) plus regressions. Commits are the step boundary (guide rule 2) — uncommitted edits deliberately do not count.
+
 ## [2.7.0] — 2026-08-03
 
 All four changes come from the first full autonomous pipeline run (an 11-task feature driven end to end by an external runner over the v2.6.0 contracts — shipped working, tested software; findings below are what it surfaced).
