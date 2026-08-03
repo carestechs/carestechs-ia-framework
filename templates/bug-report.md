@@ -128,7 +128,7 @@
 |--------------------|-------------|-----------|
 | [Entity or component name] | [What aspect is broken — data integrity, calculation, display, etc.] | [Shard path or section — e.g., `docs/data-model/entities/task.md`, `docs/api-spec/endpoints/tasks.md`, `docs/ARCHITECTURE.md` §3.2] |
 
-> **Retrieval key:** Names in this table map mechanically to spec shards — entity `Task` → `docs/data-model/entities/task.md`; resource `/api/tasks` → `docs/api-spec/endpoints/tasks.md`; screen "Project Board" → `docs/ui-specification/screens/project-board.md`. Task generation reads each spec's `index.md` plus ONLY the shards named here, so list every entity, endpoint, and screen visibly involved in the symptoms.
+<!-- Retrieval key: Names in this table map mechanically to spec shards — entity `Task` → `docs/data-model/entities/task.md`; resource `/api/tasks` → `docs/api-spec/endpoints/tasks.md`; screen "Project Board" → `docs/ui-specification/screens/project-board.md`. Task generation reads each spec's `index.md` plus ONLY the shards named here, so list every entity, endpoint, and screen visibly involved in the symptoms. (HTML comment so the example paths never trip validate-specs reference checks in a filled report.) -->
 
 <!-- TODO: Even if you're not sure of the root cause, list the entities and components that are visibly involved in the bug's symptoms. -->
 

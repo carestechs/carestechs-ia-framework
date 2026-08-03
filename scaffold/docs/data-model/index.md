@@ -4,7 +4,7 @@
 
 > **Context budget note:** This document is loaded into AI context — keep it contract-style (tables, schemas, rules); move narrative and history to `docs/rationale/` and link it (rationale files are never loaded by default).
 
-> *Sharded document set: cross-cutting content lives in this index; every entity has its own shard at `entities/<entity>.md` (kebab-case, **singular** — e.g., entity `TaskLabel` → `entities/task-label.md`). Copy `entities/TEMPLATE-entity.md` to add one. Work items name entities as retrieval keys — task generation loads this index plus only the named shards.*
+> *Sharded document set: cross-cutting content lives in this index; every entity has its own shard at `entities/<entity>.md` (kebab-case, **singular** — e.g., entity `TaskLabel` → `task-label.md`). Copy `entities/TEMPLATE-entity.md` to add one. Work items name entities as retrieval keys — task generation loads this index plus only the named shards.*
 
 ## 1. Overview
 

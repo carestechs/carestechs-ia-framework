@@ -101,7 +101,7 @@
 |--------------------|-------------|----------------|
 | [Entity or component] | [How it's affected — moved, split, renamed, restructured] | [Shard path or section — e.g., `docs/data-model/entities/<entity>.md`, `docs/api-spec/endpoints/<resource>.md`, `docs/ARCHITECTURE.md` §3.2] |
 
-> **Retrieval key:** Names in this table map mechanically to spec shards — entity `TaskLabel` → `docs/data-model/entities/task-label.md`; resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md`; screen "Project Board" → `docs/ui-specification/screens/project-board.md`. Task generation reads each spec's `index.md` plus ONLY the shards named here, so list every entity, endpoint, and screen the improvement touches.
+<!-- Retrieval key: Names in this table map mechanically to spec shards — entity `TaskLabel` → `docs/data-model/entities/task-label.md`; resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md`; screen "Project Board" → `docs/ui-specification/screens/project-board.md`. Task generation reads each spec's `index.md` plus ONLY the shards named here, so list every entity, endpoint, and screen the improvement touches. (HTML comment so the example paths never trip validate-specs reference checks in a filled proposal.) -->
 
 <!-- TODO: Repeat for each affected entity or component. If the improvement changes component boundaries (e.g., extracting a service), note both the source and target. -->
 

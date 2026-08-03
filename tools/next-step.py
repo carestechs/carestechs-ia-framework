@@ -11,6 +11,16 @@ judgment call; that is the point.
 Usage:
     python next-step.py [--root .] [--wi FEAT-001] [--json]
     python next-step.py --wi FEAT-001 --mark T-012=blocked --note "awaiting AWS account"
+    python next-step.py --root . --log-event step=planning wi=FEAT-001 task=T-004 \
+                        event=accepted tokens=5312 model=sonnet
+
+--log-event appends one well-formed line to metrics/events.ndjson (the schema in
+guides/evaluation.md) and exits — the uniform way for ANY driver (human,
+/orchestrate session, external runner) to record what a step consumed. `tokens`
+is approximate by design: record the best figure your driver exposes (headless
+JSON `usage`, a runner's accounting, or an estimate) rather than nothing.
+Key aliases: wi->work_item, tokens->session_tokens, cost->cost_usd,
+outcome->event. Required: step, event, wi. `ts` is stamped automatically.
 
 Per-task state is derived from these sources, highest precedence first:
   1. tasks/<WI>-progress.json overlay — the orchestrator-owned state of the guide's
@@ -272,7 +282,8 @@ def compute_work_item(root, wi, subjects):
               "position": "", "tasks": [], "next_steps": [], "warnings": []}
 
     status_words = wi["status"].lower().split()
-    if status_words and status_words[0].rstrip(".,;") in CLOSED_WI_STATUSES:
+    status_closed = bool(status_words) and status_words[0].rstrip(".,;") in CLOSED_WI_STATUSES
+    if status_closed and not tasks_path.is_file():
         result["position"] = "closed"
         return result
 
@@ -312,7 +323,9 @@ def compute_work_item(root, wi, subjects):
         result["next_steps"].append(step(
             "task-list-revision",
             f"Apply every required change from tasks/{wi_id}-review.md to "
-            f"tasks/{wi_id}-tasks.md. Change nothing else.",
+            f"tasks/{wi_id}-tasks.md, then update the Summary and the Acceptance "
+            f"Criteria Coverage table so they stay consistent with what you changed. "
+            f"Touch nothing else.",
             validate_cmd + "  (then re-review; cap 2 loops, then human)",
             note="If the changes were already applied and accepted, record it: " + mark_cmd))
         return result
@@ -341,6 +354,32 @@ def compute_work_item(root, wi, subjects):
 
     def deps_met(task):
         return all(states.get(d) in COMPLETE_STATES for d in task["deps"])
+
+    # A closed Status is only trusted when the task evidence agrees. A docs task
+    # that flips the Status early must not short-circuit the remaining tasks or
+    # the formal closure step (learned from a live run: the docs task set
+    # Status=Completed and the strict closure gate never ran).
+    open_ids = [f"T-{tid:03d}" for tid, s in sorted(states.items())
+                if s not in COMPLETE_STATES]
+    if status_closed:
+        if not open_ids:
+            if subjects is not None and not any(f"close({wi_id})" in s for s in subjects):
+                result["position"] = ("step 10: Status already flipped - formal closure "
+                                      "incomplete (no close commit found)")
+                result["next_steps"].append(step(
+                    "closure",
+                    f"Closure checklist for {wi_id}: the work item Status is already set - "
+                    f"complete the rest: verify traceability, run the strict spec gate and "
+                    f"the metrics report, final commit 'close({wi_id})'.",
+                    "python .ai-framework/tools/validate-specs.py --root . --strict"))
+                return result
+            result["position"] = "closed"
+            return result
+        result["warnings"].append(
+            f"work-item Status is '{wi['status']}' but {len(open_ids)} task(s) lack "
+            f"completion evidence ({', '.join(open_ids[:5])}) - a docs task may have "
+            f"flipped the Status early (the closure step owns that flip); continuing "
+            f"the frontier")
 
     mark_hint = (f"python .ai-framework/tools/next-step.py --root . --wi {wi_id} "
                  f"--mark T-XXX=done")
@@ -494,6 +533,46 @@ def render_human(report):
     return "\n".join(lines)
 
 
+# --- event logging ---
+
+EVENT_VALUES = {"started", "artifact_committed", "accepted", "revised", "completed"}
+EVENT_KEY_ALIASES = {"wi": "work_item", "tokens": "session_tokens",
+                     "cost": "cost_usd", "outcome": "event"}
+
+
+def do_log_event(root, pairs):
+    entry = {}
+    for pair in pairs:
+        if "=" not in pair:
+            print(f"ERROR: --log-event expects KEY=VALUE, got '{pair}'", file=sys.stderr)
+            return 1
+        key, _, value = pair.partition("=")
+        key = EVENT_KEY_ALIASES.get(key.strip(), key.strip())
+        entry[key] = value.strip()
+    missing = [k for k in ("step", "event", "work_item") if not entry.get(k)]
+    if missing:
+        print(f"ERROR: --log-event requires {', '.join(missing)}", file=sys.stderr)
+        return 1
+    if entry["event"] not in EVENT_VALUES:
+        print(f"ERROR: event '{entry['event']}' not in {sorted(EVENT_VALUES)}",
+              file=sys.stderr)
+        return 1
+    for key, cast in (("session_tokens", int), ("cost_usd", float)):
+        if key in entry:
+            try:
+                entry[key] = cast(entry[key])
+            except ValueError:
+                print(f"ERROR: {key} must be a number, got '{entry[key]}'", file=sys.stderr)
+                return 1
+    entry["ts"] = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    path = root / "metrics" / "events.ndjson"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(entry) + "\n")
+    print(f"{path}: logged {entry['step']}/{entry['event']} for {entry['work_item']}")
+    return 0
+
+
 # --- mark ---
 
 def do_mark(root, wi_id, marks, note):
@@ -538,6 +617,10 @@ def main():
                     help="record orchestrator-owned state in tasks/<WI>-progress.json: "
                          "T-XXX=<status> or task-review=accepted (repeatable)")
     ap.add_argument("--note", default="", help="free-text note stored with --mark entries")
+    ap.add_argument("--log-event", nargs="+", metavar="KEY=VALUE", default=None,
+                    help="append one event to metrics/events.ndjson (guides/evaluation.md "
+                         "schema) and exit: step=... event=... wi=... [task=... tokens=... "
+                         "model=... cost=... detail=...]")
     args = ap.parse_args()
 
     root = args.root.resolve()
@@ -545,6 +628,9 @@ def main():
         print(f"{root}: ERROR: docs/work-items/ not found - is this a framework project root?",
               file=sys.stderr)
         return 1
+
+    if args.log_event:
+        return do_log_event(root, args.log_event)
 
     if args.mark:
         if not args.wi:

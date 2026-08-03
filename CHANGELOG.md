@@ -2,6 +2,19 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.7.0] — 2026-08-03
+
+All four changes come from the first full autonomous pipeline run (an 11-task feature driven end to end by an external runner over the v2.6.0 contracts — shipped working, tested software; findings below are what it surfaced).
+
+### Fixed
+- **`validate-specs.py` no longer scans inside HTML comments.** Reference checks in indexes and work items now strip `<!-- -->` blocks (line-numbers preserved) before matching shard paths. This is the root fix for two measured false-failure modes: the scaffold's spec-index stubs carry commented example rows (`screens/login.md`, `endpoints/resources.md`) that failed a fresh scaffold under `--strict`, and template guidance with example paths failed filled work items.
+- **Work-item templates' "Retrieval key" guidance moved into HTML comments** (feature-brief ×3, bug-report, improvement-proposal — root templates + scaffold TEMPLATE copies). The guidance text is unchanged and still visible to authors editing raw markdown, but its example shard paths (`task-label.md`, `project-board.md`) can no longer leak into filled briefs as phantom references — measured cost of the old form: a $1.46 spec session gated out by pre-existing template text.
+- **Closure can no longer be short-circuited by an early Status flip.** Measured failure: the closing docs task set the work item's Status to Completed itself, `next-step.py` derived the work item as closed, and the formal step-10 closure (strict gate, close commit) never ran. Now: a closed Status is trusted only when every task has completion evidence AND a `close(<WI>)` commit exists; otherwise the frontier continues with a warning, and an evidence-complete work item without a close commit still gets the closure step. The step-9 session prompt in orchestrator-integration.md now says explicitly: leave Status unchanged — closure owns the flip.
+- **Task-list revision prompt now requires consistency, not just minimal diffs.** "Change nothing else" caused a measured extra review round: the revision applied the required changes and left the Summary contradicting the fixed Dependencies fields. The prompt (next-step.py + guide §4) now requires updating the Summary and AC-coverage table to stay consistent with the applied changes. The guide also documents the deeper measured behavior: fresh-review revise loops RATCHET (three consecutive reviews, disjoint finding sets) — the cap is structural. An approve-with-advisories verdict tier is recorded in BACKLOG.
+
+### Added
+- **Per-step token accounting as a first-class contract.** Every pipeline step should record its approximate `session_tokens` in `metrics/events.ndjson`; the schema (guides/evaluation.md) gains optional `model` and `cost_usd` fields (cost explicitly notional under subscription auth). New `next-step.py --log-event step=... wi=... event=... tokens=... model=...` appends a well-formed event from any driver — human, `/orchestrate` session, or external runner — and `/orchestrate` step 3 now records usage after every gate.
+
 ## [2.6.0] — 2026-08-02
 
 ### Added
