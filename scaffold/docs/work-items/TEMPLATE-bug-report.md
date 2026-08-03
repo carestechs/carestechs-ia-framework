@@ -108,7 +108,7 @@
 |--------------------|-------------|-----------|
 | <!-- TODO --> | | |
 
-> **Retrieval key:** Names in this table map mechanically to spec shards — entity `Task` → `docs/data-model/entities/task.md`; resource `/api/tasks` → `docs/api-spec/endpoints/tasks.md`; screen "Project Board" → `docs/ui-specification/screens/project-board.md`. Task generation reads each spec's `index.md` plus ONLY the shards named here, so list every entity, endpoint, and screen visibly involved in the symptoms.
+<!-- Retrieval key: Names in this table map mechanically to spec shards — entity `Task` → `docs/data-model/entities/task.md`; resource `/api/tasks` → `docs/api-spec/endpoints/tasks.md`; screen "Project Board" → `docs/ui-specification/screens/project-board.md`. Task generation reads each spec's `index.md` plus ONLY the shards named here, so list every entity, endpoint, and screen visibly involved in the symptoms. (HTML comment so the example paths never trip validate-specs reference checks in a filled report.) -->
 
 ---
 

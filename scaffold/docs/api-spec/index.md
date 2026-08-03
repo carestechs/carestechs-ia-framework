@@ -4,7 +4,7 @@
 
 > **Context budget note:** This document is loaded into AI context — keep it contract-style (tables, schemas, rules); move narrative and history to `docs/rationale/` and link it (rationale files are never loaded by default).
 
-> *Sharded document set: cross-cutting conventions live in this index; every resource group has its own shard at `endpoints/<resource>.md` (kebab-case, **plural**, matching the route segment — e.g., `/api/task-labels` → `endpoints/task-labels.md`). Copy `endpoints/TEMPLATE-resource.md` to add one. Work items name endpoints as retrieval keys — task generation loads this index plus only the named shards.*
+> *Sharded document set: cross-cutting conventions live in this index; every resource group has its own shard at `endpoints/<resource>.md` (kebab-case, **plural**, matching the route segment — e.g., `/api/task-labels` → `task-labels.md`). Copy `endpoints/TEMPLATE-resource.md` to add one. Work items name endpoints as retrieval keys — task generation loads this index plus only the named shards.*
 
 ## 1. Overview
 

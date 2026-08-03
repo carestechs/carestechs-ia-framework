@@ -27,6 +27,7 @@ import re
 import sys
 from pathlib import Path
 
+HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 STAMP_RE = re.compile(r"^>\s*\*\*Last verified against code:\*\*\s*(.*)$", re.MULTILINE)
 STAMP_DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 SHARD_REF_RE = re.compile(r"(?:docs/)?(data-model/entities|api-spec/endpoints|ui-specification/screens)/([a-z0-9][a-z0-9-]*)\.md")
@@ -58,6 +59,16 @@ class Report:
 
     def warn(self, file, msg):
         self.warnings.append(f"{file}: WARN: {msg}")
+
+
+def strip_comments(text):
+    """Remove HTML comments before reference scanning, preserving line numbers.
+
+    Templates and scaffold stubs carry example shard paths (screens/login.md,
+    entities/task-label.md) as authoring guidance inside <!-- --> comments;
+    commented-out content is not a reference and must never fail validation.
+    """
+    return HTML_COMMENT_RE.sub(lambda m: "\n" * m.group(0).count("\n"), text)
 
 
 def kebab(name):
@@ -165,7 +176,7 @@ def check_index(index_path, spec_key, docs_root, rep, max_age, today):
     sub, _ = SPEC_DIRS[spec_key]
     shard_dir = docs_root / spec_key / sub
     referenced = set()
-    for line in text.splitlines():
+    for line in strip_comments(text).splitlines():
         refs = [(m.group(1), m.group(2)) for m in SHARD_REF_RE.finditer(line)]
         refs += [(f"{spec_key}/{m.group(1)}", m.group(2))
                  for m in SHORT_REF_RE.finditer(line) if m.group(1) == sub]
@@ -194,7 +205,8 @@ def check_work_items(docs_root, rep):
     for wi in sorted(wi_dir.glob("*.md")):
         if wi.name.startswith("TEMPLATE-"):
             continue
-        for lineno, line in enumerate(wi.read_text(encoding="utf-8", errors="replace").splitlines(), 1):
+        text = strip_comments(wi.read_text(encoding="utf-8", errors="replace"))
+        for lineno, line in enumerate(text.splitlines(), 1):
             for m in WORKITEM_REF_RE.finditer(line):
                 ref = m.group(0)
                 target = docs_root.parent / ref

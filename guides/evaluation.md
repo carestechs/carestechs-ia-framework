@@ -76,8 +76,15 @@ metrics/events.ndjson`).
 | `task` | no | `T-003` — omit for brief-level steps |
 | `step` | yes | `brief` \| `task-generation` \| `task-review` \| `planning` \| `assignment` \| `implementation` \| `implementation-review` \| `docs-update` \| `closure` |
 | `event` | yes | `started` \| `artifact_committed` \| `accepted` \| `revised` \| `completed` |
-| `session_tokens` | no | integer — tokens consumed by the session that ran the step |
+| `session_tokens` | no* | integer — approximate tokens consumed by the session that ran the step. *Every step should record it (approximate is the contract — best available figure beats nothing); drivers without a JSON writer use `next-step.py --log-event` |
+| `model` | no | model the step's session ran on, e.g. `sonnet`, `opus` — enables per-model cost/quality comparisons across runs |
+| `cost_usd` | no | session cost in USD as reported by the runner — NOTIONAL under subscription auth (no dollars charged); real only for API-key runs |
 | `detail` | no | free text: verdict, commit sha, reviewer note |
+
+> **Cross-version note:** v2.8.0 outcome-anchored the review verdict bar
+> (approve-with-advisories) — first-pass `accepted` rates rise by definition from
+> that version. Annotate cross-run comparisons with the framework version each
+> run executed under.
 
 Example:
 

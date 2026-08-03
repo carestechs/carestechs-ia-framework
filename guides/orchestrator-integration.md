@@ -6,9 +6,11 @@ enough to implement against. Written for the manual/orchestrated operating model
 **every step runs as an independent session** that shares nothing with other steps
 except committed artifacts.
 
-Framework version: 2.5.0. Everything here is derived from the shipped conventions
+Framework version: 2.6.0. Everything here is derived from the shipped conventions
 (CLAUDE.md routing table, canonical task schema, validators) — when this guide and a
-prompt template disagree, the prompt template wins.
+prompt template disagree, the prompt template wins. For solo/attended use, §8 ships
+this contract's state derivation as an in-repo tool (`next-step.py` + `/orchestrate`)
+so no external orchestrator is needed.
 
 ---
 
@@ -79,15 +81,25 @@ Append one JSON line per event to `metrics/events.ndjson` (schema in
 `guides/evaluation.md`). Minimum per step: `started` when spawning,
 `artifact_committed` after the commit (put the short SHA in `detail`),
 `accepted`/`revised` when the gate or a human rules, `completed` for terminal steps.
-Include `session_tokens` whenever your runner exposes it — it's the denominator for
-cost-per-accepted-task.
+**Every step records its approximate `session_tokens`** — it's the denominator for
+cost-per-accepted-task. Approximate is the contract: record the best figure your
+runner exposes (headless-JSON `usage`, driver accounting, or an estimate) rather
+than nothing. Optional extras: `model` and `cost_usd` (note: cost is notional
+under subscription auth). Drivers without their own JSON writer append via the
+shipped tool: `python .ai-framework/tools/next-step.py --root . --log-event
+step=planning wi=FEAT-001 task=T-004 event=accepted tokens=5312 model=sonnet`.
 
 ### Verdict parsing (mechanical contracts)
 
 - **Review files** (`tasks/*-review.md`, `tasks/*-implementation-review.md`) contain a
   `## Verdict` heading whose section body is `approve` or `revise` (match
   `(?i)verdict[^a-z]*(approve|revise)` against the file). `revise` ⇒ loop back with
-  the review file added to the regenerating/fixing session's context.
+  the review file added to the regenerating/fixing session's context. Since v2.8.0,
+  `revise` is reserved for outcome-blocking CONFIRMED findings (the review prompts'
+  Step 4 bar: wrong, unbuildable, or unverified as written) and an `approve` may
+  carry an `## Advisories` section — the verdict word and this regex are unchanged.
+  Advisories are never silently dropped: they stay in the committed review, may be
+  cherry-picked at acceptance, and substantial ones are parked as new work items.
 - **Task lists**: task blocks match `^#{2,4}\s+T-\d+\s*:`; fields are `**Field:** value`
   lines. `**Dependencies:**` is a comma-separated `T-XXX` list or `None` — build the
   scheduling DAG from it. `**Files to Modify/Create:**` bullets (suffix `(new)` for
@@ -159,7 +171,7 @@ Conventions: `<WI>` = work-item ID (`FEAT-012`, `BUG-003`, `IMP-002`), `<T>` = t
 | Orchestrator provides | The `<WI>`. Nothing from step 2's session. |
 | Session prompt | "FRESH REVIEW — you did not generate this. Read CLAUDE.md. Review tasks/<WI>-tasks.md per the routing row 'Task list review'. Run both validators first and treat their output as ground truth. Write tasks/<WI>-review.md." |
 | Output | `tasks/<WI>-review.md` — `## Verdict` approve/revise + findings table + required changes. |
-| Gate | Parse the verdict. `approve` ⇒ mark task list accepted (`accepted` event). `revise` ⇒ spawn a revision session with the review file in context ("apply every required change to tasks/<WI>-tasks.md"), re-run the step-2 gate, then re-review. Cap at 2 loops before human escalation. |
+| Gate | Parse the verdict. `approve` ⇒ mark task list accepted (`accepted` event). `revise` ⇒ spawn a revision session with the review file in context ("apply every required change to tasks/<WI>-tasks.md, then update the Summary and the Acceptance Criteria Coverage table so they stay consistent with what you changed — touch nothing else"; a narrow patch that leaves the Summary contradicting the fixed fields just becomes the next review's finding), re-run the step-2 gate, then re-review. Cap at 2 loops before human escalation — and expect the loop to RATCHET rather than converge: fresh reviewers are non-exhaustive, so each round can surface different legitimate findings (measured on a live run: three consecutive revise verdicts with disjoint finding sets). The cap is structural, not a safety margin. |
 | Commit | `review(<WI>): task list <verdict>` |
 | Skip rule | May be skipped for S-complexity adhoc lists; never skip for L/XL or multi-task briefs. |
 
@@ -222,7 +234,7 @@ to step 9.
 |---|---|
 | Purpose | The batch documentation pass the operating model uses instead of per-change doc edits. |
 | Precondition | All other tasks complete. **If the task list contains no Documentation-type closing task, the orchestrator creates the work**: its Files to Modify/Create are mechanically derivable — the work item's impact-table shards + stamps + index changelogs. |
-| Session prompt | "Read CLAUDE.md. Execute the documentation task for <WI>: bring every shard named by the work item's impact tables in line with the merged implementation; refresh 'Last verified against code' stamps; add index changelog rows. Acceptance: `python .ai-framework/tools/validate-specs.py --root . --strict` passes." |
+| Session prompt | "Read CLAUDE.md. Execute the documentation task for <WI>: bring every shard named by the work item's impact tables in line with the merged implementation; refresh 'Last verified against code' stamps; add index changelog rows. LEAVE the work item's Status field unchanged — step 10 (closure) owns that flip. Acceptance: `python .ai-framework/tools/validate-specs.py --root . --strict` passes." |
 | Gate | That exact command, run by the orchestrator. This converts "remember what changed" into "make the linter pass". |
 | Commit | `docs(<WI>): sync specs post-implementation` |
 
@@ -273,3 +285,69 @@ Orchestrator-internal checklist (no session needed; a session may do the mechani
   than expanding scope mid-task).
 - Never strip the self-check instruction from a generation prompt to save time —
   it is the measured difference between 100% and 0% schema compliance.
+
+---
+
+## 8. In-repo mode: `next-step.py` + `/orchestrate` (solo / attended)
+
+The main body of this guide assumes an external orchestrator process. For solo-dev
+and attended use, the framework ships the same state machine as in-repo tooling —
+same rules, no infrastructure:
+
+- **`tools/next-step.py`** is the transition function. It derives pipeline position
+  from artifacts alone (rule 1) and prints the next legal step(s) with the session
+  prompt and the exact gate command from §5. Sequencing stops being a model judgment
+  call — the same lever that made the validators work: prose rules drift, mechanical
+  ones don't. The tool is read-only except `--mark`, never runs gates, and parses
+  task lists with the validator's contracts (run the validator first; the tool
+  assumes a clean list).
+- **`/orchestrate`** (scaffold command) is the slim driver loop for a Claude Code
+  session: run the tool, execute exactly one step by spawning a subagent with the
+  printed prompt, run the printed gate, commit, re-run the tool, stop. Subagents are
+  the "independent sessions" of §2 — `[FRESH SESSION]` steps get a subagent with no
+  generation history by construction. The orchestrating session's context stays
+  process-only, which is what keeps long pipelines from drifting.
+
+Per-task state is derived down this evidence ladder (first hit wins):
+
+| Source | Derived state |
+|---|---|
+| `tasks/<WI>-progress.json` overlay entry | as recorded (`done`, `blocked`, ...) |
+| `tasks/T-XXX-implementation-review.md` verdict | `approve` ⇒ done, `revise` ⇒ needs-fix |
+| git commit referencing `T-XXX` (type prefix not plan/review/tasks/docs/close) | implemented |
+| `plans/plan-T-XXX-*.md` exists | planned |
+| nothing | pending |
+
+The **overlay** (`tasks/<WI>-progress.json`) is §6's orchestrator-owned state in repo
+form — one JSON file per work item, written only by
+`next-step.py --wi <WI> --mark T-XXX=<status> [--note "..."]` (plus the special
+`task-review=accepted` for a review accepted after its revise loop, and for S-task
+review skips per step 7's skip rule). It exists precisely for the states artifacts
+cannot express; everything artifacts CAN express is derived, never duplicated.
+Artifacts stay immutable after acceptance — state corrections go to the overlay,
+never into accepted files.
+
+What in-repo mode deliberately does NOT do: run gates (the orchestrator runs the
+printed command and never trusts a session's claim — rule 3), schedule parallel work
+(it prints file-set conflict warnings; assignment stays with the driver), allocate
+work-item IDs, or write the event log automatically — but `--log-event` makes the
+append one command, and every step should record its approximate `session_tokens`
+(see §2's event-log contract).
+
+Closure guard: `next-step.py` trusts a closed work-item Status only when every
+task has completion evidence AND a `close(<WI>)` commit exists. A docs task that
+flips the Status early (a measured failure mode) gets a warning and the frontier
+continues; an evidence-complete work item without a close commit still gets the
+step-10 closure step.
+
+Re-review detection: a revise verdict goes stale the moment its fixes land, and a
+stale verdict must not keep emitting revision/fix steps (measured live: a
+one-step-per-invocation orchestrator had to escalate to the human purely to ask
+"re-review now?"). `next-step.py` detects the applied fix mechanically — commits
+touching the task list (or, for implementation loops, fix commits referencing the
+task) AFTER the newest commit touching the review file — and emits the fresh
+re-review step itself. Commits are the boundary (rule 2): uncommitted edits
+deliberately do not count. When a project grows past attended solo use —
+parallel task execution, unattended runs, a team — graduate to an external
+orchestrator implementing the full contract above; the artifacts and the overlay
+carry over unchanged.

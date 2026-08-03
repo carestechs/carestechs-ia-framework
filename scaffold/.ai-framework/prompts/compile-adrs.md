@@ -62,6 +62,8 @@ The ADR's **Category** field determines which additional template documents it t
 | `react` | CLAUDE.md | Patterns to Follow, Anti-Patterns to Avoid |
 | `database` | CLAUDE.md, docs/data-model/index.md | Patterns to Follow; Key Modeling Decisions, Database Conventions |
 | `api` | CLAUDE.md, docs/api-spec/index.md | Patterns to Follow; Key API Decisions, Common Conventions |
+| `typescript` | CLAUDE.md | Patterns to Follow, Anti-Patterns to Avoid |
+| `deployment` | CLAUDE.md | Patterns to Follow, Anti-Patterns to Avoid |
 | `ai` | CLAUDE.md, ARCHITECTURE.md | Patterns to Follow, Anti-Patterns to Avoid; Key Architectural Decisions |
 | *(unknown)* | CLAUDE.md | Patterns to Follow, Anti-Patterns to Avoid *(fallback)* |
 
@@ -106,11 +108,12 @@ Only produce rows when the ADR explicitly describes naming rules. Do not invent 
 
 ### Step 0: Validate Dependencies
 
-Before compiling, check each ADR's `Requires` and `Conflicts with` fields:
+Before compiling, check each ADR's `requires` and `conflicts_with` frontmatter keys. If the ADR repo ships a validator script (e.g., `scripts/validate_adrs.py`), run it first — it checks the whole graph mechanically; the checks below then apply to your *selected subset*:
 
-1. **Missing dependencies**: If an ADR lists a `Requires` that is NOT in the selected ADR set, emit a **warning** at the top of the output. A `Requires` entry may list alternatives separated by `|` — the requirement is satisfied when any one alternative is in the selected set. Warning format: `⚠ [adr-file] requires [missing-adr] which is not in the selected set. Include it or remove the dependent ADR.`
-2. **Conflicting ADRs**: If either of two selected ADRs lists the other in `Conflicts with` (declarations should be symmetric, but a one-way declaration still counts as a conflict), emit an **error** at the top of the output: `❌ [adr-a] conflicts with [adr-b]. Remove one before compiling.`
-3. **If using a stack profile**: Read the stack profile to determine which ADRs are Required/Recommended/Optional. Warn if any Required ADR from the profile is missing from the selected set.
+1. **Missing dependencies**: If an ADR lists a `requires` entry that is NOT satisfied by the selected ADR set, emit a **warning** at the top of the output. A `Requires` entry may list alternatives separated by `|` — the requirement is satisfied when any one alternative is in the selected set. Warning format: `⚠ [adr-file] requires [missing-adr] which is not in the selected set. Include it or remove the dependent ADR.`
+2. **Conflicting ADRs**: If either of two selected ADRs lists the other in `conflicts_with` (declarations should be symmetric, but a one-way declaration still counts as a conflict), emit an **error** at the top of the output: `❌ [adr-a] conflicts with [adr-b]. Remove one before compiling.`
+3. **Same-family ADRs**: If two selected ADRs share a `family` value, emit an **error** — family members answer the same architectural question for different stacks or tools and are exclusive per system: `❌ [adr-a] and [adr-b] are siblings in family '[slug]'. Keep the one matching the project's stack.`
+4. **If using a stack profile**: Read the stack profile to determine which ADRs are Required/Recommended/Optional. Warn if any Required ADR from the profile is missing from the selected set.
 
 Proceed with compilation only after listing all warnings/errors. If there are errors (conflicts), stop and ask the user to resolve them. Warnings (missing dependencies) can proceed but should be surfaced.
 
@@ -133,13 +136,21 @@ For each target document:
 Each ADR file in the ADR repo follows this generic structure. The compilation prompt derives all template content from Decision, Rationale, and Constraints — no "Compiles To" section is needed:
 
 ```markdown
-# [Decision Title]
+---
+category: dotnet          # dotnet|python|typescript|angular|react|database|api|ai|deployment
+stack: dotnet             # dotnet|python|typescript|angular|react|any
+family: structured-logging  # optional: links sibling ADRs answering the same question per stack/tool
+status: Active            # Active|Deprecated|Superseded
+requires:                 # [] when empty; " | " inside an item separates alternatives (any one suffices)
+  - adrs/dotnet/modular-monolith.md | adrs/python/modular-packages.md
+conflicts_with: []        # flat list; declared symmetrically on both sides
+last_reviewed: 2026-08-01 # freshness metadata — not a derivation input
+superseded_by: adrs/x.md  # only on status: Superseded — points at the replacement
+verify_against:           # optional: frameworks whose releases can invalidate claims
+  - Tailwind CSS 4
+---
 
-**Category:** dotnet | python | typescript | angular | react | database | api | ai | deployment
-**Stack:** dotnet | python | typescript | angular | react | any
-**Status:** Active
-**Requires:** [ADR file paths this decision depends on — `|` separates alternatives where any one suffices; — if none]
-**Conflicts with:** [ADR file paths that are mutually exclusive — declared symmetrically; — if none]
+# [Decision Title]
 
 ## Decision
 
@@ -154,38 +165,59 @@ Each ADR file in the ADR repo follows this generic structure. The compilation pr
 
 - [Hard rule 1 — the AI must never violate this]
 - [Hard rule 2]
+
+## Examples            <!-- optional: violation vs compliant code pairs -->
 ```
 
-The `Stack` field states which technology stack the ADR's constraints assume (`any` = cross-stack). When selecting ADRs without a profile, filter by the project's stack: include ADRs whose Stack matches the project's languages plus all `any` ADRs; skip other-stack variants (they conflict with their counterparts by design). Skip ADRs whose Status is Deprecated or Superseded — follow a `Superseded by` pointer to the replacement.
+Selection rules derived from the frontmatter:
+
+- **`stack`** states which technology the constraints assume (`any` = cross-stack). Without a profile, filter by the project's stack: include matching-stack ADRs plus all `any` ADRs; skip other-stack variants.
+- **`family`** links sibling ADRs that answer the same question for different stacks or tools (e.g., the .NET and Python logging ADRs). Select exactly ONE member per family — the one matching the project's stack. Two family members in one selection is an error (Step 0).
+- **`status`**: skip `Deprecated` and `Superseded` ADRs. A Superseded file is a tombstone — follow its `superseded_by` pointer to the replacement and compile that instead.
+- **`last_reviewed`** and **`verify_against`** are freshness metadata for catalog maintenance — they do not affect derivation, but a very stale `last_reviewed` on a version-sensitive ADR is worth flagging to the user.
+- An optional **`## Examples`** section (violation vs compliant pairs) may be present; derivation rules do not consume it, but the compliant snippet may be carried into CLAUDE.md verbatim when it clarifies a pattern.
 
 The derivation rules use Category to determine target documents and Constraint phrasing (MUST/NEVER) to determine whether content becomes a Pattern or Anti-Pattern.
 
 ### Stack Profile Format
 
-A stack profile is a manifest file in the ADR repo (location is organization-specific) that lists which ADRs to apply together for a given stack:
+A stack profile is a markdown document in the ADR repo (location is organization-specific) that lists which ADRs to apply together for a given stack, in three tiers:
 
 ```markdown
-# [Profile Name]
+# Stack Profile: [Name]
 
-**Description:** [One sentence describing the stack]
-**Target:** [What kind of projects this profile is for]
+**Status:** Active
+**Assumes:** [runtime/framework versions this profile assumes]
 
-## Required ADRs
+## Overview
+[what the profile is for, and how it differs from sibling profiles]
 
-[ADR file paths that MUST be included — Step 0 warns if any is missing]
+## Required (core to this stack — do not omit)
+| ADR | Summary | Depends On |
+|-----|---------|-------------|
+| `adrs/<category>/<file>.md` | ... | ... |
 
-## Recommended ADRs
+## Recommended (strong defaults — can be swapped with noted alternatives)
+| ADR | Summary | Alternative |
+...
 
-[ADR file paths that should usually be included]
-
-## Optional ADRs
-
-[ADR file paths to include case-by-case]
+## Optional (pick based on project needs)
+| ADR | Summary | When to Include |
+...
 ```
+
+Reading notes:
+
+- The ADR path in each row's first column is the file to read. The Summary column is a hint, never a substitute for reading the ADR.
+- Tier tables may be preceded by an HTML marker comment (they can be generated from a manifest) — ignore it.
+- Profiles may carry a **Golden Skeleton** section pointing at a buildable reference implementation in the ADR repo — consult it when a derived rule needs a concrete shape, and record it as the reference example.
+- Step 0 warns when any Required-tier ADR is missing from the selected set.
 
 ---
 
 ## Output Format
+
+Record the ADR repo's version once at the top of the compiled output — e.g., `<!-- compiled from ADR repo @ <git tag or commit> -->` — so a project can later tell which catalog state its docs derive from.
 
 Generate one block per target document. Each block contains merged sections from all applicable ADRs (derived via the Derivation Rules), with TODO placeholders for project-specific content.
 
@@ -232,6 +264,7 @@ Leave the remaining index.md sections (shared DTOs, endpoint summary, etc.) as T
 - Traceability uses HTML comments only (`<!-- from: adr-file.md -->`) — never inline `(from: ...)` text
 - Do not invent naming conventions — only derive them when an ADR explicitly describes naming rules
 - De-duplicate rows/bullets when multiple ADRs contribute the same rule
+- Record the ADR repo version (git tag or commit) as an HTML comment at the top of the compiled output
 
 ---
 
@@ -247,6 +280,8 @@ After the AI generates compiled template sections:
 - [ ] TODO scaffolds exist for all project-specific sections (not invented content)
 - [ ] Output heading structure matches `.ai-framework/templates/`
 - [ ] ADR sources are traceable via HTML comments (e.g., `<!-- from: modular-monolith.md -->`)
+- [ ] The compiled output records the ADR repo version (`<!-- compiled from ADR repo @ ... -->`)
+- [ ] Step 0 ran: dependencies, conflicts, family exclusivity, profile Required tier
 - [ ] Paste compiled sections into your project docs and fill in the TODO scaffolds
 
 ---
@@ -260,8 +295,9 @@ Copy this skeleton, paste your ADR files into the `<adrs>` block, and submit tog
 
 <adrs>
 <!-- REQUIRED: Paste or list the ADR files to compile.
-     Each ADR should follow the standard ADR format with Category, Decision,
-     Rationale, and Constraints sections. No "Compiles To" blocks needed. -->
+     Each ADR carries YAML frontmatter (category, stack, status, requires,
+     conflicts_with, ...) followed by Decision, Rationale, and Constraints.
+     No "Compiles To" blocks needed. -->
 [Paste ADR file contents here, or list file paths for agents to read]
 </adrs>
 
@@ -299,9 +335,15 @@ Compiling a .NET + Angular stack (example stack — substitute your own).
 <adrs>
 <!-- Selected ADRs for a .NET modular monolith + Angular project (example stack) -->
 
+---
+category: dotnet
+stack: dotnet
+status: Active
+requires: []
+conflicts_with: []
+---
+
 # Modular Monolith
-**Category:** dotnet
-**Status:** Active
 
 ## Decision
 Use a modular monolith architecture with separate C# class library projects per module.
@@ -318,9 +360,15 @@ Use a modular monolith architecture with separate C# class library projects per 
 
 ---
 
+---
+category: database
+stack: any
+status: Active
+requires: []
+conflicts_with: []
+---
+
 # UUID Primary Keys
-**Category:** database
-**Status:** Active
 
 ## Decision
 Use UUIDs for all primary keys, generated server-side.
@@ -336,9 +384,15 @@ Use UUIDs for all primary keys, generated server-side.
 
 ---
 
+---
+category: api
+stack: any
+status: Active
+requires: []
+conflicts_with: []
+---
+
 # REST Envelope Format
-**Category:** api
-**Status:** Active
 
 ## Decision
 All API responses use a standard envelope: `{ data, errors, metadata }`.

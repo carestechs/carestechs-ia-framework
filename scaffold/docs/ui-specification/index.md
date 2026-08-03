@@ -4,7 +4,7 @@
 
 > **Context budget note:** This document is loaded into AI context — keep it contract-style (tables, schemas, rules); move narrative and history to `docs/rationale/` and link it (rationale files are never loaded by default).
 
-> *Sharded document set: cross-cutting content lives in this index; every screen has its own shard at `screens/<screen>.md` (kebab-case — e.g., screen "Project Board" → `screens/project-board.md`); shared components live in `components.md`. Copy `screens/TEMPLATE-screen.md` to add a screen. Work items name screens as retrieval keys — task generation loads this index plus only the named shards.*
+> *Sharded document set: cross-cutting content lives in this index; every screen has its own shard at `screens/<screen>.md` (kebab-case — e.g., screen "Project Board" → `project-board.md`); shared components live in `components.md`. Copy `screens/TEMPLATE-screen.md` to add a screen. Work items name screens as retrieval keys — task generation loads this index plus only the named shards.*
 
 ## 1. Overview
 

@@ -88,7 +88,7 @@
 | [Entity 1] | [How this feature uses/creates/modifies it] | [Rules that apply — validation, constraints, state transitions] |
 | [Entity 2] | [How this feature uses/creates/modifies it] | [Rules that apply] |
 
-> **Retrieval key:** Entity names in this table map mechanically to spec shards — entity `TaskLabel` → `docs/data-model/entities/task-label.md` (kebab-case, singular). Task generation reads `docs/data-model/index.md` plus ONLY the entity shards named here, so list every entity the feature touches.
+<!-- Retrieval key: Entity names in this table map mechanically to spec shards — entity `TaskLabel` → `docs/data-model/entities/task-label.md` (kebab-case, singular). Task generation reads `docs/data-model/index.md` plus ONLY the entity shards named here, so list every entity the feature touches. (HTML comment so the example path never trips validate-specs reference checks in a filled brief.) -->
 
 <!-- TODO: Repeat rows for each entity involved. If the feature requires a NEW entity without a shard under docs/data-model/entities/, note it here and flag that a new entity shard is needed. -->
 
@@ -104,7 +104,7 @@
 |----------|--------|--------|-------|
 | [/api/v1/resource] | [GET · POST · PUT · DELETE] | [Existing · New · Modified] | [Brief description of what changes or what it does] |
 
-> **Retrieval key:** Endpoint paths in this table map mechanically to spec shards — resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md` (matches the route segment, plural). Task generation reads `docs/api-spec/index.md` plus ONLY the endpoint shards named here, so list every resource the feature touches.
+<!-- Retrieval key: Endpoint paths in this table map mechanically to spec shards — resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md` (matches the route segment, plural). Task generation reads `docs/api-spec/index.md` plus ONLY the endpoint shards named here, so list every resource the feature touches. -->
 
 <!-- TODO: If the feature requires NEW endpoints without a shard under docs/api-spec/endpoints/, note them here and flag that a new resource shard is needed. -->
 
@@ -120,7 +120,7 @@
 |--------------------|--------|-------------|
 | [Screen or component name] | [Existing · New · Modified] | [What changes or what it shows] |
 
-> **Retrieval key:** Screen names in this table map mechanically to spec shards — screen "Project Board" → `docs/ui-specification/screens/project-board.md` (kebab-case). Task generation reads `docs/ui-specification/index.md` plus ONLY the screen shards named here (and `components.md` when shared components are listed), so name every screen and shared component the feature touches.
+<!-- Retrieval key: Screen names in this table map mechanically to spec shards — screen "Project Board" → `docs/ui-specification/screens/project-board.md` (kebab-case). Task generation reads `docs/ui-specification/index.md` plus ONLY the screen shards named here (and `components.md` when shared components are listed), so name every screen and shared component the feature touches. -->
 
 <!-- TODO: If the feature requires NEW screens without a shard under docs/ui-specification/screens/, note them here. New screens will likely trigger `mockup-first` workflow on related tasks. -->
 
