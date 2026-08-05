@@ -1,0 +1,29 @@
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Scaffold sync drift (the 2.5.5 failure mode)
+        run: bash scripts/sync-scaffold.sh --check
+
+      - name: VERSION matches CHANGELOG head
+        run: |
+          version="$(tr -d '[:space:]' < scaffold/.ai-framework/VERSION)"
+          head="$(grep -m1 -oP '^## \[\K[0-9]+\.[0-9]+\.[0-9]+' CHANGELOG.md)"
+          echo "VERSION=$version CHANGELOG-head=$head"
+          test "$version" = "$head" || { echo "::error::scaffold VERSION ($version) != CHANGELOG head ($head) - run the release steps"; exit 1; }
+
+      - name: Tools compile
+        run: python -m py_compile tools/*.py
