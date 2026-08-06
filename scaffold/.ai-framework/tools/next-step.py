@@ -28,7 +28,7 @@ Per-task state is derived from these sources, highest precedence first:
   2. tasks/T-XXX-implementation-review.md verdict: approve => done, revise => needs-fix
      (guide section 2 verdict contract).
   3. git log commit evidence: a commit subject referencing T-XXX whose type prefix is
-     not plan/review/tasks/docs/close counts as implementation evidence => implemented.
+     not plan/review/tasks/docs/close/chore counts as implementation evidence => implemented.
   4. plans/plan-T-XXX-*.md exists => planned.
   5. Nothing => pending.
 
