@@ -314,7 +314,7 @@ Per-task state is derived down this evidence ladder (first hit wins):
 |---|---|
 | `tasks/<WI>-progress.json` overlay entry | as recorded (`done`, `blocked`, ...) |
 | `tasks/T-XXX-implementation-review.md` verdict | `approve` ⇒ done, `revise` ⇒ needs-fix |
-| git commit referencing `T-XXX` (type prefix not plan/review/tasks/docs/close) | implemented |
+| git commit referencing `T-XXX` (type prefix not plan/review/tasks/docs/close/chore) | implemented |
 | `plans/plan-T-XXX-*.md` exists | planned |
 | nothing | pending |
 

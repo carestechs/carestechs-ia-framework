@@ -2,6 +2,17 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.8.1] — 2026-08-05
+
+Both fixes adopt org-review suggestions (S-2026-08-05-7/-8) whose evidence is the pipeline-runner's committed hardening record (`runs/SUMMARY.md` items 8 and 9, from the granary build run).
+
+### Fixed
+- **`chore:` commits are no longer implementation evidence** (`next-step.py`). Bookkeeping commits that name a task ID — parks, overlay edits, event-log flushes — counted as implementation evidence, the same blind spot the `docs:` exclusion already covered for another prefix. Measured live: a `chore(...): drop stale overlay ... T-001` commit re-triggered a fresh re-review. `chore` joins the excluded prefixes.
+- **A trusted overlay that contradicts review evidence now warns loudly** (`next-step.py`). Measured live: an overlay `implemented` written before a revise verdict silently masked the fix loop, costing a redundant review session. The overlay still wins — it is the orchestrator-owned state by design — but a `done`/`implemented` overlay entry over a `revise` verdict now emits a warning naming both, so stale entries get cleared instead of silently steering.
+
+### Added
+- **LICENSE: MIT** — the standing owner decision from BACKLOG, resolved (org-review S-2026-08-05-9).
+
 ## [2.8.0] — 2026-08-03
 
 ### Changed

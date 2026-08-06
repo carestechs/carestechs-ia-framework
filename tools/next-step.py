@@ -28,7 +28,7 @@ Per-task state is derived from these sources, highest precedence first:
   2. tasks/T-XXX-implementation-review.md verdict: approve => done, revise => needs-fix
      (guide section 2 verdict contract).
   3. git log commit evidence: a commit subject referencing T-XXX whose type prefix is
-     not plan/review/tasks/docs/close counts as implementation evidence => implemented.
+     not plan/review/tasks/docs/close/chore counts as implementation evidence => implemented.
   4. plans/plan-T-XXX-*.md exists => planned.
   5. Nothing => pending.
 
@@ -78,8 +78,11 @@ OVERLAY_STATUSES = {
     "reviewed", "done", "blocked",
 }
 # Commit subjects whose type prefix is one of these are pipeline bookkeeping,
-# not implementation evidence (guide section 4 commit conventions).
-NON_IMPL_COMMIT_PREFIXES = ("plan", "review", "tasks", "docs", "close")
+# not implementation evidence (guide section 4 commit conventions). "chore"
+# added in 2.8.1: bookkeeping commits naming a task ID (park/mark/overlay
+# edits) were counting as false implementation evidence - measured live, where
+# a "chore(...): drop stale overlay ... T-001" commit re-triggered a re-review.
+NON_IMPL_COMMIT_PREFIXES = ("plan", "review", "tasks", "docs", "close", "chore")
 
 TODAY = datetime.date.today
 
@@ -409,6 +412,19 @@ def compute_work_item(root, wi, subjects):
             "complexity": task["complexity"], "state": state, "evidence": evidence,
             "deps": [f"T-{d:03d}" for d in task["deps"]],
         })
+        # 2.8.1: a trusted overlay that contradicts review evidence gets a loud
+        # warning (measured live: an overlay 'implemented' written before a
+        # revise verdict silently masked the fix loop). Overlay still wins -
+        # it is the orchestrator's state by design - but never silently.
+        if evidence.startswith("overlay") and tid in reviews \
+                and state in ("done", "implemented"):
+            verdict = parse_verdict(reviews[tid])
+            if verdict == "revise":
+                result["warnings"].append(
+                    f"T-{tid:03d}: overlay says '{state}' but {reviews[tid].name} "
+                    f"verdict is 'revise' - overlay wins by design; clear the entry "
+                    f"if it is stale, or run a fresh re-review to refresh the "
+                    f"verdict if the overlay is right")
 
     def deps_met(task):
         return all(states.get(d) in COMPLETE_STATES for d in task["deps"])

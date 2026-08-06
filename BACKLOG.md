@@ -33,7 +33,7 @@ the orchestrator can detect step completion from the repo.
   longer blocks) plus a structured `## Advisories` section with a
   never-silently-dropped disposition contract. The §2 verdict regex is unchanged.
 
-- **LICENSE** — needs an owner decision (proprietary vs open source).
+- ~~**LICENSE** — needs an owner decision (proprietary vs open source).~~ **Resolved 2026-08-05**: MIT, per owner decision ("all licenses can be MIT"); `LICENSE` file added (org-review S-2026-08-05-9).
 - **Team-scale items** (deferred 2026-07-14): AGENTS.md canonicalization for mixed-tool
   teams, CODEOWNERS per doc layer, CI enforcement of sync/changelog/schema, tracker-first
   work items via MCP, doc-drift detection action. Revisit when a second regular
