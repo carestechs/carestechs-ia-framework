@@ -422,8 +422,9 @@ def compute_work_item(root, wi, subjects):
             if verdict == "revise":
                 result["warnings"].append(
                     f"T-{tid:03d}: overlay says '{state}' but {reviews[tid].name} "
-                    f"verdict is 'revise' - overlay wins by design; if it is stale, "
-                    f"clear the entry so the artifacts drive")
+                    f"verdict is 'revise' - overlay wins by design; clear the entry "
+                    f"if it is stale, or run a fresh re-review to refresh the "
+                    f"verdict if the overlay is right")
 
     def deps_met(task):
         return all(states.get(d) in COMPLETE_STATES for d in task["deps"])
