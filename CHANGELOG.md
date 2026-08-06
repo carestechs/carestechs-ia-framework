@@ -2,6 +2,11 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.8.2] — 2026-08-05
+
+### Fixed
+- **Documentation-type tasks now gain evidence from `docs:` commits** (`next-step.py`, org-review S-2026-08-05-11; evidence: pipeline-runner `runs/SUMMARY.md` item 7). `docs:` is rightly excluded from implementation evidence for every other task type — but for a Documentation task it is the *natural* prefix, and excluding it made doc tasks whose sessions self-commit invisible to the evidence ladder (measured live: a Documentation task looped through a redundant implementation pass because its own `docs: ... (T-XXX)` commit did not count). `has_impl_commit` is now type-aware: the `docs` exclusion is lifted only when the task block's Type is `Documentation`, in both state derivation and re-review detection; `chore` and the other bookkeeping prefixes remain excluded for all types.
+
 ## [2.8.1] — 2026-08-05
 
 Both fixes adopt org-review suggestions (S-2026-08-05-7/-8) whose evidence is the pipeline-runner's committed hardening record (`runs/SUMMARY.md` items 8 and 9, from the granary build run).

@@ -28,7 +28,8 @@ Per-task state is derived from these sources, highest precedence first:
   2. tasks/T-XXX-implementation-review.md verdict: approve => done, revise => needs-fix
      (guide section 2 verdict contract).
   3. git log commit evidence: a commit subject referencing T-XXX whose type prefix is
-     not plan/review/tasks/docs/close/chore counts as implementation evidence => implemented.
+     not plan/review/tasks/docs/close/chore counts as implementation evidence => implemented
+     (exception: docs: DOES count for Documentation-type tasks - their natural prefix).
   4. plans/plan-T-XXX-*.md exists => planned.
   5. Nothing => pending.
 
@@ -253,13 +254,23 @@ def commit_subjects_since(root, since_hash, rel_path=None):
     return proc.stdout.splitlines()
 
 
-def has_impl_commit(subjects, tid):
+def has_impl_commit(subjects, tid, task_type=""):
+    """Type-aware evidence check (2.8.2, org-review S-2026-08-05-11).
+
+    For a Documentation-type task, `docs:` IS the natural implementation
+    prefix - excluding it made doc tasks whose sessions self-commit invisible
+    to the evidence ladder (measured live: a Documentation task looped through
+    a redundant implementation pass because its `docs: ... (T-XXX)` commit
+    did not count). Every other type keeps the full exclusion list."""
+    excluded = NON_IMPL_COMMIT_PREFIXES
+    if task_type == "Documentation":
+        excluded = tuple(p for p in excluded if p != "docs")
     tag_re = re.compile(rf"\bT-{tid:03d}\b")
     for subject in subjects:
         if not tag_re.search(subject):
             continue
         prefix = subject.split(":", 1)[0].strip().lower()
-        if not any(prefix.startswith(p) for p in NON_IMPL_COMMIT_PREFIXES):
+        if not any(prefix.startswith(p) for p in excluded):
             return True
     return False
 
@@ -290,7 +301,7 @@ def derive_task_state(task, overlay, reviews, subjects, plans):
             return "done", f"review approve ({reviews[tid].name})"
         if verdict == "revise":
             return "needs-fix", f"review revise ({reviews[tid].name})"
-    if subjects is not None and has_impl_commit(subjects, tid):
+    if subjects is not None and has_impl_commit(subjects, tid, task.get("type", "")):
         return "implemented", "implementation commit(s) in git log"
     if tid in plans:
         return "planned", f"plan exists ({plans[tid].name})"
@@ -474,7 +485,8 @@ def compute_work_item(root, wi, subjects):
                     root, f"tasks/{tag}-implementation-review.md")
                 if review_head:
                     later = commit_subjects_since(root, review_head)
-                    rereview_due = bool(later) and has_impl_commit(later, tid)
+                    rereview_due = bool(later) and has_impl_commit(
+                        later, tid, task.get("type", ""))
             if rereview_due:
                 result["next_steps"].append(step(
                     "implementation-review",
