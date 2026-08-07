@@ -52,3 +52,10 @@ the orchestrator can detect step completion from the repo.
   gates a real decision.
 
 - **compile-ddrs eval coverage — DORMANT**: no DDR repo exists in the organization yet (confirmed 2026-07-16). The prompt stays shipped but unmeasured; build its eval case the way case-009 froze the real ADR repo, when a DDR repo exists.
+
+- **next-step advisories from the v2.8.1 fresh review** (2026-08-05, carried in org-review
+  dispositions until 2026-08-07, given a durable home per org-review S-2026-08-07-3):
+  (#3) the overlay-contradiction warning reports the *derived* state, not the raw overlay
+  status it contradicts — reporting both would make the conflict self-explanatory;
+  (#4) guides lack a sentence stating that `chore:`-typed commits never count as
+  implementation evidence (the code enforces it; the prose doesn't teach it).
