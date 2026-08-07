@@ -406,7 +406,7 @@ Add doc updates to PR when:
 
 Every update to a living spec document must include a changelog entry — and changelogs live in each spec's `index.md`, not in the shards.
 
-**Where changelogs live:** `docs/data-model/index.md`, `docs/api-spec/index.md`, `docs/ui-specification/index.md`, and `ARCHITECTURE.md`. Individual shards do NOT carry changelogs — a shard's history is its freshness stamp plus git history. This is deliberate: per-shard changelog tables would bloat every shard loaded into AI context. When a shard changes, add the entry to its spec's `index.md` and name the shard in the description.
+**Where spec changelogs live:** `docs/data-model/index.md`, `docs/api-spec/index.md`, `docs/ui-specification/index.md`, and `ARCHITECTURE.md`. (Separate from these: the repo-root `CHANGELOG.md`, which records what the *repo* shipped and is written at work-item closure — see the Step 10 checklist in `orchestrator-integration.md`. A spec index changelog never substitutes for it.) Individual shards do NOT carry changelogs — a shard's history is its freshness stamp plus git history. This is deliberate: per-shard changelog tables would bloat every shard loaded into AI context. When a shard changes, add the entry to its spec's `index.md` and name the shard in the description.
 
 **Format:**
 
