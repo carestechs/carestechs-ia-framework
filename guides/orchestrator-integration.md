@@ -248,9 +248,7 @@ Orchestrator-internal checklist (no session needed; a session may do the mechani
 4. Traceability updated (bug→feature links etc.).
 5. Repo-level `CHANGELOG.md` entry for the shipped scope (create the file at the repo root
    if this is the first release), dated and citing the work item. Spec index changelogs do
-   not substitute — they record shard edits, not what the repo shipped. (Two repos were
-   born without one before this became a checklist item; a rule that lives only in
-   pattern-doc prose does not survive closure.)
+   not substitute — they record shard edits, not what the repo shipped.
 6. `python .ai-framework/tools/metrics-report.py` run and archived — the per-brief scorecard.
 7. Final commit `close(<WI>)`; emit `completed`(closure). Merge per your branch strategy.
 

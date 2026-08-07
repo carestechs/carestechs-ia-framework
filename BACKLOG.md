@@ -16,7 +16,7 @@ are all in the state/lifecycle layer.
 | 2 | No implementation record — nothing links a completed task to its branch/commit/PR | Convention: implementing session appends `**Implemented in:** <ref>` to the task block | First time a review session has to hunt for the diff |
 | 3 | ~~No implementation-review prompt~~ **Resolved 2026-07-16**: `prompts/review-implementation.md` written, wired (routing row, command, guides), and measured (case-010) | — | — |
 | 4 | Closing documentation task is not mandated by the task prompts | Require a final Documentation task in every generated task list, with Files to Modify/Create derived from the work item's impact tables and `validate-specs.py` passing as its acceptance criterion | Batch-at-end docs updates start missing changes |
-| 5 | No brief-closure checklist | Closure step in maintenance.md (+ optional `/close-brief` command): all tasks done, docs task done, validate-specs clean, work item Status → Completed with date, traceability updated | First brief reaches step 9 |
+| 5 | ~~No brief-closure checklist~~ **Resolved 2026-08-07** (v2.8.3): the Step 10 checklist in `guides/orchestrator-integration.md` carries all of it — tasks done, docs gate green, `validate-specs --strict` clean, Status flip with date, traceability, repo-root CHANGELOG entry, metrics report, `close(WI)` commit — and `next-step.py` emits the same list as the closure step's action. The optional `/close-brief` command remains unbuilt (not needed while the tool emits the checklist) | — |
 
 Cross-cutting recommendation recorded at the same time: make git commits the step
 boundary — each session ends by committing its artifact, so handoffs are atomic and
