@@ -2,6 +2,17 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.8.3] — 2026-08-07
+
+### Added
+- **Closure requires a repo-level CHANGELOG entry** (`guides/orchestrator-integration.md`
+  Step 10 checklist item 5; matching row in scaffold `CLAUDE.md`'s Documentation
+  Maintenance table). Evidence: two consecutive autonomously-shipped repos were born
+  without a changelog (granary — org-review S-2026-08-05-12; business-framework —
+  org-review S-2026-08-07-1). The rule existed only as prose in the patterns doc, and
+  prose rules do not survive closure; it is now a checklist item at the step where the
+  gap was created. Promoted from the 2026-08-07 org-review drift analysis.
+
 ## [2.8.2] — 2026-08-05
 
 ### Fixed

@@ -246,8 +246,13 @@ Orchestrator-internal checklist (no session needed; a session may do the mechani
 2. `validate-specs.py --strict` clean at the repo root.
 3. Work item Status → `Completed`/`Resolved` (+ date); for bugs, Root Cause & Resolution filled.
 4. Traceability updated (bug→feature links etc.).
-5. `python .ai-framework/tools/metrics-report.py` run and archived — the per-brief scorecard.
-6. Final commit `close(<WI>)`; emit `completed`(closure). Merge per your branch strategy.
+5. Repo-level `CHANGELOG.md` entry for the shipped scope (create the file at the repo root
+   if this is the first release), dated and citing the work item. Spec index changelogs do
+   not substitute — they record shard edits, not what the repo shipped. (Two repos were
+   born without one before this became a checklist item; a rule that lives only in
+   pattern-doc prose does not survive closure.)
+6. `python .ai-framework/tools/metrics-report.py` run and archived — the per-brief scorecard.
+7. Final commit `close(<WI>)`; emit `completed`(closure). Merge per your branch strategy.
 
 ---
 
