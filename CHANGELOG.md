@@ -2,6 +2,23 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.8.3] — 2026-08-07
+
+### Added
+- **Closure requires a repo-level CHANGELOG entry.** Evidence: two consecutive
+  autonomously-shipped repos were born without a changelog (granary — org-review
+  S-2026-08-05-12; business-framework — org-review S-2026-08-07-1). The rule existed only
+  as prose in an external patterns doc, and prose rules do not survive closure; it is now
+  stated at the step where the gap was created, in every place that carries the closure
+  checklist or the work-item doc-maintenance triggers: `next-step.py`'s two closure action strings
+  (the authority an autonomous orchestrator actually reads — the fresh review of this
+  change caught that a docs-only edit would not have prevented the failure it cites),
+  `guides/orchestrator-integration.md` Step 10, and the maintenance-trigger table in both
+  `templates/claude-md.md` and scaffold `CLAUDE.md`. `guides/maintenance.md` now
+  distinguishes spec-index changelogs from the repo-root one. BACKLOG gap #5
+  (brief-closure checklist) is resolved by the same change. Promoted from the 2026-08-07
+  org-review drift analysis.
+
 ## [2.8.2] — 2026-08-05
 
 ### Fixed

@@ -254,6 +254,7 @@ When code changes happen, check which docs need updating per `.ai-framework/guid
 | Design token or screen layout change | `mockups/` (affected screens) |
 | DDR updated in shared repo | Re-run DDR compilation, update Component Examples + `docs/ui-specification/index.md` + CLAUDE.md Design Patterns |
 | Feature tasks completed | `docs/work-items/FEAT-*.md` — update Status to "Completed" |
+| Work item closed (`close(WI)` commit) | `CHANGELOG.md` at the repo root — add a dated release entry for the shipped scope (create the file on first release) |
 | Bug resolved | `docs/work-items/BUG-*.md` — update Status to "Resolved" |
 | Improvement completed | `docs/work-items/IMP-*.md` — update Status to "Completed" |
 

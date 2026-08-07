@@ -16,7 +16,8 @@ DIRS=(templates prompts guides tools)
 if [[ "${1:-}" == "--check" ]]; then
   status=0
   for d in "${DIRS[@]}"; do
-    if ! diff -rq "$d" "scaffold/.ai-framework/$d"; then
+    # -x __pycache__: gitignored build residue is not drift; a trust gate must not cry wolf
+    if ! diff -rq -x '__pycache__' "$d" "scaffold/.ai-framework/$d"; then
       status=1
     fi
   done
