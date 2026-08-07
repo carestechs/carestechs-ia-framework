@@ -454,10 +454,10 @@ def compute_work_item(root, wi, subjects):
                 result["next_steps"].append(step(
                     "closure",
                     f"Closure checklist for {wi_id}: the work item Status is already set - "
-                    f"complete the rest: verify traceability, run the strict spec gate and "
-                    f"the metrics report, add a dated repo-level CHANGELOG.md entry for the "
-                    f"shipped scope (create the file on first release), final commit "
-                    f"'close({wi_id})'.",
+                    f"complete the rest: verify traceability, add a dated repo-level "
+                    f"CHANGELOG.md entry for the shipped scope (create the file on first "
+                    f"release), run the strict spec gate and the metrics report, final "
+                    f"commit 'close({wi_id})'.",
                     "python .ai-framework/tools/validate-specs.py --root . --strict"))
                 return result
             result["position"] = "closed"
@@ -585,9 +585,9 @@ def compute_work_item(root, wi, subjects):
         result["next_steps"].append(step(
             "closure",
             f"Closure checklist for {wi_id}: set the work item Status to Completed/Resolved "
-            f"(+ date), verify traceability, run the strict spec gate and the metrics report, "
-            f"add a dated repo-level CHANGELOG.md entry for the shipped scope (create the "
-            f"file on first release), final commit 'close({wi_id})'.",
+            f"(+ date), verify traceability, add a dated repo-level CHANGELOG.md entry for "
+            f"the shipped scope (create the file on first release), run the strict spec gate "
+            f"and the metrics report, final commit 'close({wi_id})'.",
             "python .ai-framework/tools/validate-specs.py --root . --strict"))
     elif not result["next_steps"]:
         if blocked and len(open_states) == len(blocked):
