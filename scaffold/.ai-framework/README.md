@@ -100,8 +100,8 @@ your-project/
 │       ├── TEMPLATE-bug-report.md             # Blank Bug Report starter
 │       └── TEMPLATE-improvement-proposal.md   # Blank Improvement Proposal starter
 ├── tasks/                             # Generated task lists (tasks/FEAT-XXX-tasks.md, ...)
-├── plans/                             # Implementation plans (plans/plan-T-XXX-short-title.md)
-└── mockups/                           # HTML mockups (mockups/T-XXX-screen-name.html)
+├── plans/                             # Implementation plans (plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md)
+└── mockups/                           # HTML mockups (mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html)
 ```
 
 ## Template ↔ Project Doc Mapping

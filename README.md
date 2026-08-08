@@ -140,8 +140,8 @@ carestechs-ia-framework/
 │   │       ├── TEMPLATE-bug-report.md
 │   │       └── TEMPLATE-improvement-proposal.md
 │   ├── tasks/                   # Generated task lists (tasks/FEAT-XXX-tasks.md)
-│   ├── plans/                   # Implementation plans (plans/plan-T-XXX-short-title.md)
-│   └── mockups/                 # HTML mockups (mockups/T-XXX-screen-name.html)
+│   ├── plans/                   # Implementation plans (plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md)
+│   └── mockups/                 # HTML mockups (mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html)
 ├── templates/                   # SOURCE OF TRUTH — 10 core templates
 │   ├── persona.md               # → docs/personas/primary-user.md
 │   ├── stakeholder-definition.md # → docs/stakeholder-definition.md (1:1)
@@ -170,7 +170,7 @@ carestechs-ia-framework/
 │   ├── spec-generation.md       # Generate Data Model or API Spec
 │   ├── ui-spec-generation.md    # Generate UI Specification
 │   ├── mockup-generation.md     # Generate HTML mockup prototypes
-│   ├── plan-generation.md       # Generate implementation plans → plans/plan-T-XXX-*.md
+│   ├── plan-generation.md       # Generate implementation plans → plans/plan-<WI>-T-XXX-*.md
 │   ├── compile-adrs.md          # Compile ADRs into template sections
 │   └── compile-ddrs.md          # Compile DDRs into design system sections
 └── guides/

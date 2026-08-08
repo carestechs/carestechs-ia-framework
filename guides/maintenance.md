@@ -267,7 +267,7 @@ Every spec shard (`docs/data-model/entities/*.md`, `docs/api-spec/endpoints/*.md
 - [ ] Colors match current design tokens from UI Specification?
 - [ ] Layout matches current ASCII sketch and component hierarchy?
 - [ ] All states are accurate and correctly labeled?
-- [ ] File naming follows the `mockups/T-XXX-screen-name.html` convention?
+- [ ] File naming follows the `mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html` convention?
 
 ---
 

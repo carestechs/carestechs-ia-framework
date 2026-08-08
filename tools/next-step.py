@@ -25,8 +25,11 @@ outcome->event. Required: step, event, wi. `ts` is stamped automatically.
 Per-task state is derived from these sources, highest precedence first:
   1. tasks/<WI>-progress.json overlay — the orchestrator-owned state of the guide's
      section 6, in repo form. The ONLY writer is --mark (or a human editing JSON).
-  2. tasks/T-XXX-implementation-review.md verdict: approve => done, revise => needs-fix
-     (guide section 2 verdict contract).
+  2. tasks/<WI>-T-XXX-implementation-review.md verdict: approve => done, revise => needs-fix
+     (guide section 2 verdict contract). Task IDs restart per task list, so per-task
+     artifacts carry the owning work item; an unqualified tasks/T-XXX-... name is still
+     honoured while no other task list declares that ID, and refused with a warning once
+     one does (this rung outranks commits - a stray approve would skip the work).
   3. git log commit evidence: a commit subject referencing T-XXX whose type prefix is
      not plan/review/tasks/docs/close/chore counts as implementation evidence => implemented
      (exception: docs: DOES count for Documentation-type tasks - their natural prefix).
@@ -34,7 +37,7 @@ Per-task state is derived from these sources, highest precedence first:
      same ID the subject must ALSO name the owning work item (feat(FEAT-002/T-001): ...)
      or it is not credited, with a warning saying so - crediting the wrong work item
      skips real work, while a missed credit only costs a redundant pass.
-  4. plans/plan-T-XXX-*.md exists => planned.
+  4. plans/plan-<WI>-T-XXX-*.md exists => planned (same qualification rule).
   5. Nothing => pending.
 
 Work-item-level position: tasks file missing => task-generation; task-list review
@@ -187,15 +190,49 @@ def parse_task_list(path):
 
 
 def glob_by_task_id(directory, pattern, id_re):
-    """Map task id (int) -> path for files like plan-T-012-*.md."""
+    """Map task id (int) -> [(owner_wi_or_None, path)] for task artifacts.
+
+    Task IDs restart at T-001 in every task list, so a globally-named artifact
+    like plans/plan-T-001-*.md or tasks/T-001-implementation-review.md does not
+    say WHOSE T-001 it is. Artifacts may carry the owning work item in the name
+    (tasks/FEAT-002-T-001-implementation-review.md, plans/plan-FEAT-002-T-001-*.md);
+    `id_re` captures that optional prefix as group "wi". Resolution happens in
+    pick_artifact() - this only collects candidates."""
     result = {}
     if not directory.is_dir():
         return result
-    for path in directory.glob(pattern):
+    for path in sorted(directory.glob(pattern)):
         m = id_re.match(path.name)
-        if m:
-            result.setdefault(int(m.group(1)), path)
+        if not m:
+            continue
+        owner = m.group("wi")  # None when the name carries no work item
+        result.setdefault(int(m.group("tid")), []).append((owner, path))
     return result
+
+
+def pick_artifact(entries, wi_id, tid, others, warnings, kind):
+    """Choose this work item's artifact from same-ID candidates.
+
+    Same fail-safe as commit evidence (2.8.4): a work-item-qualified name always
+    wins; an unqualified name is trusted only when no OTHER task list declares
+    this ID. Crediting another work item's review file is worse than crediting
+    its commit - the review rung outranks commits, so a stray approve marks a
+    task done and skips implementation AND review."""
+    if not entries:
+        return None
+    owned = [path for owner, path in entries if owner == wi_id]
+    if owned:
+        return owned[0]
+    unqualified = [path for owner, path in entries if owner is None]
+    if unqualified and not others:
+        return unqualified[0]
+    if unqualified and warnings is not None:
+        warnings.append(
+            f"T-{tid:03d}: {kind} '{unqualified[0].name}' is not work-item-qualified and "
+            f"T-{tid:03d} is also declared by {', '.join(others)} - NOT used as evidence for "
+            f"{wi_id} (crediting another work item's {kind} would skip real work). Rename it to "
+            f"include the owning work item, or record the state with --mark.")
+    return None
 
 
 def parse_verdict(path):
@@ -362,23 +399,26 @@ def derive_task_state(task, overlay, reviews, subjects, plans,
             return status, evidence
         return {"pending": "pending", "planned": "planned",
                 "implemented": "implemented"}[status], evidence
-    if tid in reviews:
-        verdict = parse_verdict(reviews[tid])
+    owners = (id_owners or {}).get(tid) or []
+    others = [o for o in owners if o != wi_id]
+    review_path = pick_artifact(reviews.get(tid), wi_id, tid, others,
+                                warnings, "implementation review")
+    if review_path is not None:
+        verdict = parse_verdict(review_path)
         if verdict == "approve":
-            return "done", f"review approve ({reviews[tid].name})"
+            return "done", f"review approve ({review_path.name})"
         if verdict == "revise":
-            return "needs-fix", f"review revise ({reviews[tid].name})"
+            return "needs-fix", f"review revise ({review_path.name})"
     if subjects is not None:
-        owners = (id_owners or {}).get(tid) or []
-        others = [o for o in owners if o != wi_id]
         credited, skipped = impl_commit_match(
             subjects, tid, task.get("type", ""), wi_id, bool(others))
         if credited:
             return "implemented", "implementation commit(s) in git log"
         if skipped and warnings is not None:
             warnings.append(commit_ambiguity_warning(tag, wi_id, others, skipped))
-    if tid in plans:
-        return "planned", f"plan exists ({plans[tid].name})"
+    plan_path = pick_artifact(plans.get(tid), wi_id, tid, others, warnings, "plan")
+    if plan_path is not None:
+        return "planned", f"plan exists ({plan_path.name})"
     return "pending", "no artifacts"
 
 
@@ -483,10 +523,15 @@ def compute_work_item(root, wi, subjects, id_owners=None):
         result["warnings"].append(f"{tasks_path.name}: no task blocks parsed - run the validator")
         return result
 
-    plans = glob_by_task_id(root / "plans", "plan-T-*.md", re.compile(r"plan-T-(\d{1,4})-"))
-    reviews = glob_by_task_id(root / "tasks", "T-*-implementation-review.md",
-                              re.compile(r"T-(\d{1,4})-implementation-review"))
-    mockups = glob_by_task_id(root / "mockups", "T-*.html", re.compile(r"T-(\d{1,4})[-.]"))
+    plans = glob_by_task_id(
+        root / "plans", "plan-*.md",
+        re.compile(r"plan-(?:(?P<wi>(?:FEAT|BUG|IMP)-\d{1,4})-)?T-(?P<tid>\d{1,4})-"))
+    reviews = glob_by_task_id(
+        root / "tasks", "*implementation-review.md",
+        re.compile(r"(?:(?P<wi>(?:FEAT|BUG|IMP)-\d{1,4})-)?T-(?P<tid>\d{1,4})-implementation-review"))
+    mockups = glob_by_task_id(
+        root / "mockups", "*.html",
+        re.compile(r"(?:(?P<wi>(?:FEAT|BUG|IMP)-\d{1,4})-)?T-(?P<tid>\d{1,4})[-.]"))
 
     states = {}
     for tid, task in sorted(tasks.items()):
@@ -503,12 +548,16 @@ def compute_work_item(root, wi, subjects, id_owners=None):
         # warning (measured live: an overlay 'implemented' written before a
         # revise verdict silently masked the fix loop). Overlay still wins -
         # it is the orchestrator's state by design - but never silently.
-        if evidence.startswith("overlay") and tid in reviews \
+        ov_review = pick_artifact(
+            reviews.get(tid), wi_id, tid,
+            [o for o in ((id_owners or {}).get(tid) or []) if o != wi_id],
+            None, "implementation review")
+        if evidence.startswith("overlay") and ov_review is not None \
                 and state in ("done", "implemented"):
-            verdict = parse_verdict(reviews[tid])
+            verdict = parse_verdict(ov_review)
             if verdict == "revise":
                 result["warnings"].append(
-                    f"T-{tid:03d}: overlay says '{state}' but {reviews[tid].name} "
+                    f"T-{tid:03d}: overlay says '{state}' but {ov_review.name} "
                     f"verdict is 'revise' - overlay wins by design; clear the entry "
                     f"if it is stale, or run a fresh re-review to refresh the "
                     f"verdict if the overlay is right")
@@ -552,6 +601,14 @@ def compute_work_item(root, wi, subjects, id_owners=None):
     for tid, task in sorted(tasks.items()):
         tag = f"T-{tid:03d}"
         slug = "<slug>"
+        # Name the plan that actually exists (qualified or legacy); fall back to
+        # the qualified placeholder so a session writing one gets the right name.
+        _plan = pick_artifact(
+            plans.get(tid), wi_id, tid,
+            [o for o in ((id_owners or {}).get(tid) or []) if o != wi_id],
+            None, "plan")
+        plan_hint = (f"plans/{_plan.name}" if _plan
+                     else f"plans/plan-{wi_id}-{tag}-{slug}.md")
         state = states[tid]
         if state == "needs-fix":
             # Same re-review detection as the task-list loop: fix commits that
@@ -559,12 +616,17 @@ def compute_work_item(root, wi, subjects, id_owners=None):
             # re-review, not another fix.
             rereview_due = False
             if subjects is not None:
+                rr_others = [o for o in ((id_owners or {}).get(tid) or [])
+                             if o != wi_id]
+                # Resolve the SAME file the state came from: a hardcoded
+                # tasks/T-XXX-... pathspec finds nothing once the review is
+                # work-item-qualified, and re-review would never trigger.
+                rr_path = pick_artifact(reviews.get(tid), wi_id, tid, rr_others,
+                                        None, "implementation review")
                 review_head = last_commit_hash(
-                    root, f"tasks/{tag}-implementation-review.md")
+                    root, rr_path.relative_to(root).as_posix()) if rr_path else None
                 if review_head:
                     later = commit_subjects_since(root, review_head)
-                    rr_others = [o for o in ((id_owners or {}).get(tid) or [])
-                                 if o != wi_id]
                     rr_credited, rr_skipped = impl_commit_match(
                         later, tid, task.get("type", ""), wi_id, bool(rr_others))
                     rereview_due = bool(later) and rr_credited
@@ -583,8 +645,8 @@ def compute_work_item(root, wi, subjects, id_owners=None):
                     f"'Implementation review', focusing on whether the previous review's "
                     f"required changes were properly applied. Gather evidence first (run "
                     f"tests, linters, validate-specs) and treat it as ground truth. "
-                    f"OVERWRITE tasks/{tag}-implementation-review.md with your review.",
-                    f"parse '## Verdict' in tasks/{tag}-implementation-review.md",
+                    f"OVERWRITE tasks/{wi_id}-{tag}-implementation-review.md with your review.",
+                    f"parse '## Verdict' in tasks/{wi_id}-{tag}-implementation-review.md",
                     fresh=True, task=tag,
                     note="Detected mechanically: fix commits referencing " + tag +
                          " landed after the current revise verdict. If already "
@@ -592,7 +654,7 @@ def compute_work_item(root, wi, subjects, id_owners=None):
             else:
                 result["next_steps"].append(step(
                     "implementation-fix",
-                    f"Apply every required change from tasks/{tag}-implementation-review.md "
+                    f"Apply every required change from tasks/{wi_id}-{tag}-implementation-review.md "
                     f"for {tag}, then request re-review.",
                     f"tests green, then fresh re-review of {tag} (cap 2 loops, then human)",
                     task=tag,
@@ -611,15 +673,15 @@ def compute_work_item(root, wi, subjects, id_owners=None):
                     f"FRESH REVIEW - you did not implement this. Read CLAUDE.md. Review the "
                     f"implementation of {tag} per the routing row 'Implementation review'. "
                     f"Gather evidence first (run tests, linters, validate-specs) and treat it "
-                    f"as ground truth. Write tasks/{tag}-implementation-review.md.",
-                    f"parse '## Verdict' in tasks/{tag}-implementation-review.md",
+                    f"as ground truth. Write tasks/{wi_id}-{tag}-implementation-review.md.",
+                    f"parse '## Verdict' in tasks/{wi_id}-{tag}-implementation-review.md",
                     fresh=True, task=tag))
             frontier_tids.append(tid)
         elif state in ("assigned", "in-progress"):
             result["next_steps"].append(step(
                 "implementation",
                 f"Read CLAUDE.md. Implement {tag} from tasks/{wi_id}-tasks.md following "
-                f"plans/plan-{tag}-{slug}.md exactly; document any deviation. Run the test "
+                f"{plan_hint} exactly; document any deviation. Run the test "
                 f"suite and validate-specs before finishing.",
                 "tests green; validate-specs clean when shards were touched", task=tag))
             frontier_tids.append(tid)
@@ -627,7 +689,7 @@ def compute_work_item(root, wi, subjects, id_owners=None):
             result["next_steps"].append(step(
                 "implementation",
                 f"Read CLAUDE.md. Implement {tag} from tasks/{wi_id}-tasks.md following "
-                f"plans/plan-{tag}-{slug}.md exactly; document any deviation. Run the test "
+                f"{plan_hint} exactly; document any deviation. Run the test "
                 f"suite and validate-specs before finishing.",
                 "tests green; validate-specs clean when shards were touched", task=tag))
             frontier_tids.append(tid)
@@ -636,11 +698,17 @@ def compute_work_item(root, wi, subjects, id_owners=None):
         tag = f"T-{tid:03d}"
         if states[tid] != "pending" or not deps_met(task):
             continue
-        if task["workflow"] == "mockup-first" and tid not in mockups:
+        mockup_path = None
+        if task["workflow"] == "mockup-first":
+            mockup_others = [o for o in ((id_owners or {}).get(tid) or [])
+                             if o != wi_id]
+            mockup_path = pick_artifact(mockups.get(tid), wi_id, tid, mockup_others,
+                                        result["warnings"], "mockup")
+        if task["workflow"] == "mockup-first" and mockup_path is None:
             result["next_steps"].append(step(
                 "mockup",
                 f"Read CLAUDE.md. Generate the HTML mockup for {tag} per the routing row "
-                f"'UI mockup'. Write mockups/{tag}-<screen>.html.",
+                f"'UI mockup'. Write mockups/{wi_id}-{tag}-<screen>.html.",
                 "human approval of the mockup (workflow gate - required before planning)",
                 task=tag))
         else:
@@ -650,7 +718,7 @@ def compute_work_item(root, wi, subjects, id_owners=None):
                 "planning",
                 f"Read CLAUDE.md. Create the implementation plan for {tag} from "
                 f"tasks/{wi_id}-tasks.md per the routing row 'Task implementation plan'. "
-                f"Write plans/plan-{tag}-<slug>.md within the plan budget.",
+                f"Write plans/plan-{wi_id}-{tag}-<slug>.md within the plan budget.",
                 f"plan exists, <= ~150 lines, references {tag}", task=tag, note=note))
         frontier_tids.append(tid)
 

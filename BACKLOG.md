@@ -59,3 +59,15 @@ the orchestrator can detect step completion from the repo.
   status it contradicts — reporting both would make the conflict self-explanatory;
   (#4) guides lack a sentence stating that `chore:`-typed commits never count as
   implementation evidence (the code enforces it; the prose doesn't teach it).
+
+- **Nothing gates `scaffold/.claude/` or `scaffold/.ai-framework/README.md`** (from the v2.8.5
+  fresh review): `scripts/sync-scaffold.sh` covers `templates prompts guides tools` only, and
+  `scaffold/.claude/commands/*.md` has no root counterpart at all — so the shipped slash-command
+  wrappers drifted from the routing table they cite, and only a human reading both caught it.
+  Options: give the commands a root source + sync them, or add a CI check that greps the shipped
+  surfaces for conventions the routing table has moved on from. Trigger: the next convention
+  change that touches an Output path.
+- **An artifact naming an unknown work item is silently invisible** (same review): a typo'd
+  `plans/plan-FEAT-009-T-001-x.md` in a FEAT-001-only repo is ignored with no warning. Fail-safe
+  direction (a redundant pass, never skipped work), but a warning when the named work item has no
+  task list would turn a silent typo into a visible one.
