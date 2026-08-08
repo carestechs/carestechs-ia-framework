@@ -128,6 +128,49 @@ def report_task_lists(root, in_repo):
     print("  (burden = % of the first committed version rewritten before/after acceptance)")
 
 
+VERDICT_HEADING_RE = re.compile(
+    r"^#{1,6}\s*\**\s*verdict\b[\s:*]*(?:(approve|revise)\b.*)?$", re.IGNORECASE)
+VERDICT_WORD_RE = re.compile(r"(?<!not )\b(approve|revise)\b", re.IGNORECASE)
+VERDICT_DECL_RE = re.compile(r"^[*_`\s]*verdict\b[^a-z]*(approve|revise)", re.IGNORECASE)
+HEADING_RE = re.compile(r"^#{1,6}\s")
+
+
+def read_verdict(path):
+    """Verdict from the '## Verdict' section only - mirrors next-step.py."""
+    lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    fence = None
+    body = []
+    for raw in lines:  # drop fenced blocks: quoted examples are not verdicts
+        st = raw.lstrip()
+        if st.startswith("```") or st.startswith("~~~"):
+            fence = None if fence == st[:3] else (fence or st[:3])
+            continue
+        if fence is None:
+            body.append(raw)
+    for i, raw in enumerate(body):
+        hm = VERDICT_HEADING_RE.match(raw)
+        if not hm:
+            continue
+        if hm.group(1):
+            return hm.group(1).lower()
+        for nxt in body[i + 1:]:
+            if HEADING_RE.match(nxt):
+                break
+            if nxt.lstrip().startswith(">"):
+                continue
+            wm = VERDICT_WORD_RE.search(nxt)
+            if wm:
+                return wm.group(1).lower()
+    for raw in body:
+        st = raw.strip()
+        if st.startswith(">"):
+            continue
+        dm = VERDICT_DECL_RE.match(st)
+        if dm:
+            return dm.group(1).lower()
+    return None
+
+
 def report_reviews(root):
     tasks_dir = root / "tasks"
     section("Reviews")
@@ -136,8 +179,10 @@ def report_reviews(root):
         return
     approve = revise = 0
     for f in sorted(tasks_dir.glob("*-review.md")):
-        m = VERDICT_RE.search(f.read_text(encoding="utf-8", errors="replace"))
-        verdict = m.group(1).lower() if m else "?"
+        # Same section-scoped read as next-step.py (v2.8.6): a whole-file search
+        # picks up a re-review's "overwrites the previous (verdict `revise`)"
+        # opener, and two tools in one scaffold must never disagree about one file.
+        verdict = read_verdict(f) or "?"
         if verdict == "approve":
             approve += 1
         elif verdict == "revise":

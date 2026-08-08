@@ -78,8 +78,8 @@ VERDICT_RE = re.compile(r"verdict[^a-z]*(approve|revise)", re.IGNORECASE)
 # VERDICT_RE stays the published cross-tool contract (drivers match it), but it
 # must be applied to the Verdict SECTION, never the whole file - see parse_verdict.
 HEADING_RE = re.compile(r"^#{1,6}\s")
-VERDICT_HEADING_RE = re.compile(r"^#{1,6}\s*\**\s*verdict\b\s*:?\s*\**", re.IGNORECASE)
-VERDICT_WORD_RE = re.compile(r"\b(approve|revise)\b", re.IGNORECASE)
+VERDICT_HEADING_RE = re.compile(r"^#{1,6}\s*\**\s*verdict\b[\s:*]*(?:(approve|revise)\b.*)?$", re.IGNORECASE)
+VERDICT_WORD_RE = re.compile(r"(?<!not )\b(approve|revise)\b", re.IGNORECASE)
 VERDICT_DECL_RE = re.compile(r"^[*_`\s]*verdict\b[^a-z]*(approve|revise)", re.IGNORECASE)
 STATUS_TABLE_RE = re.compile(r"^\|\s*\*{0,2}Status\*{0,2}\s*\|\s*(.+?)\s*\|", re.IGNORECASE)
 STATUS_LINE_RE = re.compile(r"^\*\*Status:?\*\*:?\s*(.+)$", re.IGNORECASE)
@@ -263,10 +263,9 @@ def parse_verdict(path):
     for i, raw in enumerate(lines):
         if not VERDICT_HEADING_RE.match(raw):
             continue
-        tail = VERDICT_HEADING_RE.sub("", raw, count=1)
-        m = VERDICT_WORD_RE.search(tail)
-        if m:
-            return m.group(1).lower()
+        head_verdict = VERDICT_HEADING_RE.match(raw).group(1)
+        if head_verdict:
+            return head_verdict.lower()
         for body in lines[i + 1:]:
             if HEADING_RE.match(body):
                 break

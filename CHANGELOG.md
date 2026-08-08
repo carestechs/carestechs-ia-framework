@@ -25,6 +25,12 @@ Framework versions follow [semantic versioning](https://semver.org/). Projects c
   - `VERDICT_RE` is unchanged and stays the published cross-tool contract — the fix is *where* it
     is applied. `guides/orchestrator-integration.md` §2 now states that explicitly, with the
     measured reason.
+  - `metrics-report.py` reads verdicts the same way. It had the same whole-file search, so on the
+    reported artifact it printed `revise` while `next-step.py` read `approve` — two tools in one
+    scaffold disagreeing about one file. Verified: both now agree on all 54 real artifacts.
+  - Two adversarial shapes closed after the fresh review probed them: a `## Verdict summary`
+    heading can no longer claim the Verdict section ahead of the real one, and "not approve" /
+    "cannot approve" no longer read as `approve`.
   - Verified against **all 54 review artifacts** in granary, business-framework, flowmarket and
     both testsys arms: parse result identical to `main` on every one, plus fixtures covering the
     reported shape, a verdict on the heading line, an inline declaration, a quoted prior verdict
