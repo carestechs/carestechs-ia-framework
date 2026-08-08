@@ -75,6 +75,12 @@ FILE_BULLET_RE = re.compile(
 )
 # Verdict contract from guides/orchestrator-integration.md section 2, verbatim.
 VERDICT_RE = re.compile(r"verdict[^a-z]*(approve|revise)", re.IGNORECASE)
+# VERDICT_RE stays the published cross-tool contract (drivers match it), but it
+# must be applied to the Verdict SECTION, never the whole file - see parse_verdict.
+HEADING_RE = re.compile(r"^#{1,6}\s")
+VERDICT_HEADING_RE = re.compile(r"^#{1,6}\s*\**\s*verdict\b\s*:?\s*\**", re.IGNORECASE)
+VERDICT_WORD_RE = re.compile(r"\b(approve|revise)\b", re.IGNORECASE)
+VERDICT_DECL_RE = re.compile(r"^[*_`\s]*verdict\b[^a-z]*(approve|revise)", re.IGNORECASE)
 STATUS_TABLE_RE = re.compile(r"^\|\s*\*{0,2}Status\*{0,2}\s*\|\s*(.+?)\s*\|", re.IGNORECASE)
 STATUS_LINE_RE = re.compile(r"^\*\*Status:?\*\*:?\s*(.+)$", re.IGNORECASE)
 HTML_COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
@@ -236,8 +242,49 @@ def pick_artifact(entries, wi_id, tid, others, warnings, kind):
 
 
 def parse_verdict(path):
-    m = VERDICT_RE.search(read_text(path))
-    return m.group(1).lower() if m else None
+    """Verdict of a review file, read from its '## Verdict' section only.
+
+    The published contract (guide section 2) is a '## Verdict' heading whose
+    section body is approve or revise. Applying VERDICT_RE to the WHOLE file
+    takes the first match anywhere, and a re-review's natural opening sentence
+    names the round it supersedes - "This file overwrites the previous (verdict
+    `revise`) review" - where [^a-z]* happily spans the backtick. Measured live:
+    a re-review that said approve was read as revise, and the orchestrator was
+    pointed at finished work. Silent, and invisible to the validators, because
+    nothing about the artifact is wrong.
+
+    Resolution order: the Verdict section; then a line that itself DECLARES the
+    verdict (**Verdict:** approve); then None. Quoted lines and fenced blocks
+    are never authoritative - they are someone else's words."""
+    lines = [raw for _, raw in strip_code_fences(read_text(path).splitlines())]
+
+    # 1. The Verdict section: the heading's own tail, then its body up to the
+    #    next heading of any level.
+    for i, raw in enumerate(lines):
+        if not VERDICT_HEADING_RE.match(raw):
+            continue
+        tail = VERDICT_HEADING_RE.sub("", raw, count=1)
+        m = VERDICT_WORD_RE.search(tail)
+        if m:
+            return m.group(1).lower()
+        for body in lines[i + 1:]:
+            if HEADING_RE.match(body):
+                break
+            if body.lstrip().startswith(">"):
+                continue
+            m = VERDICT_WORD_RE.search(body)
+            if m:
+                return m.group(1).lower()
+
+    # 2. No usable section: accept a line that declares the verdict itself.
+    for raw in lines:
+        stripped = raw.strip()
+        if stripped.startswith(">"):
+            continue
+        m = VERDICT_DECL_RE.match(stripped)
+        if m:
+            return m.group(1).lower()
+    return None
 
 
 def load_overlay(root, wi_id):
@@ -409,6 +456,12 @@ def derive_task_state(task, overlay, reviews, subjects, plans,
             return "done", f"review approve ({review_path.name})"
         if verdict == "revise":
             return "needs-fix", f"review revise ({review_path.name})"
+        if warnings is not None:
+            warnings.append(
+                f"{tag}: {review_path.name} exists but no verdict could be read from a "
+                f"'## Verdict' section (quoted and fenced text is never authoritative) - "
+                f"the review is not counted as evidence. Add the section per the verdict "
+                f"contract, or record the state with --mark.")
     if subjects is not None:
         credited, skipped = impl_commit_match(
             subjects, tid, task.get("type", ""), wi_id, bool(others))
