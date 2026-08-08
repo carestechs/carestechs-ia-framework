@@ -280,7 +280,7 @@ def impl_commit_match(subjects, tid, task_type="", wi_id=None, require_wi=False)
     tag_re = re.compile(rf"\bT-{tid:03d}\b")
     wi_re = re.compile(rf"\b{re.escape(wi_id)}\b") if wi_id else None
     credited = False
-    unqualified_seen = False
+    skipped = []
     for subject in subjects:
         if not tag_re.search(subject):
             continue
@@ -288,39 +288,63 @@ def impl_commit_match(subjects, tid, task_type="", wi_id=None, require_wi=False)
         if any(prefix.startswith(p) for p in excluded):
             continue
         if require_wi and not (wi_re and wi_re.search(subject)):
-            unqualified_seen = True
+            skipped.append(subject)
             continue
         credited = True
-    return credited, unqualified_seen
+    return credited, skipped
 
 
 def has_impl_commit(subjects, tid, task_type="", wi_id=None, require_wi=False):
     return impl_commit_match(subjects, tid, task_type, wi_id, require_wi)[0]
 
 
-def shared_task_ids(root):
-    """Task IDs declared by more than one work item's task list.
+def task_id_owners(root):
+    """tid -> sorted work-item IDs whose task list declares it.
 
-    These are the IDs whose commit evidence is ambiguous across work items."""
-    seen, shared = {}, set()
+    An ID owned by more than one work item has ambiguous commit evidence: task
+    IDs restart at T-001 in every list. Every `tasks/*-tasks.md` counts, whether
+    or not its work item is closed - a completed work item's commits stay in the
+    log forever, which is exactly what made the reported collision possible."""
+    owners = {}
     tasks_dir = root / "tasks"
     if not tasks_dir.is_dir():
-        return shared
+        return owners
     for path in sorted(tasks_dir.glob("*-tasks.md")):
         m = WI_ID_RE.match(path.name)
         if not m:
             continue
         owner = m.group(0)
         for tid in parse_task_list(path):
-            if seen.setdefault(tid, owner) != owner:
-                shared.add(tid)
-    return shared
+            owners.setdefault(tid, set()).add(owner)
+    return {tid: sorted(names) for tid, names in owners.items()}
+
+
+def commit_ambiguity_warning(tag, wi_id, others, skipped):
+    """Explain a skipped commit without handing over a dangerous remedy.
+
+    When the skipped subject names one of the OTHER work items that declares
+    this task ID, the commit is somebody else's work and the honest advice is
+    "nothing to do here". Suggesting --mark in that case would talk the
+    operator (or an orchestrator session) into re-creating by hand exactly the
+    cross-work-item false positive this check exists to prevent."""
+    also = ", ".join(others) if others else "another work item"
+    claimed = sorted({o for o in others for s in skipped
+                      if re.search(rf"\b{re.escape(o)}\b", s)})
+    base = (f"{tag}: commit(s) mentioning {tag} were NOT credited to {wi_id} - "
+            f"{tag} is also declared by {also}, so an unqualified subject is "
+            f"ambiguous (crediting the wrong work item skips real work).")
+    if claimed:
+        return (base + f" The commit(s) name {', '.join(claimed)}, so this is that "
+                f"work item's task, not {wi_id}'s - no action needed here.")
+    return (base + f" If this IS {wi_id}'s work, qualify the subject "
+            f"(e.g. 'feat({wi_id}/{tag}): ...'); only use "
+            f"--mark {tag}=implemented if you have verified it by hand.")
 
 
 # --- state derivation ---
 
 def derive_task_state(task, overlay, reviews, subjects, plans,
-                      wi_id=None, shared_ids=frozenset(), warnings=None):
+                      wi_id=None, id_owners=None, warnings=None):
     """Returns (state, evidence). States: pending planned implemented needs-fix
     done blocked assigned in-progress."""
     tid = task["id"]
@@ -345,18 +369,14 @@ def derive_task_state(task, overlay, reviews, subjects, plans,
         if verdict == "revise":
             return "needs-fix", f"review revise ({reviews[tid].name})"
     if subjects is not None:
-        credited, unqualified = impl_commit_match(
-            subjects, tid, task.get("type", ""), wi_id, tid in shared_ids)
+        owners = (id_owners or {}).get(tid) or []
+        others = [o for o in owners if o != wi_id]
+        credited, skipped = impl_commit_match(
+            subjects, tid, task.get("type", ""), wi_id, bool(others))
         if credited:
             return "implemented", "implementation commit(s) in git log"
-        if unqualified and warnings is not None:
-            warnings.append(
-                f"{tag}: commit evidence mentioning {tag} exists but does not name "
-                f"{wi_id}, and {tag} is also declared by another work item's task "
-                f"list - NOT credited (a cross-work-item false positive is worse "
-                f"than a missed one). Qualify the commit subject with the work-item "
-                f"id (e.g. 'feat({wi_id}/{tag}): ...') or record the state with "
-                f"--mark {tag}=implemented.")
+        if skipped and warnings is not None:
+            warnings.append(commit_ambiguity_warning(tag, wi_id, others, skipped))
     if tid in plans:
         return "planned", f"plan exists ({plans[tid].name})"
     return "pending", "no artifacts"
@@ -370,7 +390,7 @@ def step(name, prompt, gate, fresh=False, task=None, note=""):
             "prompt": prompt, "gate": gate, "note": note}
 
 
-def compute_work_item(root, wi, subjects, shared_ids=frozenset()):
+def compute_work_item(root, wi, subjects, id_owners=None):
     wi_id = wi["id"]
     tasks_path = root / "tasks" / f"{wi_id}-tasks.md"
     review_path = root / "tasks" / f"{wi_id}-review.md"
@@ -472,7 +492,7 @@ def compute_work_item(root, wi, subjects, shared_ids=frozenset()):
     for tid, task in sorted(tasks.items()):
         state, evidence = derive_task_state(
             task, overlay, reviews, subjects, plans,
-            wi_id, shared_ids, result["warnings"])
+            wi_id, id_owners, result["warnings"])
         states[tid] = state
         result["tasks"].append({
             "id": f"T-{tid:03d}", "title": task["title"], "type": task["type"],
@@ -543,9 +563,18 @@ def compute_work_item(root, wi, subjects, shared_ids=frozenset()):
                     root, f"tasks/{tag}-implementation-review.md")
                 if review_head:
                     later = commit_subjects_since(root, review_head)
-                    rereview_due = bool(later) and has_impl_commit(
-                        later, tid, task.get("type", ""),
-                        wi_id, tid in shared_ids)
+                    rr_others = [o for o in ((id_owners or {}).get(tid) or [])
+                                 if o != wi_id]
+                    rr_credited, rr_skipped = impl_commit_match(
+                        later, tid, task.get("type", ""), wi_id, bool(rr_others))
+                    rereview_due = bool(later) and rr_credited
+                    if rr_skipped and not rr_credited:
+                        # Silence here is worse than elsewhere: an applied fix
+                        # that never triggers its re-review just keeps printing
+                        # "implementation-fix" forever.
+                        result["warnings"].append(commit_ambiguity_warning(
+                            tag, wi_id, rr_others, rr_skipped)
+                            + " Until then the re-review will not trigger.")
             if rereview_due:
                 result["next_steps"].append(step(
                     "implementation-review",
@@ -827,14 +856,14 @@ def main():
     subjects = git_commit_subjects(root)
     # Task IDs restart per task list; ambiguous ones need work-item-qualified
     # commits before they count as evidence (2.8.4).
-    shared = shared_task_ids(root)
+    id_owners = task_id_owners(root)
     report = {"root": str(root), "work_items": [], "closed": [], "notes": []}
     if subjects is None:
         report["notes"].append("not a git repo (or git unavailable) - commit evidence "
                                "disabled; task states rely on reviews, plans, and the overlay")
 
     for wi in work_items:
-        computed = compute_work_item(root, wi, subjects, shared)
+        computed = compute_work_item(root, wi, subjects, id_owners)
         if computed["position"] == "closed":
             report["closed"].append(wi["id"])
         else:

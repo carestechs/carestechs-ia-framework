@@ -25,6 +25,12 @@ Framework versions follow [semantic versioning](https://semver.org/). Projects c
   - Fixture-verified in all four directions: the reported false positive is gone, the rightful
     owner is credited once its subject is qualified, the other work item still is not, and an
     unambiguous single-work-item repo still credits a plain `feat(T-001): ...`.
+- Warning is owner-aware: when the skipped commit names one of the other work items that
+  declares the ID, it says so and offers no `--mark` remedy. The generic advice would have
+  talked an operator (or an orchestrator session) into hand-recreating the exact false positive
+  this check prevents. Re-review detection carries the same warning — a skipped fix commit there
+  would otherwise silently keep printing `implementation-fix` forever. Both from the v2.8.4
+  fresh review.
 - Convention documented where it is used: `guides/orchestrator-integration.md` step 6 commit row
   and the evidence-ladder section now state the qualified-subject rule and why refusing to credit
   is the safe direction.
