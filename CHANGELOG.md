@@ -28,9 +28,12 @@ Framework versions follow [semantic versioning](https://semver.org/). Projects c
   - The implementation prompt names the plan that actually exists (qualified or legacy)
     instead of a hardcoded unqualified path; the mockup ownership check runs only for
     `mockup-first` tasks, so standard tasks get no spurious warning.
-  - Convention swept through every doc that stated the old form: both prompt contracts, the
-    mockup prompt, `README.md`, `getting-started.md`, `context-compilation.md`,
-    `maintenance.md`, `orchestrator-integration.md`, and both routing tables.
+  - Convention swept through the docs that stated the old form: all three prompt contracts,
+    `README.md` (root and scaffold), `getting-started.md`, `context-compilation.md`,
+    `maintenance.md`, `orchestrator-integration.md`, both routing tables, and the three
+    shipped `.claude/commands/` wrappers — the last of these caught by this change's second
+    fresh review, which noted nothing gates them (`sync-scaffold.sh` covers only
+    `templates prompts guides tools`).
   - Fixture-verified: the unqualified-review collision marks *neither* work item done and warns;
     a qualified review credits only its owner; a single-work-item repo still resolves a plain
     `tasks/T-001-implementation-review.md`.

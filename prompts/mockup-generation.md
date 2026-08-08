@@ -48,7 +48,7 @@ What NOT to include:
 4. **Fonts:** use a system font stack unless the Design System declares specific fonts [e.g., Inter + Roboto via Google Fonts]. **Icons:** use inline SVG or Unicode glyphs unless the Design System declares an icon set [e.g., Material Icons].
 5. **DDR component examples take precedence** — if a Component Examples Appendix (`docs/component-examples.md`) is provided, use those HTML patterns for buttons, cards, forms, states, etc. instead of inventing new patterns.
 6. **File naming:** `mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html` (uppercase `T-XXX` task ID, kebab-case screen name).
-   - Example: `mockups/T-011-login.html`, `mockups/T-025-project-board.html`
+   - Example: `mockups/FEAT-011-T-011-login.html`, `mockups/T-025-project-board.html`
 7. **Reviewer header** at the top of the page identifying the task ID, screen name, and which states are shown.
 8. **Static only** — no JavaScript logic. No event handlers, no state management, no fetch calls. (If a CSS framework CDN is used, its own script is the only allowed `<script>`.)
 9. **Use realistic placeholder content** derived from API response DTO shapes when available.
@@ -291,4 +291,4 @@ Viewport: Desktop (1280px)
 </mockup-generation-request>
 ```
 
-**Output:** `mockups/T-011-login.html` — a single HTML file showing all 3 login states side-by-side.
+**Output:** `mockups/FEAT-011-T-011-login.html` — a single HTML file showing all 3 login states side-by-side.

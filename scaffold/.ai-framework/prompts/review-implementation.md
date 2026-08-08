@@ -14,7 +14,7 @@ The reviewer's job is to find problems, not to fix them: unmet acceptance criter
 
 ## How to Use
 
-- **AI agents (Claude Code, etc.):** Run in a **new session** — never the session that implemented the task. Read the context files listed in your project CLAUDE.md's routing table for "Implementation review" (the task block, its plan, the implementation diff or changed files, CLAUDE.md, and the spec shards the task references), follow the sections below, and **write** the review to `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md` (e.g., `tasks/FEAT-012-T-002-implementation-review.md`).
+- **AI agents (Claude Code, etc.):** Run in a **new session** — never the session that implemented the task. Read the context files listed in your project CLAUDE.md's routing table for "Implementation review" (the task block, its plan, the implementation diff or changed files, CLAUDE.md, and the spec shards the task references), follow the sections below, and **write** the review to `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md` (e.g., `tasks/FEAT-001-T-002-implementation-review.md`).
 - **Chat workflows (manual copy-paste):** Use the XML skeleton in the [Chat Workflow Template (XML)](#chat-workflow-template-xml) appendix **in a fresh conversation**. Include this prompt's Guidance, Output Format, and Constraints sections alongside the skeleton, and paste the evidence (test/linter/validator output) — chat reviewers cannot execute tools themselves.
 
 ---
@@ -231,7 +231,7 @@ the review in the Output Format (Verdict, Findings table, Required Changes check
 
 ## Example
 
-Excerpt of `tasks/FEAT-012-T-002-implementation-review.md` — reviewing the implementation of T-002 ("Implement label CRUD endpoints") from TaskFlow's FEAT-001 task list:
+Excerpt of `tasks/FEAT-001-T-002-implementation-review.md` — reviewing the implementation of T-002 ("Implement label CRUD endpoints") from TaskFlow's FEAT-001 task list:
 
 ```markdown
 # Implementation Review: T-002 Implement Label CRUD Endpoints

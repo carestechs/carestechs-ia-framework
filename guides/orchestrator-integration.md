@@ -179,7 +179,7 @@ Conventions: `<WI>` = work-item ID (`FEAT-012`, `BUG-003`, `IMP-002`), `<T>` = t
 
 | | |
 |---|---|
-| Precondition | Task list accepted; the task's Dependencies are complete; **Workflow honored**: `mockup-first` ⇒ run the UI mockup row first (`mockups/<T>-<screen>.html`, human approval) — `investigation-first` ⇒ the investigation task(s) completed and findings recorded before fix tasks are planned. |
+| Precondition | Task list accepted; the task's Dependencies are complete; **Workflow honored**: `mockup-first` ⇒ run the UI mockup row first (`mockups/<WI>-<T>-<screen>.html`, human approval) — `investigation-first` ⇒ the investigation task(s) completed and findings recorded before fix tasks are planned. |
 | Orchestrator provides | `<WI>` and `<T>`. |
 | Session prompt | "Read CLAUDE.md. Create the implementation plan for <T> from tasks/<WI>-tasks.md per the routing row 'Task implementation plan'. Write plans/plan-<WI>-<T>-<slug>.md within the plan budget." |
 | Context (via routing) | The task block, CLAUDE.md, the files its Files to Modify/Create names (existing ones), conditional spec shards. |
@@ -316,7 +316,7 @@ Per-task state is derived down this evidence ladder (first hit wins):
 | Source | Derived state |
 |---|---|
 | `tasks/<WI>-progress.json` overlay entry | as recorded (`done`, `blocked`, ...) |
-| `tasks/<WI>-T-XXX-implementation-review.md` verdict (unqualified `tasks/T-XXX-...` accepted while the ID is unique) | `approve` ⇒ done, `revise` ⇒ needs-fix |
+| `tasks/<WI>-<WORK-ITEM-ID>-T-XXX-implementation-review.md` verdict (unqualified `tasks/T-XXX-...` accepted while the ID is unique) | `approve` ⇒ done, `revise` ⇒ needs-fix |
 | git commit referencing `T-XXX` (type prefix not plan/review/tasks/docs/close/chore; `docs` DOES count for Documentation-type tasks) — **must also name the work item when `T-XXX` is declared by more than one task list** | implemented |
 | `plans/plan-<WI>-T-XXX-*.md` exists (unqualified `plan-T-XXX-*` accepted while the ID is unique) | planned |
 | nothing | pending |
