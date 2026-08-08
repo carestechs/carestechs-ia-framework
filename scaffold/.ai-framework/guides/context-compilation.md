@@ -478,12 +478,12 @@ Before judging semantics, the reviewer runs the external validators — `python 
 
 **Goal**: Adversarially review an implemented task's code changes — after implementation, before the task is marked complete — verify AC satisfaction, plan adherence, scope fidelity, convention compliance, spec sync, and test adequacy.
 
-**Prompt:** `.ai-framework/prompts/review-implementation.md` — writes the review to `tasks/<TASK-ID>-implementation-review.md` (verdict + findings table).
+**Prompt:** `.ai-framework/prompts/review-implementation.md` — writes the review to `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md` (verdict + findings table).
 
 | Priority | Document | Include When | What to Include |
 |----------|----------|--------------|-----------------|
 | Required | Task Block | Always | The single `T-XXX` block under review from `tasks/<WORK-ITEM-ID>-tasks.md` — not the whole task list |
-| Required | Implementation Plan | Always | The full `plans/plan-T-XXX-short-title.md` the implementation was supposed to follow |
+| Required | Implementation Plan | Always | The full `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md` the implementation was supposed to follow |
 | Required | Implementation Diff | Always | The diff or changed-file set, as provided by the requester (e.g., `git diff <base>..<head>` output, or a branch to inspect) |
 | Required | CLAUDE.md | Always | Full document |
 | Required | Spec Shards | Task references entities/endpoints/screens | Each spec's `index.md` + only the shards the task names, mapped via the retrieval-key naming rule |
@@ -503,7 +503,7 @@ Before judging the diff, the reviewer gathers **external evidence** and treats i
   </task-block>
 
   <implementation-plan>
-    [Full plans/plan-T-XXX-short-title.md]
+    [Full plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md]
   </implementation-plan>
 
   <implementation-diff>
@@ -579,7 +579,7 @@ Agents have direct file access and don't need XML assembly. Follow these steps:
 2. **Read the files** listed in the CLAUDE.md routing table for that task type
 3. **For the sharded spec docs**, read each spec's `index.md` plus only the shards named by the work item's impact tables — e.g., for a task about the `TaskLabel` entity and the `/api/task-labels` resource, read `docs/data-model/index.md` + `docs/data-model/entities/task-label.md` and `docs/api-spec/index.md` + `docs/api-spec/endpoints/task-labels.md`. Never read whole spec directories, and never read `docs/rationale/`
 4. **Read the prompt template** from `.ai-framework/prompts/` — use the **Output Format** section as your deliverable structure, and apply the **Guidance**, **Constraints**, and **Post-Generation Checklist**
-5. **Generate the deliverable** directly — no XML wrapping needed — and write it to its canonical location (task lists to `tasks/FEAT-XXX-tasks.md` etc., plans to `plans/plan-T-XXX-short-title.md`, mockups to `mockups/T-XXX-screen-name.html`)
+5. **Generate the deliverable** directly — no XML wrapping needed — and write it to its canonical location (task lists to `tasks/FEAT-XXX-tasks.md` etc., plans to `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md`, mockups to `mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html`)
 
 ### Path B: Manual Context Assembly (Chat Workflows)
 
@@ -658,7 +658,7 @@ Include the specific request, constraints, and output format requirements.
 
 † Sharded spec — include the spec's `index.md` plus ONLY the shards named by the work item's impact tables (see Retrieval Keys) — for Implementation Review, the shards the task itself references. Never load the whole directory; never load `docs/rationale/`.
 
-‡ Runs in a FRESH context — never include the generating/implementing session's transcript or reasoning, never `docs/rationale/`. Task List Review: `.ai-framework/prompts/review-tasks.md` → `tasks/<WORK-ITEM-ID>-review.md`. Implementation Review: `.ai-framework/prompts/review-implementation.md` → `tasks/<TASK-ID>-implementation-review.md`.
+‡ Runs in a FRESH context — never include the generating/implementing session's transcript or reasoning, never `docs/rationale/`. Task List Review: `.ai-framework/prompts/review-tasks.md` → `tasks/<WORK-ITEM-ID>-review.md`. Implementation Review: `.ai-framework/prompts/review-implementation.md` → `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md`.
 
 ---
 

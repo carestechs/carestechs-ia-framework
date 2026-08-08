@@ -20,6 +20,17 @@ Framework versions follow [semantic versioning](https://semver.org/). Projects c
   - Prompt contracts (`review-implementation.md`, `plan-generation.md`) and the routing table in
     `templates/claude-md.md` + scaffold `CLAUDE.md` state the qualified form and why.
   - Legacy repos are unaffected: with one task list, unqualified names resolve exactly as before.
+  - Re-review detection resolves the SAME file the state came from: a hardcoded
+    `tasks/T-XXX-...` pathspec finds nothing once the review is qualified, so the fix loop
+    would never advance to its fresh re-review — caught by this change's own fresh review,
+    which called it "half-wired: it tells every session to write the qualified name, then
+    looks up the unqualified one".
+  - The implementation prompt names the plan that actually exists (qualified or legacy)
+    instead of a hardcoded unqualified path; the mockup ownership check runs only for
+    `mockup-first` tasks, so standard tasks get no spurious warning.
+  - Convention swept through every doc that stated the old form: both prompt contracts, the
+    mockup prompt, `README.md`, `getting-started.md`, `context-compilation.md`,
+    `maintenance.md`, `orchestrator-integration.md`, and both routing tables.
   - Fixture-verified: the unqualified-review collision marks *neither* work item done and warns;
     a qualified review credits only its owner; a single-work-item repo still resolves a plain
     `tasks/T-001-implementation-review.md`.

@@ -14,7 +14,7 @@ Generate a self-contained HTML mockup file for stakeholder visual approval befor
 
 ## How to Use
 
-- **AI agents (Claude Code, etc.):** Read the context files listed in the project CLAUDE.md routing table for "UI mockup" (in particular the target screen's shard `docs/ui-specification/screens/<screen>.md` and the Design System sections from `docs/ui-specification/index.md`), follow the **Guidance**, **Output Format**, and **Constraints** sections below, and **write the output file**: `mockups/T-XXX-screen-name.html`.
+- **AI agents (Claude Code, etc.):** Read the context files listed in the project CLAUDE.md routing table for "UI mockup" (in particular the target screen's shard `docs/ui-specification/screens/<screen>.md` and the Design System sections from `docs/ui-specification/index.md`), follow the **Guidance**, **Output Format**, and **Constraints** sections below, and **write the output file**: `mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html`.
 - **Chat workflows (manual copy-paste):** Use the XML skeleton in the **Chat Workflow Template (XML)** appendix — paste your documentation into the `<context>` sections, fill in the `<mockup-scope>`, and include the Guidance, Output Format, and Constraints sections of this prompt alongside it.
 
 ---
@@ -47,7 +47,7 @@ What NOT to include:
 3. **Optional CSS framework CDN:** if CLAUDE.md declares a CSS framework, the mockup MAY load that framework's official CDN build instead of hand-writing component CSS [e.g., for Tailwind CSS, the v4 browser build: `<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>`, defining tokens with `@theme` in a `<style type="text/tailwindcss">` block]. Do NOT use the deprecated Tailwind v3 Play CDN (`cdn.tailwindcss.com`) with an inline `tailwind.config` JS object. Note: a CDN-based mockup requires network access on first open.
 4. **Fonts:** use a system font stack unless the Design System declares specific fonts [e.g., Inter + Roboto via Google Fonts]. **Icons:** use inline SVG or Unicode glyphs unless the Design System declares an icon set [e.g., Material Icons].
 5. **DDR component examples take precedence** — if a Component Examples Appendix (`docs/component-examples.md`) is provided, use those HTML patterns for buttons, cards, forms, states, etc. instead of inventing new patterns.
-6. **File naming:** `mockups/T-XXX-screen-name.html` (uppercase `T-XXX` task ID, kebab-case screen name).
+6. **File naming:** `mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html` (uppercase `T-XXX` task ID, kebab-case screen name).
    - Example: `mockups/T-011-login.html`, `mockups/T-025-project-board.html`
 7. **Reviewer header** at the top of the page identifying the task ID, screen name, and which states are shown.
 8. **Static only** — no JavaScript logic. No event handlers, no state management, no fetch calls. (If a CSS framework CDN is used, its own script is the only allowed `<script>`.)
@@ -57,7 +57,7 @@ What NOT to include:
 
 1. **Pick a screen** from the UI Specification screen inventory (`docs/ui-specification/index.md`). Prioritize user-facing screens with novel layouts (not standard CRUD), screens with multiple states that stakeholders need to approve, and screens where the ASCII layout sketch needs visual validation.
 2. **Assemble context**: the target screen's shard (`docs/ui-specification/screens/<screen>.md`), the Design System sections from `index.md`, and relevant API response DTOs.
-3. **Generate the mockup** — a single HTML file at `mockups/T-XXX-screen-name.html`.
+3. **Generate the mockup** — a single HTML file at `mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html`.
 4. **Review in browser**: open the file by double-clicking. Verify all states render correctly.
 5. **Share for approval**: send the HTML file to stakeholders for visual feedback. Iterate if needed.
 
@@ -65,7 +65,7 @@ What NOT to include:
 
 ## Output Format
 
-Write the mockup to: **`mockups/T-XXX-screen-name.html`** (uppercase `T-XXX`, kebab-case screen name).
+Write the mockup to: **`mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html`** (uppercase `T-XXX`, kebab-case screen name).
 
 Generate a single HTML file with this structure (default: fully self-contained, plain embedded CSS):
 
@@ -161,7 +161,7 @@ After the AI generates a mockup file, verify:
 - [ ] Design tokens (colors, fonts, spacing) match the UI Specification Design System
 - [ ] Layout matches the ASCII sketch from the UI Specification
 - [ ] Placeholder content is realistic (derived from API DTOs when available)
-- [ ] File is named correctly: `mockups/T-XXX-screen-name.html`
+- [ ] File is named correctly: `mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html`
 - [ ] Reviewer header at top identifies the task ID and states
 - [ ] No JavaScript logic (only a declared CSS framework's own CDN script, if used)
 - [ ] Fonts fall back to the system stack unless the Design System declares specific fonts

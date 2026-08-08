@@ -69,7 +69,7 @@ your-project/
 │       ├── TEMPLATE-bug-report.md
 │       └── TEMPLATE-improvement-proposal.md
 ├── tasks/                        # Generated task lists (FEAT-XXX-tasks.md, ...)
-├── plans/                        # Implementation plans (plan-T-XXX-short-title.md)
+├── plans/                        # Implementation plans (plan-<WORK-ITEM-ID>-T-XXX-short-title.md)
 └── mockups/                      # HTML mockups (T-XXX-screen-name.html)
 ```
 
@@ -292,7 +292,7 @@ Work through the templates in this order. Each step builds on the previous one.
 1. Pick a screen from `docs/ui-specification/screens/`
 2. Use the [`mockup-generation.md`](../prompts/mockup-generation.md) prompt template
 3. Assemble context: the screen's shard (`docs/ui-specification/screens/<screen>.md`) + Design System from `docs/ui-specification/index.md` + CLAUDE.md
-4. Generate the HTML mockup file and save it as `mockups/T-XXX-screen-name.html`
+4. Generate the HTML mockup file and save it as `mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html`
 5. Open in a browser and review visually
 6. Share with stakeholders for approval
 
@@ -433,9 +433,9 @@ Task generation is not just chat output — it produces files that feed the next
 1. **Generate the task list.** The feature/bugfix/refactor prompts write a task list to `tasks/` — `tasks/FEAT-XXX-tasks.md`, `tasks/BUG-XXX-tasks.md`, or `tasks/IMP-XXX-tasks.md` (for ad-hoc work without a work item: `tasks/adhoc-short-title-tasks.md`).
 2. **Validate the task list.** Run `python .ai-framework/tools/validate-tasks.py tasks/<file>.md` and fix every error before planning or implementation. Add `--work-item docs/work-items/<id>-short-title.md` to cross-check the Acceptance Criteria Coverage table (other optional flags: `--root`, `--strict`).
 3. **Review the task list (recommended).** In a NEW agent session — one with no generation history in context — run [`review-tasks.md`](../prompts/review-tasks.md) per the CLAUDE.md routing row "Task list review". The reviewer re-runs `python .ai-framework/tools/validate-tasks.py` and `python .ai-framework/tools/validate-specs.py` as ground truth, then judges the tasks against the work item and spec shards, writing its verdict and findings to `tasks/<WORK-ITEM-ID>-review.md`. Recommended for L/XL work items, or when an orchestrator samples multiple candidate task lists — review each validator-clean candidate, then pick or synthesize the best.
-4. **Plan each task before implementing.** For each task `T-XXX` in the list, run [`plan-generation.md`](../prompts/plan-generation.md) to produce `plans/plan-T-XXX-short-title.md` — a concrete implementation plan an agent can execute.
+4. **Plan each task before implementing.** For each task `T-XXX` in the list, run [`plan-generation.md`](../prompts/plan-generation.md) to produce `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md` — a concrete implementation plan an agent can execute.
 5. **Execute under Workflow Enforcement.** The **Workflow Enforcement** section in your project's CLAUDE.md defines how agents move through the pipeline (which workflow each task follows, when mockups or investigation come first, and how status gets updated).
-6. **Review the implementation (recommended for M+ complexity).** After a task is implemented, in a NEW agent session — one that did NOT implement the task — run [`review-implementation.md`](../prompts/review-implementation.md) per the CLAUDE.md routing row "Implementation review". The reviewer first gathers external evidence as ground truth — the project's test suite and linters, plus `python .ai-framework/tools/validate-specs.py` when the task touched spec shards — then judges the diff against the task's acceptance criteria, its plan, and CLAUDE.md conventions, writing its verdict and findings to `tasks/<TASK-ID>-implementation-review.md`. Address every required change before marking the task complete.
+6. **Review the implementation (recommended for M+ complexity).** After a task is implemented, in a NEW agent session — one that did NOT implement the task — run [`review-implementation.md`](../prompts/review-implementation.md) per the CLAUDE.md routing row "Implementation review". The reviewer first gathers external evidence as ground truth — the project's test suite and linters, plus `python .ai-framework/tools/validate-specs.py` when the task touched spec shards — then judges the diff against the task's acceptance criteria, its plan, and CLAUDE.md conventions, writing its verdict and findings to `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md`. Address every required change before marking the task complete.
 
 ### Assemble Context
 
@@ -512,7 +512,7 @@ Every generated artifact has a fixed home. Agents write to these locations; huma
 | Work items | `docs/work-items/` | `FEAT-XXX-short-title.md`, `BUG-XXX-short-title.md`, `IMP-XXX-short-title.md` |
 | Work item starters | `docs/work-items/` | `TEMPLATE-feature-brief.md`, `TEMPLATE-bug-report.md`, `TEMPLATE-improvement-proposal.md` (copy, don't fill in place) |
 | Task lists | `tasks/` | `FEAT-XXX-tasks.md`, `BUG-XXX-tasks.md`, `IMP-XXX-tasks.md`; ad-hoc work: `adhoc-short-title-tasks.md` |
-| Implementation plans | `plans/` | `plan-T-XXX-short-title.md` |
+| Implementation plans | `plans/` | `plan-<WORK-ITEM-ID>-T-XXX-short-title.md` |
 | HTML mockups | `mockups/` | `T-XXX-screen-name.html` |
 | Component Examples (DDR output) | `docs/` | `component-examples.md` |
 | Data model | `docs/data-model/` | `index.md` + `entities/<entity>.md` (kebab-case, singular) |

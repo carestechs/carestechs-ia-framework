@@ -601,6 +601,14 @@ def compute_work_item(root, wi, subjects, id_owners=None):
     for tid, task in sorted(tasks.items()):
         tag = f"T-{tid:03d}"
         slug = "<slug>"
+        # Name the plan that actually exists (qualified or legacy); fall back to
+        # the qualified placeholder so a session writing one gets the right name.
+        _plan = pick_artifact(
+            plans.get(tid), wi_id, tid,
+            [o for o in ((id_owners or {}).get(tid) or []) if o != wi_id],
+            None, "plan")
+        plan_hint = (f"plans/{_plan.name}" if _plan
+                     else f"plans/plan-{wi_id}-{tag}-{slug}.md")
         state = states[tid]
         if state == "needs-fix":
             # Same re-review detection as the task-list loop: fix commits that
@@ -608,12 +616,17 @@ def compute_work_item(root, wi, subjects, id_owners=None):
             # re-review, not another fix.
             rereview_due = False
             if subjects is not None:
+                rr_others = [o for o in ((id_owners or {}).get(tid) or [])
+                             if o != wi_id]
+                # Resolve the SAME file the state came from: a hardcoded
+                # tasks/T-XXX-... pathspec finds nothing once the review is
+                # work-item-qualified, and re-review would never trigger.
+                rr_path = pick_artifact(reviews.get(tid), wi_id, tid, rr_others,
+                                        None, "implementation review")
                 review_head = last_commit_hash(
-                    root, f"tasks/{tag}-implementation-review.md")
+                    root, rr_path.relative_to(root).as_posix()) if rr_path else None
                 if review_head:
                     later = commit_subjects_since(root, review_head)
-                    rr_others = [o for o in ((id_owners or {}).get(tid) or [])
-                                 if o != wi_id]
                     rr_credited, rr_skipped = impl_commit_match(
                         later, tid, task.get("type", ""), wi_id, bool(rr_others))
                     rereview_due = bool(later) and rr_credited
@@ -668,7 +681,7 @@ def compute_work_item(root, wi, subjects, id_owners=None):
             result["next_steps"].append(step(
                 "implementation",
                 f"Read CLAUDE.md. Implement {tag} from tasks/{wi_id}-tasks.md following "
-                f"plans/plan-{tag}-{slug}.md exactly; document any deviation. Run the test "
+                f"{plan_hint} exactly; document any deviation. Run the test "
                 f"suite and validate-specs before finishing.",
                 "tests green; validate-specs clean when shards were touched", task=tag))
             frontier_tids.append(tid)
@@ -676,7 +689,7 @@ def compute_work_item(root, wi, subjects, id_owners=None):
             result["next_steps"].append(step(
                 "implementation",
                 f"Read CLAUDE.md. Implement {tag} from tasks/{wi_id}-tasks.md following "
-                f"plans/plan-{tag}-{slug}.md exactly; document any deviation. Run the test "
+                f"{plan_hint} exactly; document any deviation. Run the test "
                 f"suite and validate-specs before finishing.",
                 "tests green; validate-specs clean when shards were touched", task=tag))
             frontier_tids.append(tid)
@@ -685,9 +698,12 @@ def compute_work_item(root, wi, subjects, id_owners=None):
         tag = f"T-{tid:03d}"
         if states[tid] != "pending" or not deps_met(task):
             continue
-        mockup_others = [o for o in ((id_owners or {}).get(tid) or []) if o != wi_id]
-        mockup_path = pick_artifact(mockups.get(tid), wi_id, tid, mockup_others,
-                                    result["warnings"], "mockup")
+        mockup_path = None
+        if task["workflow"] == "mockup-first":
+            mockup_others = [o for o in ((id_owners or {}).get(tid) or [])
+                             if o != wi_id]
+            mockup_path = pick_artifact(mockups.get(tid), wi_id, tid, mockup_others,
+                                        result["warnings"], "mockup")
         if task["workflow"] == "mockup-first" and mockup_path is None:
             result["next_steps"].append(step(
                 "mockup",

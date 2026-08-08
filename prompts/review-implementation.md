@@ -14,7 +14,7 @@ The reviewer's job is to find problems, not to fix them: unmet acceptance criter
 
 ## How to Use
 
-- **AI agents (Claude Code, etc.):** Run in a **new session** — never the session that implemented the task. Read the context files listed in your project CLAUDE.md's routing table for "Implementation review" (the task block, its plan, the implementation diff or changed files, CLAUDE.md, and the spec shards the task references), follow the sections below, and **write** the review to `tasks/<TASK-ID>-implementation-review.md` (e.g., `tasks/T-002-implementation-review.md`).
+- **AI agents (Claude Code, etc.):** Run in a **new session** — never the session that implemented the task. Read the context files listed in your project CLAUDE.md's routing table for "Implementation review" (the task block, its plan, the implementation diff or changed files, CLAUDE.md, and the spec shards the task references), follow the sections below, and **write** the review to `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md` (e.g., `tasks/FEAT-012-T-002-implementation-review.md`).
 - **Chat workflows (manual copy-paste):** Use the XML skeleton in the [Chat Workflow Template (XML)](#chat-workflow-template-xml) appendix **in a fresh conversation**. Include this prompt's Guidance, Output Format, and Constraints sections alongside the skeleton, and paste the evidence (test/linter/validator output) — chat reviewers cannot execute tools themselves.
 
 ---
@@ -24,7 +24,7 @@ The reviewer's job is to find problems, not to fix them: unmet acceptance criter
 The reviewer's context is deliberately minimal. Load **only**:
 
 1. **The task block under review** — the single `T-XXX` block from `tasks/<WORK-ITEM-ID>-tasks.md` (Title, Description, Acceptance Criteria, Complexity, Files to Modify/Create, Technical Notes). Not the whole task list — the review targets one task.
-2. **The task's implementation plan** — `plans/plan-T-XXX-short-title.md`, the plan the implementation was supposed to follow.
+2. **The task's implementation plan** — `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md`, the plan the implementation was supposed to follow.
 3. **The implementation diff or the set of changed files** — as provided by the requester: e.g., the output of `git diff <base>..<head>`, a branch to inspect (diff it against its base yourself), or an explicit list of changed files to read. This is the object under review — if it was not provided and cannot be derived, stop and ask for it.
 4. **CLAUDE.md** — conventions, Patterns/Anti-Patterns, error handling, testing rules, maintenance discipline, and the project's test/lint commands.
 5. **The spec shards the task references** — for each entity, endpoint, or screen the task names (in its Description, Acceptance Criteria, or Files to Modify/Create), read that spec's `index.md` plus the shard, mapped via the retrieval-key naming rule: entity `TaskLabel` → `docs/data-model/entities/task-label.md` (singular); resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md` (matches the route segment); screen "Project Board" → `docs/ui-specification/screens/project-board.md`. Do not read whole spec directories.
@@ -61,7 +61,7 @@ Evaluate the implementation against all six points. Every point gets examined; a
 | # | Rubric Point | What to Verify |
 |---|-------------|----------------|
 | 1 | **AC satisfaction** | Every acceptance criterion of the task is checked against the actual diff and observed behavior — never against the implementer's claims. For each AC, locate the code (and the test) that satisfies it; an AC with no corresponding change, or whose verification fails, is unmet |
-| 2 | **Plan adherence** | The implementation follows `plans/plan-T-XXX-short-title.md`. A deviation is not automatically wrong — but an UNDOCUMENTED deviation is a finding: it must be surfaced and justified, not silently absorbed |
+| 2 | **Plan adherence** | The implementation follows `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md`. A deviation is not automatically wrong — but an UNDOCUMENTED deviation is a finding: it must be surfaced and justified, not silently absorbed |
 | 3 | **Scope fidelity** | Nothing in the diff goes beyond the task (and its plan): no drive-by refactors, no unrelated file changes, no features smuggled in. Out-of-scope work belongs in its own task |
 | 4 | **Convention compliance** | The diff follows CLAUDE.md: Patterns to Follow applied, Anti-Patterns to Avoid absent, naming conventions kept, error handling per the standard pattern |
 | 5 | **Spec sync** | If the task changed a contract (entity, endpoint, screen), the corresponding shard was updated in the same change set — with its "Last verified against code" stamp refreshed and a changelog row added to the spec's `index.md` (the maintenance discipline). Contract changed + shard untouched = finding |
@@ -184,7 +184,7 @@ Use in a **fresh conversation** — do not paste this into the conversation that
 
 <implementation-plan>
 <!-- REQUIRED: The plan the implementation was supposed to follow -->
-[Paste full plans/plan-T-XXX-short-title.md content]
+[Paste full plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md content]
 </implementation-plan>
 
 <implementation-diff>
@@ -231,12 +231,12 @@ the review in the Output Format (Verdict, Findings table, Required Changes check
 
 ## Example
 
-Excerpt of `tasks/T-002-implementation-review.md` — reviewing the implementation of T-002 ("Implement label CRUD endpoints") from TaskFlow's FEAT-001 task list:
+Excerpt of `tasks/FEAT-012-T-002-implementation-review.md` — reviewing the implementation of T-002 ("Implement label CRUD endpoints") from TaskFlow's FEAT-001 task list:
 
 ```markdown
 # Implementation Review: T-002 Implement Label CRUD Endpoints
 
-**Task:** T-002 (tasks/FEAT-001-tasks.md) · **Plan:** plans/plan-T-002-label-crud-endpoints.md
+**Task:** T-002 (tasks/FEAT-001-tasks.md) · **Plan:** plans/plan-FEAT-001-T-002-label-crud-endpoints.md
 **Diff:** git diff main..feat/FEAT-001-labels · **Reviewed:** 2026-03-05
 **Evidence:** tests 41 passed / 1 failed · lint 0 errors · validate-specs 0 errors
 

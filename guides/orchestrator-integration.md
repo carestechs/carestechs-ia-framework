@@ -181,9 +181,9 @@ Conventions: `<WI>` = work-item ID (`FEAT-012`, `BUG-003`, `IMP-002`), `<T>` = t
 |---|---|
 | Precondition | Task list accepted; the task's Dependencies are complete; **Workflow honored**: `mockup-first` ⇒ run the UI mockup row first (`mockups/<T>-<screen>.html`, human approval) — `investigation-first` ⇒ the investigation task(s) completed and findings recorded before fix tasks are planned. |
 | Orchestrator provides | `<WI>` and `<T>`. |
-| Session prompt | "Read CLAUDE.md. Create the implementation plan for <T> from tasks/<WI>-tasks.md per the routing row 'Task implementation plan'. Write plans/plan-<T>-<slug>.md within the plan budget." |
+| Session prompt | "Read CLAUDE.md. Create the implementation plan for <T> from tasks/<WI>-tasks.md per the routing row 'Task implementation plan'. Write plans/plan-<WI>-<T>-<slug>.md within the plan budget." |
 | Context (via routing) | The task block, CLAUDE.md, the files its Files to Modify/Create names (existing ones), conditional spec shards. |
-| Output | `plans/plan-<T>-<slug>.md` — ≤ ~150 lines, ≤ 10 steps, Acceptance Verification section. |
+| Output | `plans/plan-<WI>-<T>-<slug>.md` — ≤ ~150 lines, ≤ 10 steps, Acceptance Verification section. |
 | Gate | Mechanical: file exists, ≤ ~150 lines (`line_count` logic), mentions `<T>`. Semantic: human skim or accept on the strength of the baseline (plans measured 9.0 with zero variance — the safest step to auto-accept). |
 | Commit | `plan(<T>): implementation plan` |
 | Events | `started`, `artifact_committed`, `accepted` |
@@ -203,7 +203,7 @@ authority for per-task state (deliberate; see §6).
 |---|---|
 | Precondition | Plan accepted; task assigned. |
 | Orchestrator provides | `<WI>`, `<T>`, and a working branch (recommended: `task/<T>-<slug>`). |
-| Session prompt | "Read CLAUDE.md. Implement <T> from tasks/<WI>-tasks.md following plans/plan-<T>-<slug>.md exactly; document any deviation in the commit message. Update the spec shards your changes affect (+ stamps + index changelog) per the maintenance table. Run the test suite and `python .ai-framework/tools/validate-specs.py --root .` before finishing." |
+| Session prompt | "Read CLAUDE.md. Implement <T> from tasks/<WI>-tasks.md following plans/plan-<WI>-<T>-<slug>.md exactly; document any deviation in the commit message. Update the spec shards your changes affect (+ stamps + index changelog) per the maintenance table. Run the test suite and `python .ai-framework/tools/validate-specs.py --root .` before finishing." |
 | Session tooling | Needs wider Bash allowances (test runner, linters) than other steps. |
 | Output | Code changes + spec-shard updates on the branch. **Implementation record**: the orchestrator stores the branch/commit range against `<T>` (the framework does not — orchestrator-owned state). |
 | Gate | Tests pass; `validate-specs.py` clean when shards were touched. The real gate is step 7. |
@@ -216,7 +216,7 @@ authority for per-task state (deliberate; see §6).
 |---|---|
 | Precondition | Implementation pushed to its branch. **Fresh session — not the implementer.** |
 | Orchestrator provides | `<WI>`, `<T>`, and the diff handle: either a git range (`git diff main..task/<T>-<slug>`) or the branch name. This is the one step where the orchestrator supplies material beyond IDs — the diff is not derivable from the routing table. |
-| Session prompt | "FRESH REVIEW — you did not implement this. Read CLAUDE.md. Review the implementation of <T> per the routing row 'Implementation review'. The diff: `git diff <range>`. Gather evidence first (run tests, linters, validate-specs) and treat it as ground truth. Write tasks/<T>-implementation-review.md." |
+| Session prompt | "FRESH REVIEW — you did not implement this. Read CLAUDE.md. Review the implementation of <T> per the routing row 'Implementation review'. The diff: `git diff <range>`. Gather evidence first (run tests, linters, validate-specs) and treat it as ground truth. Write tasks/<WI>-<T>-implementation-review.md." |
 | Output | `tasks/<WI>-<T>-implementation-review.md` — verdict, findings (AC satisfaction, plan adherence, scope, conventions, spec sync, test adequacy), required changes. ≤ ~120 lines. |
 | Gate | Parse verdict. `revise` ⇒ fix session on the same branch with the review in context, then re-review (cap 2 loops → human). `approve` ⇒ merge the task branch, mark `<T>` complete, emit `accepted` + `completed`. |
 | Commit | `review(<T>): implementation <verdict>` (the review file goes to the main branch or the task branch per your merge flow — pick one and stay consistent). |
