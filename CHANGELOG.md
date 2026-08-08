@@ -2,6 +2,40 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.8.6] — 2026-08-08
+
+### Fixed
+- **A re-review's verdict is read from its Verdict section, not the whole file** (`next-step.py`).
+  `VERDICT_RE` was applied with `search()` across the entire review, so the FIRST match anywhere
+  won — and a re-review's natural opening names the round it supersedes: *"This file overwrites
+  the previous (verdict `revise`) review"*. `[^a-z]*` spans the backtick, so the tool read the
+  PREVIOUS round's verdict. Reported from live use on BUG-004: a re-review that said `approve`
+  was reported as `revise`, and the orchestrator emitted a revision step for work already done.
+  Silent, recurring by construction (every re-review is instructed to overwrite its predecessor,
+  and naming what it supersedes is the natural thing to write), and invisible to both validators
+  because nothing about the artifact is wrong — the same class of trap v2.7.1 closed for stale
+  verdicts, reached by a different route.
+  - `parse_verdict()` now resolves in order: the `## Verdict` section (its heading tail, then its
+    body up to the next heading); then a line that itself DECLARES the verdict (`**Verdict:**
+    approve`); then `None`. Quoted (`>`) lines and fenced blocks are never authoritative — they
+    are someone else's words.
+  - A review file whose verdict cannot be read is no longer guessed at: it yields `None`, the
+    review is not counted as evidence, and the work item carries a warning naming the file. A
+    redundant review pass is the safe failure; pointing the pipeline at finished work is not.
+  - `VERDICT_RE` is unchanged and stays the published cross-tool contract — the fix is *where* it
+    is applied. `guides/orchestrator-integration.md` §2 now states that explicitly, with the
+    measured reason.
+  - `metrics-report.py` reads verdicts the same way. It had the same whole-file search, so on the
+    reported artifact it printed `revise` while `next-step.py` read `approve` — two tools in one
+    scaffold disagreeing about one file. Verified: both now agree on all 54 real artifacts.
+  - Two adversarial shapes closed after the fresh review probed them: a `## Verdict summary`
+    heading can no longer claim the Verdict section ahead of the real one, and "not approve" /
+    "cannot approve" no longer read as `approve`.
+  - Verified against **all 54 review artifacts** in granary, business-framework, flowmarket and
+    both testsys arms: parse result identical to `main` on every one, plus fixtures covering the
+    reported shape, a verdict on the heading line, an inline declaration, a quoted prior verdict
+    followed by a real one, a fenced-only example, and prose-mention-only.
+
 ## [2.8.5] — 2026-08-08
 
 ### Fixed

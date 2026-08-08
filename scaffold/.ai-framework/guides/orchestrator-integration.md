@@ -93,7 +93,13 @@ step=planning wi=FEAT-001 task=T-004 event=accepted tokens=5312 model=sonnet`.
 
 - **Review files** (`tasks/*-review.md`, `tasks/*-implementation-review.md`) contain a
   `## Verdict` heading whose section body is `approve` or `revise` (match
-  `(?i)verdict[^a-z]*(approve|revise)` against the file). `revise` ⇒ loop back with
+  `(?i)verdict[^a-z]*(approve|revise)` **against that section — never the whole file**).
+  Whole-file matching is a live-measured trap: a re-review's natural opening names the
+  round it supersedes ("overwrites the previous (verdict `revise`) review"), `[^a-z]*`
+  spans the backtick, and the first match wins — so an `approve` was read as `revise` and
+  the orchestrator was sent back to finished work. Quoted (`>`) lines and fenced blocks are
+  never authoritative. If no Verdict section parses, treat the review as having no verdict
+  rather than guessing. `revise` ⇒ loop back with
   the review file added to the regenerating/fixing session's context. Since v2.8.0,
   `revise` is reserved for outcome-blocking CONFIRMED findings (the review prompts'
   Step 4 bar: wrong, unbuildable, or unverified as written) and an `approve` may
