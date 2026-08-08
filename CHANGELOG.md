@@ -2,6 +2,40 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.8.4] — 2026-08-08
+
+### Fixed
+- **Commit evidence no longer credits one work item's task to another** (`next-step.py`).
+  Task IDs restart at `T-001` in every task list, and `has_impl_commit` matched `\bT-XXX\b`
+  against every commit subject in the repo with no work-item scoping — so `feat(T-001):
+  extract Chapas design tokens` (FEAT-002) was credited to BUG-001's `T-001`. Reported from
+  live use, where it briefly marked **all five** BUG-001 tasks implemented; the operator
+  corrected it through the progress overlay, and it would have recurred on every future work
+  item. This is a false *positive*, which skips implementation entirely rather than looping —
+  the more dangerous direction.
+  - `task_id_owners()` maps each task ID to the work items whose task lists declare it; when an
+    ID has more than one owner, a commit is credited only if its subject also names the owning
+    work item (`feat(FEAT-002/T-001): ...`). Every `tasks/*-tasks.md` counts, including completed
+    work items' — their commits stay in the log forever, which is what made the collision
+    possible. IDs with a single owner are unchanged, so a repo with one task list behaves exactly
+    as before.
+  - When an otherwise-valid commit is skipped for this reason, the work item carries a warning
+    naming the task, the colliding work items, and what to do — the ambiguity is never silent.
+  - `impl_commit_match()` returns `(credited, skipped_subjects)`; `has_impl_commit()` is kept as
+    the boolean wrapper. Both state derivation and re-review detection pass the work item.
+  - Fixture-verified in all four directions: the reported false positive is gone, the rightful
+    owner is credited once its subject is qualified, the other work item still is not, and an
+    unambiguous single-work-item repo still credits a plain `feat(T-001): ...`.
+- Warning is owner-aware: when the skipped commit names one of the other work items that
+  declares the ID, it says so and offers no `--mark` remedy. The generic advice would have
+  talked an operator (or an orchestrator session) into hand-recreating the exact false positive
+  this check prevents. Re-review detection carries the same warning — a skipped fix commit there
+  would otherwise silently keep printing `implementation-fix` forever. Both from the v2.8.4
+  fresh review.
+- Convention documented where it is used: `guides/orchestrator-integration.md` step 6 commit row
+  and the evidence-ladder section now state the qualified-subject rule and why refusing to credit
+  is the safe direction.
+
 ## [2.8.3] — 2026-08-07
 
 ### Added

@@ -207,7 +207,7 @@ authority for per-task state (deliberate; see §6).
 | Session tooling | Needs wider Bash allowances (test runner, linters) than other steps. |
 | Output | Code changes + spec-shard updates on the branch. **Implementation record**: the orchestrator stores the branch/commit range against `<T>` (the framework does not — orchestrator-owned state). |
 | Gate | Tests pass; `validate-specs.py` clean when shards were touched. The real gate is step 7. |
-| Commit | The session's own commits on the branch; conventional style per CLAUDE.md. |
+| Commit | The session's own commits on the branch; conventional style per CLAUDE.md. **Qualify the task ID with its work item once the repo has a second task list** — `feat(<WI>/<T>): ...` rather than `feat(<T>): ...`. Task IDs restart at `T-001` in every task list and completed work items' lists stay on disk, so from your second work item onward an unqualified subject is ambiguous and `next-step.py` will refuse to credit it (see "Commit evidence" below). |
 | Events | `started`, `artifact_committed` (head SHA in detail), `completed` after step 7 approves |
 
 ### Step 7 — Implementation review (`step: implementation-review`) — FRESH SESSION
@@ -317,9 +317,20 @@ Per-task state is derived down this evidence ladder (first hit wins):
 |---|---|
 | `tasks/<WI>-progress.json` overlay entry | as recorded (`done`, `blocked`, ...) |
 | `tasks/T-XXX-implementation-review.md` verdict | `approve` ⇒ done, `revise` ⇒ needs-fix |
-| git commit referencing `T-XXX` (type prefix not plan/review/tasks/docs/close/chore; `docs` DOES count for Documentation-type tasks) | implemented |
+| git commit referencing `T-XXX` (type prefix not plan/review/tasks/docs/close/chore; `docs` DOES count for Documentation-type tasks) — **must also name the work item when `T-XXX` is declared by more than one task list** | implemented |
 | `plans/plan-T-XXX-*.md` exists | planned |
 | nothing | pending |
+
+**Commit evidence across work items.** Task IDs restart at `T-001` in every task list, so
+`feat(T-001): ...` alone does not say *whose* `T-001` it is. When two task lists declare the
+same ID, `next-step.py` credits a commit only if its subject also names the owning work item
+(`feat(FEAT-002/T-001): ...`, or any subject containing `FEAT-002`), and it warns — naming the
+task and the work item — when it skips an otherwise-valid commit for this reason. Refusing to
+credit is deliberate: a cross-work-item false positive marks a task implemented that nobody
+implemented and **skips** the work, while a missed credit only costs a redundant pass. A repo with a
+single task list under `tasks/` is unaffected — unqualified subjects still count — so in
+practice qualification becomes the convention from your second work item onward, including
+after the first one is completed (its list, and its commits, stay in the repo forever).
 
 The **overlay** (`tasks/<WI>-progress.json`) is §6's orchestrator-owned state in repo
 form — one JSON file per work item, written only by
