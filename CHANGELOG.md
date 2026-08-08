@@ -2,6 +2,33 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.8.4] — 2026-08-08
+
+### Fixed
+- **Commit evidence no longer credits one work item's task to another** (`next-step.py`).
+  Task IDs restart at `T-001` in every task list, and `has_impl_commit` matched `\bT-XXX\b`
+  against every commit subject in the repo with no work-item scoping — so `feat(T-001):
+  extract Chapas design tokens` (FEAT-002) was credited to BUG-001's `T-001`. Reported from
+  live use, where it briefly marked **all five** BUG-001 tasks implemented; the operator
+  corrected it through the progress overlay, and it would have recurred on every future work
+  item. This is a false *positive*, which skips implementation entirely rather than looping —
+  the more dangerous direction.
+  - `shared_task_ids()` finds IDs declared by more than one `tasks/*-tasks.md`; for those IDs
+    a commit is credited only if its subject also names the owning work item
+    (`feat(FEAT-002/T-001): ...`). Unambiguous IDs are unchanged, so single-work-item repos
+    behave exactly as before.
+  - When an otherwise-valid commit is skipped for this reason, the work item carries a warning
+    naming the task, the work item, the qualified-subject form, and the `--mark` escape hatch —
+    the ambiguity is never silent.
+  - `impl_commit_match()` returns `(credited, unqualified_seen)`; `has_impl_commit()` is kept
+    as the boolean wrapper. Both state derivation and re-review detection pass the work item.
+  - Fixture-verified in all four directions: the reported false positive is gone, the rightful
+    owner is credited once its subject is qualified, the other work item still is not, and an
+    unambiguous single-work-item repo still credits a plain `feat(T-001): ...`.
+- Convention documented where it is used: `guides/orchestrator-integration.md` step 6 commit row
+  and the evidence-ladder section now state the qualified-subject rule and why refusing to credit
+  is the safe direction.
+
 ## [2.8.3] — 2026-08-07
 
 ### Added

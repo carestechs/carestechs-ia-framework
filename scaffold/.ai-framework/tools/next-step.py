@@ -30,6 +30,10 @@ Per-task state is derived from these sources, highest precedence first:
   3. git log commit evidence: a commit subject referencing T-XXX whose type prefix is
      not plan/review/tasks/docs/close/chore counts as implementation evidence => implemented
      (exception: docs: DOES count for Documentation-type tasks - their natural prefix).
+     Task IDs restart at T-001 in every task list, so when two task lists declare the
+     same ID the subject must ALSO name the owning work item (feat(FEAT-002/T-001): ...)
+     or it is not credited, with a warning saying so - crediting the wrong work item
+     skips real work, while a missed credit only costs a redundant pass.
   4. plans/plan-T-XXX-*.md exists => planned.
   5. Nothing => pending.
 
@@ -254,30 +258,69 @@ def commit_subjects_since(root, since_hash, rel_path=None):
     return proc.stdout.splitlines()
 
 
-def has_impl_commit(subjects, tid, task_type=""):
-    """Type-aware evidence check (2.8.2, org-review S-2026-08-05-11).
+def impl_commit_match(subjects, tid, task_type="", wi_id=None, require_wi=False):
+    """Commit evidence for one task. Returns (credited, unqualified_seen).
 
-    For a Documentation-type task, `docs:` IS the natural implementation
-    prefix - excluding it made doc tasks whose sessions self-commit invisible
-    to the evidence ladder (measured live: a Documentation task looped through
-    a redundant implementation pass because its `docs: ... (T-XXX)` commit
-    did not count). Every other type keeps the full exclusion list."""
+    Type-aware (2.8.2, org-review S-2026-08-05-11): for a Documentation-type
+    task, `docs:` IS the natural implementation prefix - excluding it made doc
+    tasks whose sessions self-commit invisible to the evidence ladder. Every
+    other type keeps the full exclusion list.
+
+    Work-item-aware (2.8.4): task IDs restart at T-001 in every task list, so
+    `feat(T-001): ...` from one work item was credited to another work item's
+    T-001 - a FALSE POSITIVE, which silently skips implementation instead of
+    looping (reported from live use: a FEAT-002 commit marked all five BUG-001
+    tasks implemented). When the same task ID exists in more than one task
+    list, `require_wi` demands the subject also name the owning work item;
+    otherwise the commit is not credited and `unqualified_seen` reports that a
+    candidate was skipped, so the caller can say why."""
     excluded = NON_IMPL_COMMIT_PREFIXES
     if task_type == "Documentation":
         excluded = tuple(p for p in excluded if p != "docs")
     tag_re = re.compile(rf"\bT-{tid:03d}\b")
+    wi_re = re.compile(rf"\b{re.escape(wi_id)}\b") if wi_id else None
+    credited = False
+    unqualified_seen = False
     for subject in subjects:
         if not tag_re.search(subject):
             continue
         prefix = subject.split(":", 1)[0].strip().lower()
-        if not any(prefix.startswith(p) for p in excluded):
-            return True
-    return False
+        if any(prefix.startswith(p) for p in excluded):
+            continue
+        if require_wi and not (wi_re and wi_re.search(subject)):
+            unqualified_seen = True
+            continue
+        credited = True
+    return credited, unqualified_seen
+
+
+def has_impl_commit(subjects, tid, task_type="", wi_id=None, require_wi=False):
+    return impl_commit_match(subjects, tid, task_type, wi_id, require_wi)[0]
+
+
+def shared_task_ids(root):
+    """Task IDs declared by more than one work item's task list.
+
+    These are the IDs whose commit evidence is ambiguous across work items."""
+    seen, shared = {}, set()
+    tasks_dir = root / "tasks"
+    if not tasks_dir.is_dir():
+        return shared
+    for path in sorted(tasks_dir.glob("*-tasks.md")):
+        m = WI_ID_RE.match(path.name)
+        if not m:
+            continue
+        owner = m.group(0)
+        for tid in parse_task_list(path):
+            if seen.setdefault(tid, owner) != owner:
+                shared.add(tid)
+    return shared
 
 
 # --- state derivation ---
 
-def derive_task_state(task, overlay, reviews, subjects, plans):
+def derive_task_state(task, overlay, reviews, subjects, plans,
+                      wi_id=None, shared_ids=frozenset(), warnings=None):
     """Returns (state, evidence). States: pending planned implemented needs-fix
     done blocked assigned in-progress."""
     tid = task["id"]
@@ -301,8 +344,19 @@ def derive_task_state(task, overlay, reviews, subjects, plans):
             return "done", f"review approve ({reviews[tid].name})"
         if verdict == "revise":
             return "needs-fix", f"review revise ({reviews[tid].name})"
-    if subjects is not None and has_impl_commit(subjects, tid, task.get("type", "")):
-        return "implemented", "implementation commit(s) in git log"
+    if subjects is not None:
+        credited, unqualified = impl_commit_match(
+            subjects, tid, task.get("type", ""), wi_id, tid in shared_ids)
+        if credited:
+            return "implemented", "implementation commit(s) in git log"
+        if unqualified and warnings is not None:
+            warnings.append(
+                f"{tag}: commit evidence mentioning {tag} exists but does not name "
+                f"{wi_id}, and {tag} is also declared by another work item's task "
+                f"list - NOT credited (a cross-work-item false positive is worse "
+                f"than a missed one). Qualify the commit subject with the work-item "
+                f"id (e.g. 'feat({wi_id}/{tag}): ...') or record the state with "
+                f"--mark {tag}=implemented.")
     if tid in plans:
         return "planned", f"plan exists ({plans[tid].name})"
     return "pending", "no artifacts"
@@ -316,7 +370,7 @@ def step(name, prompt, gate, fresh=False, task=None, note=""):
             "prompt": prompt, "gate": gate, "note": note}
 
 
-def compute_work_item(root, wi, subjects):
+def compute_work_item(root, wi, subjects, shared_ids=frozenset()):
     wi_id = wi["id"]
     tasks_path = root / "tasks" / f"{wi_id}-tasks.md"
     review_path = root / "tasks" / f"{wi_id}-review.md"
@@ -416,7 +470,9 @@ def compute_work_item(root, wi, subjects):
 
     states = {}
     for tid, task in sorted(tasks.items()):
-        state, evidence = derive_task_state(task, overlay, reviews, subjects, plans)
+        state, evidence = derive_task_state(
+            task, overlay, reviews, subjects, plans,
+            wi_id, shared_ids, result["warnings"])
         states[tid] = state
         result["tasks"].append({
             "id": f"T-{tid:03d}", "title": task["title"], "type": task["type"],
@@ -488,7 +544,8 @@ def compute_work_item(root, wi, subjects):
                 if review_head:
                     later = commit_subjects_since(root, review_head)
                     rereview_due = bool(later) and has_impl_commit(
-                        later, tid, task.get("type", ""))
+                        later, tid, task.get("type", ""),
+                        wi_id, tid in shared_ids)
             if rereview_due:
                 result["next_steps"].append(step(
                     "implementation-review",
@@ -768,13 +825,16 @@ def main():
             return 1
 
     subjects = git_commit_subjects(root)
+    # Task IDs restart per task list; ambiguous ones need work-item-qualified
+    # commits before they count as evidence (2.8.4).
+    shared = shared_task_ids(root)
     report = {"root": str(root), "work_items": [], "closed": [], "notes": []}
     if subjects is None:
         report["notes"].append("not a git repo (or git unavailable) - commit evidence "
                                "disabled; task states rely on reviews, plans, and the overlay")
 
     for wi in work_items:
-        computed = compute_work_item(root, wi, subjects)
+        computed = compute_work_item(root, wi, subjects, shared)
         if computed["position"] == "closed":
             report["closed"].append(wi["id"])
         else:
