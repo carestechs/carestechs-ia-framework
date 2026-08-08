@@ -13,15 +13,16 @@ Framework versions follow [semantic versioning](https://semver.org/). Projects c
   corrected it through the progress overlay, and it would have recurred on every future work
   item. This is a false *positive*, which skips implementation entirely rather than looping —
   the more dangerous direction.
-  - `shared_task_ids()` finds IDs declared by more than one `tasks/*-tasks.md`; for those IDs
-    a commit is credited only if its subject also names the owning work item
-    (`feat(FEAT-002/T-001): ...`). Unambiguous IDs are unchanged, so single-work-item repos
-    behave exactly as before.
+  - `task_id_owners()` maps each task ID to the work items whose task lists declare it; when an
+    ID has more than one owner, a commit is credited only if its subject also names the owning
+    work item (`feat(FEAT-002/T-001): ...`). Every `tasks/*-tasks.md` counts, including completed
+    work items' — their commits stay in the log forever, which is what made the collision
+    possible. IDs with a single owner are unchanged, so a repo with one task list behaves exactly
+    as before.
   - When an otherwise-valid commit is skipped for this reason, the work item carries a warning
-    naming the task, the work item, the qualified-subject form, and the `--mark` escape hatch —
-    the ambiguity is never silent.
-  - `impl_commit_match()` returns `(credited, unqualified_seen)`; `has_impl_commit()` is kept
-    as the boolean wrapper. Both state derivation and re-review detection pass the work item.
+    naming the task, the colliding work items, and what to do — the ambiguity is never silent.
+  - `impl_commit_match()` returns `(credited, skipped_subjects)`; `has_impl_commit()` is kept as
+    the boolean wrapper. Both state derivation and re-review detection pass the work item.
   - Fixture-verified in all four directions: the reported false positive is gone, the rightful
     owner is credited once its subject is qualified, the other work item still is not, and an
     unambiguous single-work-item repo still credits a plain `feat(T-001): ...`.
