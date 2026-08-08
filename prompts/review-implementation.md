@@ -97,7 +97,14 @@ Do not fix the code yourself. The review file is the deliverable; fixes happen i
 
 ## Output Format
 
-**Output file:** `tasks/<TASK-ID>-implementation-review.md` (e.g., `tasks/T-002-implementation-review.md`). AI agents write this file — the review is not just chat output.
+**Output file:** `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md` (e.g., `tasks/FEAT-002-T-002-implementation-review.md`). AI agents write this file — the review is not just chat output.
+
+> **Work-item-qualified filename.** Task IDs restart at `T-001` in every task list, so an
+> unqualified artifact name does not say which work item owns it. Include the work-item id
+> (e.g. `FEAT-002-T-001-...`): `next-step.py` refuses to use an unqualified artifact as
+> evidence when another task list declares the same ID, because crediting another work
+> item's artifact skips real work. Legacy unqualified names still work while the ID is unique.
+
 
 Structure:
 
@@ -157,7 +164,7 @@ After writing the review, verify:
 - [ ] Non-blocking findings (whatever their severity) are recorded under `## Advisories`, not silently dropped and not smuggled into the blocking checklist
 - [ ] The review is ≤ ~120 lines and contains no rewritten code
 - [ ] No implementer transcript or rationale file was loaded during the review
-- [ ] Review saved to `tasks/<TASK-ID>-implementation-review.md` (agents)
+- [ ] Review saved to `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md` (agents)
 
 ---
 

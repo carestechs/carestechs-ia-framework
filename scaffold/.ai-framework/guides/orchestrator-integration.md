@@ -217,7 +217,7 @@ authority for per-task state (deliberate; see §6).
 | Precondition | Implementation pushed to its branch. **Fresh session — not the implementer.** |
 | Orchestrator provides | `<WI>`, `<T>`, and the diff handle: either a git range (`git diff main..task/<T>-<slug>`) or the branch name. This is the one step where the orchestrator supplies material beyond IDs — the diff is not derivable from the routing table. |
 | Session prompt | "FRESH REVIEW — you did not implement this. Read CLAUDE.md. Review the implementation of <T> per the routing row 'Implementation review'. The diff: `git diff <range>`. Gather evidence first (run tests, linters, validate-specs) and treat it as ground truth. Write tasks/<T>-implementation-review.md." |
-| Output | `tasks/<T>-implementation-review.md` — verdict, findings (AC satisfaction, plan adherence, scope, conventions, spec sync, test adequacy), required changes. ≤ ~120 lines. |
+| Output | `tasks/<WI>-<T>-implementation-review.md` — verdict, findings (AC satisfaction, plan adherence, scope, conventions, spec sync, test adequacy), required changes. ≤ ~120 lines. |
 | Gate | Parse verdict. `revise` ⇒ fix session on the same branch with the review in context, then re-review (cap 2 loops → human). `approve` ⇒ merge the task branch, mark `<T>` complete, emit `accepted` + `completed`. |
 | Commit | `review(<T>): implementation <verdict>` (the review file goes to the main branch or the task branch per your merge flow — pick one and stay consistent). |
 | Skip rule | Recommended for M+ complexity; S tasks may go straight to merge on green tests. Measured: these reviews catch unplanned real defects, not just planted ones — skip sparingly. |
@@ -316,10 +316,18 @@ Per-task state is derived down this evidence ladder (first hit wins):
 | Source | Derived state |
 |---|---|
 | `tasks/<WI>-progress.json` overlay entry | as recorded (`done`, `blocked`, ...) |
-| `tasks/T-XXX-implementation-review.md` verdict | `approve` ⇒ done, `revise` ⇒ needs-fix |
+| `tasks/<WI>-T-XXX-implementation-review.md` verdict (unqualified `tasks/T-XXX-...` accepted while the ID is unique) | `approve` ⇒ done, `revise` ⇒ needs-fix |
 | git commit referencing `T-XXX` (type prefix not plan/review/tasks/docs/close/chore; `docs` DOES count for Documentation-type tasks) — **must also name the work item when `T-XXX` is declared by more than one task list** | implemented |
-| `plans/plan-T-XXX-*.md` exists | planned |
+| `plans/plan-<WI>-T-XXX-*.md` exists (unqualified `plan-T-XXX-*` accepted while the ID is unique) | planned |
 | nothing | pending |
+
+**Task artifacts across work items.** The same collision applies to every per-task artifact
+— review files, plans and mockups are all named by task ID alone, and the review rung *outranks*
+commit evidence, so a stray `tasks/T-001-implementation-review.md` written for one work item used
+to mark another work item's `T-001` **done**, skipping implementation and review with no warning.
+Artifacts now carry the owning work item (`tasks/FEAT-002-T-001-implementation-review.md`,
+`plans/plan-FEAT-002-T-001-*.md`, `mockups/FEAT-002-T-001-*.html`); an unqualified name is still
+honoured while no other task list declares that ID, and is refused with a warning once one does.
 
 **Commit evidence across work items.** Task IDs restart at `T-001` in every task list, so
 `feat(T-001): ...` alone does not say *whose* `T-001` it is. When two task lists declare the

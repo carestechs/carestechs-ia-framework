@@ -2,6 +2,28 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.8.5] — 2026-08-08
+
+### Fixed
+- **Per-task artifacts are work-item-scoped too** (`next-step.py`, prompts, routing table).
+  v2.8.4 closed the task-ID collision on the commit rung; its own fresh review found the same
+  collision untouched on the rungs *above* it, where it is worse. `tasks/T-XXX-implementation-review.md`,
+  `plans/plan-T-XXX-*.md` and `mockups/T-XXX-*.html` are named by task ID alone, and the review
+  rung outranks commit evidence — so a review file written for FEAT-002's `T-001` marked
+  **BUG-001's** `T-001` `done`, skipping implementation *and* review, with no warning at all.
+  - Artifacts now carry the owning work item: `tasks/<WI>-T-XXX-implementation-review.md`,
+    `plans/plan-<WI>-T-XXX-*.md`, `mockups/<WI>-T-XXX-*.html`. `pick_artifact()` prefers the
+    qualified name, accepts an unqualified one only while no other task list declares that ID,
+    and otherwise refuses it with a warning — the same fail-safe as commit evidence.
+  - Every path the tool prints (review, re-review, fix, plan, mockup prompts and gates) is now
+    qualified, so sessions write the disambiguated name by default.
+  - Prompt contracts (`review-implementation.md`, `plan-generation.md`) and the routing table in
+    `templates/claude-md.md` + scaffold `CLAUDE.md` state the qualified form and why.
+  - Legacy repos are unaffected: with one task list, unqualified names resolve exactly as before.
+  - Fixture-verified: the unqualified-review collision marks *neither* work item done and warns;
+    a qualified review credits only its owner; a single-work-item repo still resolves a plain
+    `tasks/T-001-implementation-review.md`.
+
 ## [2.8.4] — 2026-08-08
 
 ### Fixed

@@ -16,7 +16,7 @@ Task definitions follow the canonical task schema in `prompts/base-template.md`,
 
 ## How to Use
 
-- **AI agents (Claude Code, etc.):** Read the task definition (T-XXX) from the task list file `tasks/<WORK-ITEM-ID>-tasks.md`, read `CLAUDE.md` for conventions, read the files listed in the task's "Files to Modify/Create" to understand current code state, add relevant specs per Required Context below, follow the sections below, and **write** the plan to `plans/plan-T-XXX-short-title.md`.
+- **AI agents (Claude Code, etc.):** Read the task definition (T-XXX) from the task list file `tasks/<WORK-ITEM-ID>-tasks.md`, read `CLAUDE.md` for conventions, read the files listed in the task's "Files to Modify/Create" to understand current code state, add relevant specs per Required Context below, follow the sections below, and **write** the plan to `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md`.
 - **Chat workflows (manual copy-paste):** Use the XML skeleton in the [Chat Workflow Template (XML)](#chat-workflow-template-xml) appendix. Include this prompt's Guidance and Output Format sections alongside the skeleton so the assistant knows the rules and plan structure.
 
 ---
@@ -75,7 +75,14 @@ Plan generation has its own context recipe (it operates on a single task, not a 
 
 ## Output Format
 
-**Output file:** `plans/plan-T-XXX-short-title.md` — uppercase `T-XXX`, kebab-case short title. Example: `plans/plan-T-035-delivery-fee-service.md`. AI agents write this file.
+**Output file:** `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md` — uppercase `T-XXX`, kebab-case short title. Example: `plans/plan-FEAT-012-T-035-delivery-fee-service.md`. AI agents write this file.
+
+> **Work-item-qualified filename.** Task IDs restart at `T-001` in every task list, so an
+> unqualified artifact name does not say which work item owns it. Include the work-item id
+> (e.g. `FEAT-002-T-001-...`): `next-step.py` refuses to use an unqualified artifact as
+> evidence when another task list declares the same ID, because crediting another work
+> item's artifact skips real work. Legacy unqualified names still work while the ID is unique.
+
 
 **Plan budget** (the output budget for plans — a plan is the implementing developer's or agent's context, so verbosity degrades implementation precision): a plan is ≤ ~150 lines and ≤ 10 implementation steps, and each step names concrete files and changes. If a plan wants more, the task is too big — send it back to the task list for splitting.
 
@@ -137,7 +144,7 @@ to implement without ambiguity. Reference patterns from CLAUDE.md.]
 
 After the AI generates a plan file, verify:
 
-- [ ] Plan file is saved to `plans/plan-T-XXX-short-title.md` with correct naming (uppercase `T-XXX`, kebab-case title)
+- [ ] Plan file is saved to `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md` with correct naming (uppercase `T-XXX`, kebab-case title)
 - [ ] Task Reference section matches the task definition exactly
 - [ ] Overview clearly explains what and why in plain language
 - [ ] Every file in the task's "Files to Modify/Create" is covered by at least one step
@@ -278,4 +285,4 @@ Task Title: Add delivery fee calculation to order summary
 </plan-generation-request>
 ```
 
-**Output:** `plans/plan-T-035-delivery-fee-service.md`
+**Output:** `plans/plan-FEAT-012-T-035-delivery-fee-service.md`

@@ -162,12 +162,12 @@ When asked to generate tasks, identify the task type, read the required files, r
 | Task list review | `.ai-framework/prompts/review-tasks.md` | The task list under review (`tasks/<WORK-ITEM-ID>-tasks.md`), the work item, each spec's `index.md` + the shards named by the work item's impact tables, `CLAUDE.md`. **MUST run in a fresh agent session** — no generation history in context | `tasks/<WORK-ITEM-ID>-review.md` |
 | Spec generation | `.ai-framework/prompts/spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md` | `docs/data-model/index.md` + `docs/data-model/entities/*.md`, `docs/api-spec/index.md` + `docs/api-spec/endpoints/*.md` |
 | UI spec generation | `.ai-framework/prompts/ui-spec-generation.md` | `docs/stakeholder-definition.md`, `CLAUDE.md`, `docs/ARCHITECTURE.md`, `docs/api-spec/index.md` + `docs/api-spec/endpoints/*.md` | `docs/ui-specification/` (`index.md` + `screens/*.md` + `components.md`) |
-| UI mockup | `.ai-framework/prompts/mockup-generation.md` | `docs/ui-specification/screens/<screen>.md` (target screen) + Design System from `docs/ui-specification/index.md`, `CLAUDE.md` | `mockups/T-XXX-screen-name.html` |
+| UI mockup | `.ai-framework/prompts/mockup-generation.md` | `docs/ui-specification/screens/<screen>.md` (target screen) + Design System from `docs/ui-specification/index.md`, `CLAUDE.md` | `mockups/<WORK-ITEM-ID>-T-XXX-screen-name.html` |
 | ADR compilation | `.ai-framework/prompts/compile-adrs.md` | ADR files (from shared ADR repo), `.ai-framework/templates/` | Updated `CLAUDE.md` sections |
 | DDR compilation | `.ai-framework/prompts/compile-ddrs.md` | DDR files (from shared DDR repo), `.ai-framework/templates/` | `docs/component-examples.md`, updated `docs/ui-specification/index.md` + `CLAUDE.md` design sections |
 | Release transition | `.ai-framework/guides/release-lifecycle.md` | `docs/stakeholder-definition.md`, `CLAUDE.md` | Updated `docs/stakeholder-definition.md` |
-| Task implementation plan | `.ai-framework/prompts/plan-generation.md` | `CLAUDE.md`, task definition, files listed in task's "Files to Modify/Create" | `plans/plan-T-XXX-short-title.md` |
-| Implementation review | `.ai-framework/prompts/review-implementation.md` | The task block (from `tasks/<WORK-ITEM-ID>-tasks.md`), its plan (`plans/plan-T-XXX-short-title.md`), the implementation diff or changed files (as provided by the requester), `CLAUDE.md`, the spec shards the task references (via retrieval keys). **MUST run in a fresh agent session** — no implementation history in context | `tasks/<TASK-ID>-implementation-review.md` |
+| Task implementation plan | `.ai-framework/prompts/plan-generation.md` | `CLAUDE.md`, task definition, files listed in task's "Files to Modify/Create" | `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md` |
+| Implementation review | `.ai-framework/prompts/review-implementation.md` | The task block (from `tasks/<WORK-ITEM-ID>-tasks.md`), its plan (`plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md`), the implementation diff or changed files (as provided by the requester), `CLAUDE.md`, the spec shards the task references (via retrieval keys). **MUST run in a fresh agent session** — no implementation history in context | `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md` |
 | Testing / Integration / Prioritization | No dedicated prompt — use `.ai-framework/prompts/base-template.md` with the context recipe from `.ai-framework/guides/context-compilation.md` | Per the context recipe for that task type | `tasks/adhoc-short-title-tasks.md` |
 
 **Optional context** (read only when relevant to the specific task):
@@ -194,9 +194,9 @@ Each task definition (in the task-list file under `tasks/` — e.g., `tasks/FEAT
 
 | Workflow | Required Steps Before Implementation |
 |----------|--------------------------------------|
-| `standard` | 1. Generate an implementation plan using `.ai-framework/prompts/plan-generation.md`. Output: `plans/plan-T-XXX-short-title.md`. 2. Implement following the plan. |
-| `mockup-first` | 1. Generate an HTML mockup using `.ai-framework/prompts/mockup-generation.md`. Get stakeholder approval. See `.ai-framework/guides/getting-started.md` Step 7.5. 2. Generate an implementation plan using `.ai-framework/prompts/plan-generation.md`. Output: `plans/plan-T-XXX-short-title.md`. 3. Implement following the plan. |
-| `investigation-first` | 1. Complete all investigation steps in the task. Document findings (root cause, affected areas). 2. Generate an implementation plan using `.ai-framework/prompts/plan-generation.md`. Output: `plans/plan-T-XXX-short-title.md`. 3. Implement following the plan. |
+| `standard` | 1. Generate an implementation plan using `.ai-framework/prompts/plan-generation.md`. Output: `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md`. 2. Implement following the plan. |
+| `mockup-first` | 1. Generate an HTML mockup using `.ai-framework/prompts/mockup-generation.md`. Get stakeholder approval. See `.ai-framework/guides/getting-started.md` Step 7.5. 2. Generate an implementation plan using `.ai-framework/prompts/plan-generation.md`. Output: `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md`. 3. Implement following the plan. |
+| `investigation-first` | 1. Complete all investigation steps in the task. Document findings (root cause, affected areas). 2. Generate an implementation plan using `.ai-framework/prompts/plan-generation.md`. Output: `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md`. 3. Implement following the plan. |
 
 **If a task has no Workflow field** (legacy tasks), classify it yourself:
 - Type is Frontend + adds/changes a screen → treat as `mockup-first`
@@ -215,10 +215,10 @@ Then follow this sequence for **each task**:
 
 1. **Pick a task** from the task-list file in `tasks/` (respect dependency order).
 2. **Check its Workflow field** and complete any prerequisites (see Workflow Enforcement above).
-3. **Generate an implementation plan** using `.ai-framework/prompts/plan-generation.md`. Output: `plans/plan-T-XXX-short-title.md`.
+3. **Generate an implementation plan** using `.ai-framework/prompts/plan-generation.md`. Output: `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md`.
 4. **Implement** following the steps in the plan.
 5. **Verify** the acceptance criteria from the task definition are met.
-6. **Implementation review (recommended for M+ complexity):** in a NEW session, run the Implementation review row from the routing table above (`.ai-framework/prompts/review-implementation.md` → `tasks/<TASK-ID>-implementation-review.md`) — the reviewer must not be the session that implemented the task. Address every required change before marking the task complete.
+6. **Implementation review (recommended for M+ complexity):** in a NEW session, run the Implementation review row from the routing table above (`.ai-framework/prompts/review-implementation.md` → `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md`) — the reviewer must not be the session that implemented the task. Address every required change before marking the task complete.
 
 This sequence applies to every task. The plan file is a developer-facing artifact — it bridges "what to do" (task definition) and "how to do it" (exact code changes).
 
