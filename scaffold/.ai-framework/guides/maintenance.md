@@ -182,7 +182,7 @@ Every spec shard (`docs/data-model/entities/*.md`, `docs/api-spec/endpoints/*.md
 - [ ] Field types and constraints match migration code?
 - [ ] Indexes listed match actual migration indexes?
 - [ ] Enum values match C# enum definitions?
-- [ ] Cross-module references are ID-only (no navigation properties)?
+- [ ] Cross-module references match the form recorded in the Key Modeling Decisions table?
 - [ ] Relationships overview (ER diagram) in `index.md` reflects current entity structure?
 - [ ] Business rules are accurate and complete?
 

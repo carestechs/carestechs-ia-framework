@@ -172,7 +172,7 @@ When generating tasks from this document set:
 
 1. **Shard loading**: Read `index.md` plus ONLY the resource shards named by the work item's impact tables (mapped via the Naming Rule) — do not read the whole `endpoints/` directory
 2. **Controller structure**: Each resource shard maps to a controller / route group — generate controller tasks per resource, not per endpoint
-3. **DTO generation**: Request and response JSON shapes map directly to DTO classes — generate DTOs in the owning module
+3. **DTO generation**: Request and response JSON shapes map directly to DTO classes — generate DTOs where the owning module's conventions (CLAUDE.md) place them
 4. **Status codes**: Every endpoint must handle all listed status codes — include error-path tasks
 5. **Auth requirements**: Respect the auth/roles attributes — generate middleware or attribute decorations accordingly
 6. **Response envelope**: All responses must use the shared envelope format (Section 2.1) — never return raw entities
