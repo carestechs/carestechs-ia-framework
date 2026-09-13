@@ -19,15 +19,16 @@
 | <!-- e.g., Primary key strategy --> | <!-- e.g., UUIDs --> | <!-- e.g., No sequential ID leaks --> |
 | <!-- e.g., Soft vs hard deletes --> | <!-- e.g., Soft deletes with `deleted_at` --> | <!-- e.g., Audit trail --> |
 | <!-- e.g., Timestamp handling --> | <!-- e.g., TIMESTAMPTZ, always UTC --> | <!-- e.g., Timezone consistency --> |
+| <!-- Cross-module references --> | <!-- e.g., Foreign IDs only, no navigation properties — or navigation properties within a shared persistence unit --> | <!-- e.g., Why this form was chosen --> |
 
 ## 2. Module Ownership
 
-<!-- TODO: Every entity belongs to exactly one module. This table doubles as the shard directory — every entity listed here must have a shard at entities/<entity>.md -->
+<!-- TODO: Every entity has exactly one owning module — a documentation boundary, not an architecture rule; how modules reference each other is the decision recorded in Section 1.2. This table doubles as the shard directory — every entity listed here must have a shard at entities/<entity>.md -->
 
-| Module | Entities Owned | Persistence Unit [e.g., EF Core DbContext / Prisma schema] |
+| Module | Entities Owned | Persistence Unit [e.g., DbContext / Prisma schema — shared or per module, per Section 1.2] |
 |--------|---------------|-------------------------------------------------------------|
-| <!-- e.g., Users --> | <!-- e.g., User, Role --> | <!-- e.g., UsersDbContext --> |
-| <!-- e.g., Projects --> | <!-- e.g., Project, ProjectMember --> | <!-- e.g., ProjectsDbContext --> |
+| <!-- e.g., Users --> | <!-- e.g., User, Role --> | <!-- e.g., AppDbContext --> |
+| <!-- e.g., Projects --> | <!-- e.g., Project, ProjectMember --> | <!-- e.g., AppDbContext --> |
 
 ## 3. Database Conventions
 
@@ -56,7 +57,7 @@
 
 ### 4.3 Cross-Module References
 
-<!-- These are ID-only references — no navigation properties across module boundaries -->
+<!-- References between entities owned by different modules. Their form (ID-only, navigation property, DB-level FK) follows the Section 1.2 decision — state it in the Field column -->
 
 | Source Entity (Module) | Target Entity (Module) | Field | Purpose |
 |----------------------|----------------------|-------|---------|
@@ -96,9 +97,9 @@
 ## Usage Notes for AI Task Generation
 
 - **Shard loading**: Read this `index.md` plus ONLY the entity shards named by the work item's impact tables — do not read the whole `entities/` directory
-- **Module boundaries**: Every data-access task must target the correct module's persistence unit [e.g., DbContext / Prisma client / repository]
+- **Persistence units**: Every data-access task must target the persistence unit recorded for the owning module in Section 2; cross-module access follows the Section 1.2 decision
 - **Field completeness**: Generated entity classes must include all fields defined in the entity's shard
-- **Relationship integrity**: Ensure cascade behaviors and cross-module ID-only references are respected
+- **Relationship integrity**: Ensure cascade behaviors and the recorded form of cross-module references (Section 1.2) are respected
 - **Naming conventions**: Table and column names must follow the conventions in Section 3
 - **New entities**: Create a new shard at `entities/<entity>.md` (copy `entities/TEMPLATE-entity.md`), add a Module Ownership row (Section 2), add its relationships to Section 4, and record the change in the Changelog
 

@@ -47,7 +47,7 @@ For each entity, determine:
 - What indexes are needed (from query patterns implied by the UI)
 
 Cross-module references:
-- Use ID-only references (no navigation properties across modules)
+- Implement them in the form the Architecture and CLAUDE.md prescribe (ID-only, navigation properties, or database-level foreign keys) and record that choice in the Key Modeling Decisions table — do not default to one form
 - Note which module owns the reference and which module owns the target
 - Document the purpose of each cross-module reference
 
@@ -200,7 +200,7 @@ After the AI generates a spec document set, verify:
 - [ ] Each entity has an explicit module owner (exactly one module)
 - [ ] All field types are specific (not vague — `string(200)` not just `string`)
 - [ ] Relationships are fully defined with cascade behaviors
-- [ ] Cross-module references are ID-only (no navigation properties)
+- [ ] Cross-module references follow the form recorded in Key Modeling Decisions (no unstated default)
 - [ ] Enums are defined with all values listed
 - [ ] Standard audit fields (id, created_at, updated_at) are on every entity
 - [ ] Indexes are defined for fields used in lookups and filters
@@ -317,7 +317,7 @@ Phase 5: Collaborate via comments and file attachments on tasks
 - Soft deletes with deleted_at where appropriate
 ## Naming
 - Entity class: PascalCase (TaskItem, not Task)
-- Persistence unit: {Module}DbContext
+- Persistence unit: as the project decides — e.g., one shared AppDbContext, or {Module}DbContext per module
 </code-conventions>
 
 </context>

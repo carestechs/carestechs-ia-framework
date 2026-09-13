@@ -2,6 +2,45 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.9.0] — 2026-09-12
+
+### Changed
+- **The data-model template and spec-generation prompt are architecture-neutral** (`templates/data-model.md`,
+  `prompts/spec-generation.md`, `templates/api-spec.md`, `guides/getting-started.md`, `guides/maintenance.md`,
+  scaffold `docs/data-model/`). The templates carried one architecture's rules as defaults — *every entity
+  belongs to exactly one module, cross-module references are ID-only, no navigation properties, no
+  cross-module foreign keys, one persistence unit per module, never query across module boundaries* —
+  in the Module Ownership guidance, the Cross-Module References note, three of the index's Usage Notes
+  for AI Task Generation, the example relationship row, and the spec-generation checklist. Those are the
+  modular-monolith ADR's constraints (see the worked example in `prompts/compile-adrs.md`), absorbed into
+  the templates as if every project had adopted that ADR. Found while evaluating the framework against a
+  multi-tenant, per-Lambda .NET codebase with one DbContext and navigation properties everywhere: the
+  generated index would assert boundaries the code does not have, and usage notes 2, 4 and 8 would
+  contradict the project's own Key Modeling Decisions row.
+  - **Ownership stays; the constraints go.** "Exactly one owning module" is kept as what it always was
+    mechanically — the shard directory (one row per entity, one shard per row) — and is now labelled a
+    documentation boundary. Every sentence that prescribed *how* modules reference each other now defers
+    to the **Cross-module references** row of Section 1.2 Key Modeling Decisions, which is where the
+    project records the choice (ID-only, navigation properties, database-level FKs; shared or per-module
+    persistence unit). The example value on that row shows both shapes so neither reads as the default.
+  - `prompts/spec-generation.md`: the generator is told to implement cross-module references in the form
+    the Architecture and CLAUDE.md prescribe and to record that choice in the decisions table — "do not
+    default to one form"; the checklist item becomes "follows the form recorded in Key Modeling Decisions".
+    The sample `<code-conventions>` block no longer states `{Module}DbContext` as the persistence unit.
+  - `templates/api-spec.md` usage note 3: DTOs go "where the owning module's conventions (CLAUDE.md)
+    place them" rather than "in the owning module".
+  - Scaffold `docs/data-model/index.md` gains the Cross-module references row in Section 1.2 (it was in
+    the template but not in the scaffold copy), and its TODO comments and usage notes carry the same
+    decision-referencing wording; `entities/TEMPLATE-entity.md` likewise.
+  - Where the modular constraints belong: an ADR compiled through `prompts/compile-adrs.md` for projects
+    that adopt it. The framework's own mechanism for injecting architecture decisions was already there;
+    the templates just should not have carried one baked in.
+  - Neutral uses of "module" (Module Ownership table, Module column in the endpoint summary, owning
+    module on every shard) are unchanged — they are the retrieval-key mechanism, not architecture.
+  - No validator, eval assertion or rubric encoded the old wording, so no tool or gate changes. Eval
+    fixtures (the TaskFlow sample) remain modular by their own decision row, which is exactly the point.
+    `scripts/sync-scaffold.sh --check` clean; `validate-specs.py --root scaffold` 0 errors.
+
 ## [2.8.6] — 2026-08-08
 
 ### Fixed

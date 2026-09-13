@@ -1,6 +1,6 @@
 # Data Model Template
 
-> **Purpose**: Document the domain entities, their fields, relationships, and module ownership. This provides AI with the structural understanding needed to generate data-layer tasks, validate feature scope, and ensure cross-module boundaries are respected.
+> **Purpose**: Document the domain entities, their fields, relationships, and module ownership. This provides AI with the structural understanding needed to generate data-layer tasks, validate feature scope, and ensure ownership boundaries are respected.
 
 > **Context budget note:** This document is loaded into AI context. Keep it contract-style —
 > tables, schemas, rules, one example each. Move narrative and history to `docs/rationale/`
@@ -53,21 +53,21 @@ Everything from here down to "Entity Shard" defines the contents of `index.md`. 
 | [Soft vs hard deletes] | [e.g., Soft deletes with `deleted_at`] | [Why] |
 | [Multi-tenancy approach] | [e.g., Shared DB with tenant column] | [Why] |
 | [Timestamp handling] | [e.g., TIMESTAMPTZ, always UTC] | [Why] |
-| [Cross-module references] | [e.g., Foreign IDs only, no navigation properties] | [Why] |
+| [Cross-module references] | [e.g., Foreign IDs only, no navigation properties — or navigation properties allowed within a shared persistence unit] | [Why] |
 
 ---
 
 ## 2. Module Ownership
 
-> *Every entity belongs to exactly one module. Cross-module references use IDs only — no shared tables, no cross-module foreign keys at the ORM level.*
+> *Every entity has exactly one owning module. Ownership is a documentation boundary — it says which module's shard and conventions describe the entity. How references between modules are implemented (ID-only, navigation properties, database-level foreign keys) is the project's decision, recorded in Section 1.2; this template does not prescribe it.*
 >
 > *This table doubles as the shard directory: every entity listed here must have a shard at `entities/<entity>.md` (see Naming Rule at the bottom of this template).*
 
-| Module | Entities Owned | Persistence Unit [e.g., EF Core DbContext / Prisma schema / repository module] |
+| Module | Entities Owned | Persistence Unit [e.g., DbContext / Prisma schema / repository module — one shared unit or one per module, per Section 1.2] |
 |--------|---------------|--------------------------------------------------------------------------------|
-| [Module A] | [Entity1, Entity2] | [e.g., ModuleADbContext] |
-| [Module B] | [Entity3, Entity4] | [e.g., ModuleBDbContext] |
-| [Module C] | [Entity5, Entity6, Entity7] | [e.g., ModuleCDbContext] |
+| [Module A] | [Entity1, Entity2] | [e.g., AppDbContext] |
+| [Module B] | [Entity3, Entity4] | [e.g., AppDbContext] |
+| [Module C] | [Entity5, Entity6, Entity7] | [e.g., ReportingDbContext] |
 
 ---
 
@@ -107,7 +107,7 @@ Everything from here down to "Entity Shard" defines the contents of `index.md`. 
 
 ### 4.3 Cross-Module References
 
-> *These are ID-only references — no ORM-level navigation properties or relations [e.g., EF Core navigation properties / Prisma relation fields], no database-level foreign keys across module boundaries.*
+> *References between entities owned by different modules. Whether they are ID-only, ORM navigation properties, or database-level foreign keys follows the Cross-module references decision in Section 1.2 — state the form in the Field column.*
 
 | Source Entity (Module) | Target Entity (Module) | Field | Purpose |
 |----------------------|----------------------|-------|---------|
@@ -174,13 +174,13 @@ Everything from here down to "Entity Shard" defines the contents of `index.md`. 
 When generating tasks from this document set:
 
 1. **Shard loading**: Read `index.md` plus ONLY the entity shards named by the work item's impact tables (mapped via the Naming Rule) — do not read the whole `entities/` directory
-2. **Module boundaries**: Every data-access task must target the correct module's persistence unit [e.g., DbContext / Prisma client / repository] — never query across module boundaries
+2. **Persistence units**: Every data-access task must target the persistence unit recorded for the owning module in Section 2; where modules share a unit, cross-module queries are allowed exactly as far as the Section 1.2 decision permits
 3. **Field completeness**: Generated entity classes must include all fields defined in the entity's shard with correct types and constraints
-4. **Relationship integrity**: Ensure cascade behaviors and cross-module ID-only references are respected in migrations
+4. **Relationship integrity**: Ensure cascade behaviors and the recorded form of cross-module references (Section 1.2) are respected in migrations
 5. **Enum consistency**: Use the enum values defined in Section 5 (shared) or the entity shard (entity-specific) — do not invent new values without updating the owning file
 6. **Index awareness**: Include index creation in migration tasks for fields marked with indexes in the entity shard
 7. **Naming conventions**: Table and column names must follow the conventions in Section 3
-8. **Cross-module lookups**: When a task needs data from another module, generate a call through that module's public interface [e.g., a service interface in a shared contracts project / the module's exported API] — not a direct DB query
+8. **Cross-module lookups**: When a task needs data from another module, access it the way the Section 1.2 decision and CLAUDE.md prescribe [e.g., a call through the module's public interface, or a direct query when modules share a persistence unit]
 9. **New entities**: Create a new shard at `entities/<entity>.md`, add a Module Ownership row (Section 2), add its relationships to Section 4, and record the change in the Changelog
 
 ---
@@ -241,7 +241,7 @@ screens: [screen-a]        # ui-specification/screens/<x>.md shards that render 
 | Related Entity (Module) | Cardinality | Foreign Key / Join Table | Cascade Behavior | Notes |
 |-------------------------|-------------|--------------------------|------------------|-------|
 | [EntityB (same module)] | [1:N — this entity is parent] | [entity_a_id on EntityB] | [Cascade delete / Restrict / Set null] | [—] |
-| [EntityX (Module B)] | [N:1 — cross-module] | [entity_x_id — ID only, no navigation property or DB-level FK] | [—] | [Why this reference exists] |
+| [EntityX (Module B)] | [N:1 — cross-module] | [entity_x_id — form per the Section 1.2 decision: ID only, navigation property, or DB-level FK] | [—] | [Why this reference exists] |
 | [EntityY] | [N:M] | [entity_a_entity_y join table] | [Join rows removed with either side] | [Join carries: role, assigned_at] |
 
 ## Entity-Specific Enums & Rules

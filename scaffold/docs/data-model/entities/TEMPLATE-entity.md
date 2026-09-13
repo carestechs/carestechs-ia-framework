@@ -31,7 +31,7 @@ screens: [screen-a]        # ui-specification/screens/<x>.md shards that render 
 
 ## Relationships
 
-<!-- This entity's slice of the Relationships Overview in index.md — keep the two in sync. Cross-module references are ID-only. -->
+<!-- This entity's slice of the Relationships Overview in index.md — keep the two in sync. Cross-module references take the form recorded in index.md Section 1.2. -->
 
 | Related Entity (Module) | Cardinality | Foreign Key / Join Table | Cascade Behavior | Notes |
 |-------------------------|-------------|--------------------------|------------------|-------|

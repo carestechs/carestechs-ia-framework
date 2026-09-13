@@ -206,14 +206,14 @@ Work through the templates in this order. Each step builds on the previous one.
 - What entities does each module own?
 - What fields does each entity have (name, type, constraints)?
 - How do entities relate to each other (1:N, M:N)?
-- Which references cross module boundaries (ID-only)?
+- Which references cross module boundaries, and in what form (ID-only, navigation property, database-level FK)?
 - What enums and value types exist?
 
 **"Good enough" checklist:**
 - [ ] Every in-scope feature maps to at least one entity
 - [ ] Each entity has its own shard `entities/<entity>.md` (kebab-case, singular — `TaskLabel` → `task-label.md`) with a field table (types, constraints)
 - [ ] Relationships are defined with cascade behaviors; the relationships overview (ER diagram) in `index.md` covers them
-- [ ] Cross-module references are ID-only
+- [ ] Cross-module references have their form recorded in the Key Modeling Decisions table
 - [ ] Standard audit fields (id, created_at, updated_at) are on every entity
 
 **Time:** ~20 minutes
