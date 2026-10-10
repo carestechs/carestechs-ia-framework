@@ -24,6 +24,12 @@ measurement, not a gate. Python 3.8+, standard library only.
 --rescore LABEL re-runs the checks over the archived samples of an existing
 baseline WITHOUT regenerating (free): use it after changing assertions or the
 checker itself. Writes results-rescored.json next to the original results.json.
+
+--rescore LABEL --gate is the CI form: it writes nothing and exits 1 when any
+archived sample now FAILS a check that the recorded results (results-rescored.json
+if present, else results.json) do not show failing. The committed baselines thus
+double as a zero-token regression corpus for run-evals.py and the validators.
+Accept an intended change by re-recording: --rescore LABEL without --gate.
 """
 
 import argparse
@@ -93,9 +99,54 @@ def archive_output(out_path, archive_base):
 
 def restore_output(sample, out_path):
     if sample.is_file():
+        out_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(sample, out_path)
     else:
-        shutil.copytree(sample, out_path)
+        # Directory outputs keep a tracked output/.gitkeep anchor, so the target exists;
+        # without dirs_exist_ok every directory-output rescore died with FileExistsError.
+        shutil.copytree(sample, out_path, dirs_exist_ok=True)
+
+
+def sample_index(value):
+    """1 for 1, 'sample-1', 'sample-1.md' or 'sample-1.html' - generation-time results
+    record the integer, rescores record the archived file name."""
+    m = re.search(r"\d+", str(value))
+    return int(m.group(0)) if m else None
+
+
+def load_reference(label_dir):
+    """Recorded results to gate against: the latest accepted rescore if there is one,
+    else the generation-time results. Returns (cases, filename)."""
+    for name in ("results-rescored.json", "results.json"):
+        path = label_dir / name
+        if path.is_file():
+            data = json.loads(path.read_text(encoding="utf-8"))
+            return data.get("cases", {}), name
+    return {}, "(no recorded results)"
+
+
+def compare_to_reference(results, reference):
+    """Regressions as (case, sample, check_type, detail): a check that FAILs now but is
+    not recorded as failing. Unrecorded samples or checks that fail count as well - accept
+    them deliberately by re-recording (--rescore LABEL without --gate). SKIP never regresses,
+    so judge checks are inert here unless --judge is passed."""
+    regressions = []
+    for case, samples in sorted(results.items()):
+        recorded = {sample_index(s.get("sample")): s
+                    for s in (reference.get(case) or {}).get("samples", [])}
+        for s in samples:
+            prior_checks = (recorded.get(sample_index(s.get("sample"))) or {}).get("checks", [])
+            for i, check in enumerate(s.get("checks", [])):
+                if check["status"] != "FAIL":
+                    continue
+                before = prior_checks[i] if i < len(prior_checks) else None
+                if before is None or before.get("type") != check["type"]:
+                    regressions.append((case, s["sample"], check["type"],
+                                        "unrecorded check fails: " + check["detail"]))
+                elif before.get("status") != "FAIL":
+                    regressions.append((case, s["sample"], check["type"],
+                                        f"was {before['status']}, now FAIL: " + check["detail"]))
+    return regressions
 
 
 def check_case(case_name, judge, judge_samples=1):
@@ -181,7 +232,14 @@ def main():
                     help="judge runs per check, median taken (default 1)")
     ap.add_argument("--rescore", default="",
                     help="re-check archived samples of this baseline label (no generation)")
+    ap.add_argument("--gate", action="store_true",
+                    help="with --rescore: exit 1 when an archived sample fails a check the "
+                         "recorded results do not show failing; writes nothing (CI use)")
     args = ap.parse_args()
+
+    if args.gate and not args.rescore:
+        print("ERROR: --gate requires --rescore LABEL", file=sys.stderr)
+        return 1
 
     if args.rescore:
         all_results, label_dir = rescore(args.rescore, args.judge, args.judge_samples)
@@ -226,6 +284,19 @@ def main():
               f"{judge_col:>12s}  {top}")
         summary[name] = {"samples": results, "pass_rate": rate,
                          "judge_scores": scores, "failing_checks": fail_counts}
+
+    if args.gate:
+        reference, reference_name = load_reference(label_dir)
+        regressions = compare_to_reference(all_results, reference)
+        if regressions:
+            print(f"\n{len(regressions)} REGRESSION(S) against {reference_name}:")
+            for case, sample, ctype, detail in regressions:
+                print(f"  REGRESSION {case} {sample} {ctype}: {detail}")
+            print(f"Fix the checker or validator, or accept the change deliberately by "
+                  f"re-recording: python evals/run-baseline.py --rescore {args.rescore}")
+            return 1
+        print(f"\ngate: no regressions against {reference_name}")
+        return 0
 
     results_path = label_dir / ("results-rescored.json" if args.rescore else "results.json")
     results_path.write_text(json.dumps(

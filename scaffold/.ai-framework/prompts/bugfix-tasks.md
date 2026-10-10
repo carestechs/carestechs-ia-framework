@@ -205,7 +205,7 @@ When the Bug Report defines acceptance criteria, end the task list with:
 
 After Claude generates tasks, verify:
 
-- [ ] Run `python .ai-framework/tools/validate-tasks.py tasks/BUG-XXX-tasks.md` and fix every error
+- [ ] Run `python .ai-framework/tools/validate-tasks.py tasks/BUG-XXX-tasks.md --work-item docs/work-items/BUG-XXX-short-title.md` and fix every error (the same command the pipeline gate runs; a missing coverage table is a warning for bug lists, and a present one is cross-checked)
 - [ ] Run `python .ai-framework/tools/validate-specs.py` and fix every error — confirms the spec shards the task list relies on are internally consistent and fresh
 - [ ] Investigation tasks come before fix tasks
 - [ ] Root cause is identified, not just symptoms treated

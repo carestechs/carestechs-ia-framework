@@ -26,4 +26,22 @@ jobs:
           test "$version" = "$head" || { echo "::error::scaffold VERSION ($version) != CHANGELOG head ($head) - run the release steps"; exit 1; }
 
       - name: Tools compile
-        run: python -m py_compile tools/*.py
+        run: python -m py_compile tools/*.py evals/*.py
+
+      # Validators, the sequencing gate (every CHANGELOG-cited trapped state rebuilt as a
+      # temp git repo), the eval checker and the baseline tooling. Stdlib unittest, no model.
+      - name: Regression suite
+        run: python -m unittest discover -s tests
+
+      # The committed eval baselines are archived model outputs; rescoring them with today's
+      # checker and validators costs no tokens and catches checker/validator regressions.
+      - name: Eval checker regression (rescore every archived baseline)
+        run: |
+          status=0
+          for dir in evals/baselines/*/; do
+            label="$(basename "$dir")"
+            echo "::group::rescore $label"
+            python evals/run-baseline.py --rescore "$label" --gate || status=1
+            echo "::endgroup::"
+          done
+          exit $status

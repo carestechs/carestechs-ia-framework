@@ -21,6 +21,11 @@ list can still decompose work badly.
 **Metric:** validator failures per generated artifact, over time. Should approach zero
 and stay there. Anything else means the prompts and the schema have drifted apart.
 
+The tooling itself is under test: the framework repo's `tests/` suite (stdlib `unittest`,
+no model calls) covers both validators, the sequencing gate and the eval checker, and CI
+rescores every archived eval baseline against today's checker — a validator change that
+would alter a recorded verdict fails the build instead of silently moving the floor.
+
 ---
 
 ## Level 2 — Step quality, offline (prompt evals)

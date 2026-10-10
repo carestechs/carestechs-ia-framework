@@ -305,7 +305,7 @@ When the Improvement Proposal defines success criteria / acceptance criteria, en
 
 ## Post-Generation Checklist
 
-- [ ] Run `python .ai-framework/tools/validate-tasks.py tasks/IMP-XXX-tasks.md` and fix every error
+- [ ] Run `python .ai-framework/tools/validate-tasks.py tasks/IMP-XXX-tasks.md --work-item docs/work-items/IMP-XXX-short-title.md` and fix every error (the same command the pipeline gate runs; a missing coverage table is a warning for refactor lists, and a present one is cross-checked)
 - [ ] Run `python .ai-framework/tools/validate-specs.py` and fix every error — confirms the spec shards the task list relies on are internally consistent and fresh
 
 ### Safety Checklist

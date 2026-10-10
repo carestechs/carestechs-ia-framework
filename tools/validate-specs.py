@@ -150,6 +150,10 @@ def check_shard(path, spec_key, kind, docs_root, rep, max_age, today):
         return
     name_key = NAME_KEY[kind]
     name = fm.get(name_key, "")
+    if isinstance(name, list):
+        # `name: [EntityName]` - the templates' own placeholder form - parses as an inline
+        # array; rebuild the text so it is reported as unfilled instead of crashing kebab().
+        name = "[" + ", ".join(name) + "]"
     if is_placeholder(name):
         rep.warn(path, f"frontmatter '{name_key}' looks unfilled: {name!r}")
     elif kebab(name) != path.stem:

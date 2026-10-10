@@ -458,7 +458,7 @@ Each task definition (in the task-list file under `tasks/` — e.g., `tasks/FEAT
 
 When implementing tasks from a generated task list (saved in `tasks/` per the routing table above):
 
-0. **Validate the task list** — immediately after task generation (once per task list), run `python .ai-framework/tools/validate-tasks.py tasks/<file>.md` and fix every error before implementation begins. Companion check: `python .ai-framework/tools/validate-specs.py` — the cross-shard spec-consistency linter — catches drift in the spec shards the task list relies on.
+0. **Validate the task list** — immediately after task generation (once per task list), run `python .ai-framework/tools/validate-tasks.py tasks/<file>.md --work-item docs/work-items/<id>-short-title.md` and fix every error before implementation begins (the coverage table is mandatory for feature lists and recommended — a warning — for bug and refactor lists). Companion check: `python .ai-framework/tools/validate-specs.py` — the cross-shard spec-consistency linter — catches drift in the spec shards the task list relies on.
 
 **Fresh-context review (recommended for L/XL work):** in a NEW session, run the Task list review row from the routing table above (`.ai-framework/prompts/review-tasks.md` → `tasks/<WORK-ITEM-ID>-review.md`) — the reviewer must have no generation history in context. Address every required change before implementation.
 

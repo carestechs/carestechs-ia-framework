@@ -3,6 +3,7 @@
   "checks": [
     {
       "type": "validator",
+      "work_item": "input/docs/work-items/BUG-001-overdue-filter-timezone.md",
       "root": "input"
     },
     {

@@ -93,7 +93,21 @@ spot flipping an experiment's verdict).
 
 ## CI wiring (optional)
 
-The check step is a plain exit-code command. A minimal gate for prompt-change PRs:
-run the generation step with your agent of choice, then
-`python evals/run-evals.py --require-all`. Budget note: one generation per case per
-run; keep the case count small and high-signal rather than exhaustive.
+Two zero-token gates run in `.github/workflows/check.yml` on every push and PR:
+
+- `python -m unittest discover -s tests` — the framework's own regression suite exercises
+  every check type of this runner (judge harness included, via a scripted judge) and the
+  baseline tooling.
+- `python evals/run-baseline.py --rescore <label> --gate`, for every label under
+  `evals/baselines/` — re-checks the archived samples with today's checker and validators
+  and fails on any check that FAILs now but is not recorded as failing (reference:
+  `results-rescored.json` if present, else `results.json`). Nothing is generated in CI.
+
+Accepting an intended change (a tightened assertion, a stricter validator) means
+re-recording deliberately: `python evals/run-baseline.py --rescore <label>` without
+`--gate` rewrites `results-rescored.json`, which becomes the new reference.
+
+A generation gate for prompt-change PRs stays optional and billable: run the generation
+step with your agent of choice, then `python evals/run-evals.py --require-all`. Budget
+note: one generation per case per run; keep the case count small and high-signal rather
+than exhaustive.

@@ -3,6 +3,7 @@
   "checks": [
     {
       "type": "validator",
+      "work_item": "input/docs/work-items/IMP-001-extract-date-logic.md",
       "root": "input"
     },
     {

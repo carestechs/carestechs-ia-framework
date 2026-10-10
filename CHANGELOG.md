@@ -2,6 +2,60 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.10.0] — 2026-10-09
+
+### Added
+- **The framework tests itself: `tests/` + CI.** Evidence: the validation audit of 2026-10-09
+  (repo-root `pending.txt`: "make the validation process more robust ... add test rigor"). Six
+  `next-step.py` fixes (v2.7.1, 2.8.1, 2.8.2, 2.8.4, 2.8.5, 2.8.6) were each "fixture-verified",
+  but the fixtures lived in gitignored `.fx*/` folders and are gone; CI compiled the file and
+  nothing else. `tests/` (stdlib `unittest`, zero model calls, 142 tests, about a minute) rebuilds every cited
+  trapped state as a temp git repo and reads the tool's `--json` contract: evidence ladder, overlay
+  semantics, cross-work-item collisions, re-review detection, closure guard, event logging. Also
+  covered: both validators against the golden references plus synthetic rule-by-rule cases; the
+  verdict parser in both tools on every committed review artifact; every `run-evals.py` check type
+  (judge harness included, via a scripted judge); `run-baseline.py` helpers and an end-to-end
+  rescore in a miniature repo; and parity tests pinning the regex copies the tools carry, the
+  scaffold mirror (a Python `sync-scaffold.sh --check` for Windows), VERSION vs CHANGELOG head,
+  and the slash-command self-checks. `check.yml` runs the suite and compiles `evals/*.py` too.
+- **Committed eval baselines are a regression gate: `run-baseline.py --rescore LABEL --gate`.**
+  Rescoring archived samples costs no tokens; `--gate` exits 1 when a sample fails a check the
+  recorded results do not show failing (reference: `results-rescored.json` if present, else
+  `results.json`) and writes nothing. CI rescores every label under `evals/baselines/`. Found while
+  gating: `--rescore` crashed on every directory-output baseline (spec-gen, ui-spec-gen,
+  compile-adrs) with `FileExistsError` — `restore_output` copied into the tracked `output/.gitkeep`
+  anchor without `dirs_exist_ok`. Fixed; every label rescores clean.
+- **`.gitattributes`: `*.sh text eol=lf`.** With `core.autocrlf=true` the sync script checked out
+  as CRLF and bash refused it (`set: pipefail: invalid option name`) — the release gate was
+  unrunnable on Windows.
+
+### Fixed
+- **The step-2 gate no longer rejects BUG/IMP task lists the prompts call correct**
+  (`validate-tasks.py`). `bugfix-tasks.md` and `refactor-tasks.md` make the Acceptance Criteria
+  Coverage table *recommended*, and `review-tasks.md` says its absence is at most low severity —
+  but `next-step.py` prints the gate with `--work-item` for every work-item type, and with that
+  flag the validator made the table mandatory. The framework's own golden references for case-002
+  (BUG) and case-004 (IMP) failed the printed gate with exit 1; an orchestrator running it would
+  have rejected them. The validator is now type-aware: a BUG/IMP list without the table gets a
+  warning (an error under `--strict`), a FEAT list still errors, and a table that IS present is
+  cross-checked for every type. The bugfix/refactor prompts' self-check, the two shipped slash
+  commands, case-002/004's assertions, and pipeline step 0 in both CLAUDE.md routing tables now
+  run the same command the gate runs (`--work-item` included); `tests/test_contract_parity.py`
+  keeps them aligned. The two cases' frozen `GENERATE.md` procedures are deliberately unchanged
+  (baseline comparability), and the gate's warning is exactly why their outputs still pass.
+- **`validate-specs.py` no longer crashes on an unfilled shard name** — found by the new suite on
+  its first run. `name: [EntityName]` is the templates' own placeholder form, and the frontmatter
+  parser reads a bracketed value as an inline array, so a shard copied from `TEMPLATE-entity.md`
+  and not yet filled made `kebab()` raise `AttributeError` (a traceback where the linter should
+  have said "looks unfilled"). The list is rebuilt as text and reported as an unfilled-name warning.
+- **Coverage-table parsing is header-aware** (`validate-tasks.py`) — caught by the new baseline gate
+  on its first run. A header row was recognised only when its first cell was exactly `Work Item AC`,
+  so the archived smoke sample's `| Work Item AC (Section 9 success criteria) | Covered By |` header
+  counted as a data row with no task IDs (a false error), and task IDs were always read from the
+  LAST column although two archived samples add a `How` column after `Covered By`. The header row
+  is now detected by its content and the `Covered By` column is located by name (last column as
+  the fallback).
+
 ## [2.9.0] — 2026-09-12
 
 ### Changed
