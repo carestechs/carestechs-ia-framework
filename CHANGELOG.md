@@ -2,6 +2,36 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.10.1] — 2026-10-09
+
+### Added
+- **Proof suite: whole-pipeline validation per release** (`evals/proof-suite/`, framework-repo-only).
+  The framework had been proven on real builds and on one purpose-built test system (Shortlist, built
+  three ways on 2026-08-03 under 2.6.0/2.7.0), but nothing re-ran the same brief on a later version,
+  quality was self-graded (the agents' own tests), and one brief covered one shape. The suite freezes
+  a brief's human inputs (`CLAUDE.md`, strategy docs, work items, seed code for brownfield briefs),
+  builds it with the pipeline-runner in two arms (default policy and all-Opus control) on each minor
+  release, grades the product with an **external exam** the builders never see, and records outcomes
+  under `results/<version>/` with the raw event log. `README.md` carries the design rules, the three
+  brief shapes (greenfield API, greenfield full stack, brownfield BUG+IMP pair), procedure, metrics,
+  record format, cadence and caveats; `guides/evaluation.md` gains Level 5 and a cadence row.
+  - **First brief frozen: Shortlist v1**, byte-exact from `testsys-shortlist @ 052f580` (the five
+    human-authored files both autonomous arms and the `/orchestrate` fixture started from).
+  - **First exam: `exam/shortlist_exam.py`**, 16 black-box HTTP checks over AC-1..AC-4 and the
+    section-9 edge cases (Problem Details shapes, byte-identical redirect round-trip, 50 concurrent
+    redirects losing no increment). Stdlib only. Calibrated by `tests/test_proof_suite_exam.py`: a
+    fake perfect server scores 16/16 and a deliberately broken one fails exactly the expected checks.
+  - **First records, reconstructed for 2.7.0**: the exam was run retroactively against both preserved
+    2026-08-03 builds — **16/16 in both arms**. From the event logs: default arm (Sonnet workers)
+    11 tasks, implementation-review first-pass 8/12, task-list review revised 3x (the ratchet that
+    became v2.8.0), 1 park, ~$30 notional; all-Opus control 15 tasks, 9/13, revised 3x, 0 parks,
+    ~$57. Attributed findings in the records: the default arm hard-codes `localhost:5080` and ignores
+    `--urls` (a stakeholder-constraint deviation no review caught); the runner logged the `model`
+    field on 4 of 88 events in the default arm (the records state the policy instead).
+  - **Lesson carried forward**: the brief leaves request/response field names to spec generation and
+    both arms converged only because `CLAUDE.md` pins the conventions; from the next brief on, the
+    work item's API section states the wire contract the exam probes.
+
 ## [2.10.0] — 2026-10-09
 
 ### Added

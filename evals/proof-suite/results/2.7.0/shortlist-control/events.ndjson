@@ -1,0 +1,119 @@
+{"work_item": "bootstrap", "step": "spec-generation", "event": "started", "ts": "2026-08-03T14:55:50Z"}
+{"work_item": "bootstrap", "step": "spec-generation", "event": "artifact_committed", "detail": "8caf3a8", "session_tokens": 17493, "model": "opus", "cost_usd": 1.6545020000000004, "ts": "2026-08-03T15:00:18Z"}
+{"work_item": "FEAT-001", "step": "task-generation", "event": "started", "ts": "2026-08-03T15:00:18Z"}
+{"work_item": "FEAT-001", "step": "task-generation", "event": "artifact_committed", "detail": "6d249e3", "session_tokens": 21698, "model": "opus", "cost_usd": 1.4470644999999998, "ts": "2026-08-03T15:04:20Z"}
+{"work_item": "FEAT-001", "step": "task-review", "event": "started", "ts": "2026-08-03T15:04:20Z"}
+{"work_item": "FEAT-001", "step": "task-review", "event": "revised", "detail": "verdict: revise", "session_tokens": 11305, "model": "opus", "cost_usd": 1.0172444999999999, "ts": "2026-08-03T15:07:22Z"}
+{"work_item": "FEAT-001", "step": "task-list-revision", "event": "started", "ts": "2026-08-03T15:07:22Z"}
+{"work_item": "FEAT-001", "step": "task-list-revision", "event": "artifact_committed", "detail": "71085c0", "session_tokens": 3217, "model": "opus", "cost_usd": 0.5106415000000001, "ts": "2026-08-03T15:08:09Z"}
+{"work_item": "FEAT-001", "step": "task-review", "event": "revised", "detail": "verdict: revise", "session_tokens": 17775, "model": "opus", "cost_usd": 1.3276914999999998, "ts": "2026-08-03T15:12:30Z"}
+{"work_item": "FEAT-001", "step": "task-list-revision", "event": "started", "ts": "2026-08-03T15:12:30Z"}
+{"work_item": "FEAT-001", "step": "task-list-revision", "event": "artifact_committed", "detail": "6a358b7", "session_tokens": 5556, "model": "opus", "cost_usd": 0.793213, "ts": "2026-08-03T15:14:14Z"}
+{"work_item": "FEAT-001", "step": "task-review", "event": "revised", "detail": "verdict: revise", "session_tokens": 14218, "model": "opus", "cost_usd": 1.2539295, "ts": "2026-08-03T15:17:39Z"}
+{"work_item": "FEAT-001", "task": "T-001", "step": "planning", "event": "started", "ts": "2026-08-03T15:20:42Z"}
+{"work_item": "FEAT-001", "task": "T-001", "step": "planning", "event": "accepted", "detail": "plan-T-001-solution-skeleton.md (66 lines)", "session_tokens": 4343, "model": "opus", "cost_usd": 0.6366224999999999, "ts": "2026-08-03T15:22:14Z"}
+{"work_item": "FEAT-001", "task": "T-001", "step": "implementation", "event": "started", "ts": "2026-08-03T15:22:15Z"}
+{"work_item": "FEAT-001", "task": "T-001", "step": "implementation", "event": "artifact_committed", "session_tokens": 9588, "model": "opus", "cost_usd": 1.39438, "ts": "2026-08-03T15:26:55Z"}
+{"work_item": "FEAT-001", "task": "T-001", "step": "implementation-review", "event": "started", "ts": "2026-08-03T15:26:55Z"}
+{"work_item": "FEAT-001", "task": "T-001", "step": "implementation-review", "event": "accepted", "detail": "verdict: approve", "session_tokens": 7043, "model": "opus", "cost_usd": 0.8102419999999999, "ts": "2026-08-03T15:29:55Z"}
+{"work_item": "FEAT-001", "task": "T-002", "step": "planning", "event": "started", "ts": "2026-08-03T15:29:55Z"}
+{"work_item": "FEAT-001", "task": "T-002", "step": "planning", "event": "accepted", "detail": "plan-T-002-link-models-and-dtos.md (101 lines)", "session_tokens": 5939, "model": "opus", "cost_usd": 0.8710285, "ts": "2026-08-03T15:31:30Z"}
+{"work_item": "FEAT-001", "task": "T-002", "step": "implementation", "event": "started", "ts": "2026-08-03T15:31:31Z"}
+{"work_item": "FEAT-001", "task": "T-002", "step": "implementation", "event": "artifact_committed", "session_tokens": 6284, "model": "opus", "cost_usd": 0.8822229999999999, "ts": "2026-08-03T15:34:10Z"}
+{"work_item": "FEAT-001", "task": "T-002", "step": "task-completion", "event": "started", "ts": "2026-08-03T15:34:10Z"}
+{"work_item": "FEAT-001", "task": "T-002", "step": "task-completion", "event": "completed", "detail": "S task, review skipped", "ts": "2026-08-03T15:34:18Z"}
+{"work_item": "FEAT-001", "task": "T-003", "step": "planning", "event": "started", "ts": "2026-08-03T15:34:19Z"}
+{"work_item": "FEAT-001", "task": "T-003", "step": "planning", "event": "accepted", "detail": "plan-T-003-link-store-contract.md (72 lines)", "session_tokens": 4471, "model": "opus", "cost_usd": 0.703253, "ts": "2026-08-03T15:35:27Z"}
+{"work_item": "FEAT-001", "task": "T-003", "step": "implementation", "event": "started", "ts": "2026-08-03T15:35:27Z"}
+{"work_item": "FEAT-001", "task": "T-003", "step": "implementation", "event": "artifact_committed", "session_tokens": 4935, "model": "opus", "cost_usd": 0.8914765, "ts": "2026-08-03T15:37:24Z"}
+{"work_item": "FEAT-001", "task": "T-003", "step": "task-completion", "event": "started", "ts": "2026-08-03T15:37:24Z"}
+{"work_item": "FEAT-001", "task": "T-003", "step": "task-completion", "event": "completed", "detail": "S task, review skipped", "ts": "2026-08-03T15:37:31Z"}
+{"work_item": "FEAT-001", "task": "T-004", "step": "planning", "event": "started", "ts": "2026-08-03T15:37:31Z"}
+{"work_item": "FEAT-001", "task": "T-004", "step": "planning", "event": "started", "ts": "2026-08-03T16:00:50Z"}
+{"work_item": "FEAT-001", "task": "T-004", "step": "planning", "event": "accepted", "detail": "plan-T-004-short-code-generator.md (74 lines)", "session_tokens": 6362, "model": "opus", "cost_usd": 0.662852, "ts": "2026-08-03T16:02:15Z"}
+{"work_item": "FEAT-001", "task": "T-004", "step": "implementation", "event": "started", "ts": "2026-08-03T16:02:15Z"}
+{"work_item": "FEAT-001", "task": "T-004", "step": "implementation", "event": "artifact_committed", "session_tokens": 2909, "model": "opus", "cost_usd": 0.5927960000000001, "ts": "2026-08-03T16:03:54Z"}
+{"work_item": "FEAT-001", "task": "T-004", "step": "task-completion", "event": "started", "ts": "2026-08-03T16:03:54Z"}
+{"work_item": "FEAT-001", "task": "T-004", "step": "task-completion", "event": "completed", "detail": "S task, review skipped", "ts": "2026-08-03T16:04:01Z"}
+{"work_item": "FEAT-001", "task": "T-005", "step": "planning", "event": "started", "ts": "2026-08-03T16:04:02Z"}
+{"work_item": "FEAT-001", "task": "T-005", "step": "planning", "event": "accepted", "detail": "plan-T-005-in-memory-link-store.md (85 lines)", "session_tokens": 5403, "model": "opus", "cost_usd": 0.7266480000000001, "ts": "2026-08-03T16:05:18Z"}
+{"work_item": "FEAT-001", "task": "T-005", "step": "implementation", "event": "started", "ts": "2026-08-03T16:05:18Z"}
+{"work_item": "FEAT-001", "task": "T-005", "step": "implementation", "event": "artifact_committed", "session_tokens": 9594, "model": "opus", "cost_usd": 1.0148665, "ts": "2026-08-03T16:08:15Z"}
+{"work_item": "FEAT-001", "task": "T-005", "step": "implementation-review", "event": "started", "ts": "2026-08-03T16:08:15Z"}
+{"work_item": "FEAT-001", "task": "T-005", "step": "implementation-review", "event": "revised", "detail": "verdict: revise", "session_tokens": 9761, "model": "opus", "cost_usd": 1.035665, "ts": "2026-08-03T16:11:36Z"}
+{"work_item": "FEAT-001", "task": "T-005", "step": "implementation-fix", "event": "started", "ts": "2026-08-03T16:11:36Z"}
+{"work_item": "FEAT-001", "task": "T-005", "step": "implementation-fix", "event": "artifact_committed", "session_tokens": 10385, "model": "opus", "cost_usd": 1.06425, "ts": "2026-08-03T16:14:48Z"}
+{"work_item": "FEAT-001", "task": "T-005", "step": "implementation-review", "event": "accepted", "detail": "verdict: approve", "session_tokens": 8361, "model": "opus", "cost_usd": 0.959872, "ts": "2026-08-03T16:17:43Z"}
+{"work_item": "FEAT-001", "task": "T-006", "step": "planning", "event": "started", "ts": "2026-08-03T16:17:43Z"}
+{"work_item": "FEAT-001", "task": "T-006", "step": "planning", "event": "accepted", "detail": "plan-T-006-create-link-validation.md (104 lines)", "session_tokens": 6107, "model": "opus", "cost_usd": 0.799126, "ts": "2026-08-03T16:19:09Z"}
+{"work_item": "FEAT-001", "task": "T-006", "step": "implementation", "event": "started", "ts": "2026-08-03T16:19:10Z"}
+{"work_item": "FEAT-001", "task": "T-006", "step": "implementation", "event": "artifact_committed", "session_tokens": 5053, "model": "opus", "cost_usd": 0.7706609999999999, "ts": "2026-08-03T16:21:17Z"}
+{"work_item": "FEAT-001", "task": "T-006", "step": "implementation-review", "event": "started", "ts": "2026-08-03T16:21:17Z"}
+{"work_item": "FEAT-001", "task": "T-006", "step": "implementation-review", "event": "revised", "detail": "verdict: revise", "session_tokens": 14456, "model": "opus", "cost_usd": 1.3403100000000001, "ts": "2026-08-03T16:25:45Z"}
+{"work_item": "FEAT-001", "task": "T-006", "step": "implementation-fix", "event": "started", "ts": "2026-08-03T16:25:45Z"}
+{"work_item": "FEAT-001", "task": "T-006", "step": "implementation-fix", "event": "artifact_committed", "session_tokens": 4091, "model": "opus", "cost_usd": 0.658899, "ts": "2026-08-03T16:27:34Z"}
+{"work_item": "FEAT-001", "task": "T-006", "step": "implementation-review", "event": "accepted", "detail": "verdict: approve", "session_tokens": 9508, "model": "opus", "cost_usd": 1.0670124999999997, "ts": "2026-08-03T16:31:00Z"}
+{"work_item": "FEAT-001", "task": "T-007", "step": "planning", "event": "started", "ts": "2026-08-03T16:31:00Z"}
+{"work_item": "FEAT-001", "task": "T-007", "step": "planning", "event": "accepted", "detail": "plan-T-007-map-post-links.md (117 lines)", "session_tokens": 6035, "model": "opus", "cost_usd": 0.8252055, "ts": "2026-08-03T16:32:20Z"}
+{"work_item": "FEAT-001", "task": "T-007", "step": "implementation", "event": "started", "ts": "2026-08-03T16:32:48Z"}
+{"work_item": "FEAT-001", "task": "T-007", "step": "implementation", "event": "started", "ts": "2026-08-03T16:35:11Z"}
+{"work_item": "FEAT-001", "task": "T-007", "step": "implementation", "event": "artifact_committed", "session_tokens": 5682, "model": "opus", "cost_usd": 0.840619, "ts": "2026-08-03T16:37:12Z"}
+{"work_item": "FEAT-001", "task": "T-007", "step": "implementation-review", "event": "started", "ts": "2026-08-03T16:37:24Z"}
+{"work_item": "FEAT-001", "task": "T-007", "step": "implementation-review", "event": "accepted", "detail": "verdict: approve", "session_tokens": 12695, "model": "opus", "cost_usd": 1.1989655, "ts": "2026-08-03T16:42:06Z"}
+{"work_item": "FEAT-001", "task": "T-008", "step": "planning", "event": "started", "ts": "2026-08-03T16:42:25Z"}
+{"work_item": "FEAT-001", "task": "T-008", "step": "planning", "event": "accepted", "detail": "plan-T-008-list-detail-delete-endpoints.md (112 lines)", "session_tokens": 5337, "model": "opus", "cost_usd": 0.8350450000000001, "ts": "2026-08-03T16:43:57Z"}
+{"work_item": "FEAT-001", "task": "T-008", "step": "implementation", "event": "started", "ts": "2026-08-03T16:43:58Z"}
+{"work_item": "FEAT-001", "task": "T-008", "step": "implementation", "event": "artifact_committed", "session_tokens": 4619, "model": "opus", "cost_usd": 0.781164, "ts": "2026-08-03T16:45:48Z"}
+{"work_item": "FEAT-001", "task": "T-008", "step": "implementation-review", "event": "started", "ts": "2026-08-03T16:46:03Z"}
+{"work_item": "FEAT-001", "task": "T-008", "step": "implementation-review", "event": "accepted", "detail": "verdict: approve", "session_tokens": 13845, "model": "opus", "cost_usd": 1.589815, "ts": "2026-08-03T16:51:39Z"}
+{"work_item": "FEAT-001", "task": "T-009", "step": "planning", "event": "started", "ts": "2026-08-03T16:51:54Z"}
+{"work_item": "FEAT-001", "task": "T-009", "step": "planning", "event": "accepted", "detail": "plan-T-009-redirect-endpoint.md (90 lines)", "session_tokens": 5538, "model": "opus", "cost_usd": 0.6317439999999999, "ts": "2026-08-03T16:53:39Z"}
+{"work_item": "FEAT-001", "task": "T-009", "step": "implementation", "event": "started", "ts": "2026-08-03T16:53:55Z"}
+{"work_item": "FEAT-001", "task": "T-009", "step": "implementation", "event": "artifact_committed", "session_tokens": 4954, "model": "opus", "cost_usd": 0.7149315, "ts": "2026-08-03T16:56:02Z"}
+{"work_item": "FEAT-001", "task": "T-009", "step": "implementation-review", "event": "started", "ts": "2026-08-03T16:56:14Z"}
+{"work_item": "FEAT-001", "task": "T-009", "step": "implementation-review", "event": "revised", "detail": "verdict: revise", "session_tokens": 11003, "model": "opus", "cost_usd": 1.2557579999999997, "ts": "2026-08-03T17:02:10Z"}
+{"work_item": "FEAT-001", "task": "T-009", "step": "implementation-fix", "event": "started", "ts": "2026-08-03T17:02:18Z"}
+{"work_item": "FEAT-001", "task": "T-009", "step": "implementation-fix", "event": "artifact_committed", "session_tokens": 14371, "model": "opus", "cost_usd": 2.9688282500000005, "ts": "2026-08-03T17:12:48Z"}
+{"work_item": "FEAT-001", "task": "T-009", "step": "implementation-review", "event": "accepted", "detail": "verdict: approve", "session_tokens": 11887, "model": "opus", "cost_usd": 1.4312174999999998, "ts": "2026-08-03T17:18:14Z"}
+{"work_item": "FEAT-001", "task": "T-010", "step": "planning", "event": "started", "ts": "2026-08-03T17:18:35Z"}
+{"work_item": "FEAT-001", "task": "T-010", "step": "planning", "event": "accepted", "detail": "plan-T-010-startup-and-di.md (76 lines)", "session_tokens": 4386, "model": "opus", "cost_usd": 0.6992010000000001, "ts": "2026-08-03T17:19:43Z"}
+{"work_item": "FEAT-001", "task": "T-010", "step": "implementation", "event": "started", "ts": "2026-08-03T17:19:55Z"}
+{"work_item": "FEAT-001", "task": "T-010", "step": "implementation", "event": "artifact_committed", "session_tokens": 6869, "model": "opus", "cost_usd": 1.3435469999999998, "ts": "2026-08-03T17:22:34Z"}
+{"work_item": "FEAT-001", "task": "T-010", "step": "task-completion", "event": "started", "ts": "2026-08-03T17:22:42Z"}
+{"work_item": "FEAT-001", "task": "T-010", "step": "task-completion", "event": "completed", "detail": "S task, review skipped", "ts": "2026-08-03T17:22:50Z"}
+{"work_item": "FEAT-001", "task": "T-011", "step": "planning", "event": "started", "ts": "2026-08-03T17:22:58Z"}
+{"work_item": "FEAT-001", "task": "T-011", "step": "planning", "event": "accepted", "detail": "plan-T-011-store-and-generator-unit-tests.md (86 lines)", "session_tokens": 5765, "model": "opus", "cost_usd": 0.680217, "ts": "2026-08-03T17:24:18Z"}
+{"work_item": "FEAT-001", "task": "T-011", "step": "implementation", "event": "started", "ts": "2026-08-03T17:24:19Z"}
+{"work_item": "FEAT-001", "task": "T-011", "step": "implementation", "event": "artifact_committed", "session_tokens": 7892, "model": "opus", "cost_usd": 0.9490190000000001, "ts": "2026-08-03T17:26:29Z"}
+{"work_item": "FEAT-001", "task": "T-011", "step": "implementation-review", "event": "started", "ts": "2026-08-03T17:26:36Z"}
+{"work_item": "FEAT-001", "task": "T-011", "step": "implementation-review", "event": "accepted", "detail": "verdict: approve", "session_tokens": 7016, "model": "opus", "cost_usd": 0.7646510000000001, "ts": "2026-08-03T17:28:54Z"}
+{"work_item": "FEAT-001", "task": "T-012", "step": "planning", "event": "started", "ts": "2026-08-03T17:29:02Z"}
+{"work_item": "FEAT-001", "task": "T-012", "step": "planning", "event": "accepted", "detail": "plan-T-012-create-link-integration-tests.md (100 lines)", "session_tokens": 8740, "model": "opus", "cost_usd": 0.853611, "ts": "2026-08-03T17:31:19Z"}
+{"work_item": "FEAT-001", "task": "T-012", "step": "implementation", "event": "started", "ts": "2026-08-03T17:31:19Z"}
+{"work_item": "FEAT-001", "task": "T-012", "step": "implementation", "event": "artifact_committed", "session_tokens": 12336, "model": "opus", "cost_usd": 1.2323029999999997, "ts": "2026-08-03T17:34:33Z"}
+{"work_item": "FEAT-001", "task": "T-012", "step": "implementation-review", "event": "started", "ts": "2026-08-03T17:34:42Z"}
+{"work_item": "FEAT-001", "task": "T-012", "step": "implementation-review", "event": "revised", "detail": "verdict: revise", "session_tokens": 9988, "model": "opus", "cost_usd": 1.0369535000000003, "ts": "2026-08-03T17:38:07Z"}
+{"work_item": "FEAT-001", "task": "T-012", "step": "implementation-fix", "event": "started", "ts": "2026-08-03T17:38:14Z"}
+{"work_item": "FEAT-001", "task": "T-012", "step": "implementation-fix", "event": "artifact_committed", "session_tokens": 4332, "model": "opus", "cost_usd": 1.6474179999999998, "ts": "2026-08-03T17:43:14Z"}
+{"work_item": "FEAT-001", "task": "T-012", "step": "implementation-review", "event": "accepted", "detail": "verdict: approve", "session_tokens": 10966, "model": "opus", "cost_usd": 1.3049565, "ts": "2026-08-03T17:47:02Z"}
+{"work_item": "FEAT-001", "task": "T-013", "step": "planning", "event": "started", "ts": "2026-08-03T17:47:04Z"}
+{"work_item": "FEAT-001", "task": "T-013", "step": "planning", "event": "accepted", "detail": "plan-T-013-redirect-management-integration-tests.md (82 lines)", "session_tokens": 7141, "model": "opus", "cost_usd": 0.8410775, "ts": "2026-08-03T17:48:43Z"}
+{"work_item": "FEAT-001", "task": "T-013", "step": "implementation", "event": "started", "ts": "2026-08-03T17:49:03Z"}
+{"work_item": "FEAT-001", "task": "T-013", "step": "implementation", "event": "artifact_committed", "session_tokens": 9971, "model": "opus", "cost_usd": 1.0480495, "ts": "2026-08-03T17:51:50Z"}
+{"work_item": "FEAT-001", "task": "T-013", "step": "implementation-review", "event": "started", "ts": "2026-08-03T17:51:58Z"}
+{"work_item": "FEAT-001", "task": "T-013", "step": "implementation-review", "event": "accepted", "detail": "verdict: approve", "session_tokens": 11586, "model": "opus", "cost_usd": 1.098045, "ts": "2026-08-03T17:55:49Z"}
+{"work_item": "FEAT-001", "task": "T-014", "step": "planning", "event": "started", "ts": "2026-08-03T17:55:57Z"}
+{"work_item": "FEAT-001", "task": "T-014", "step": "planning", "event": "accepted", "detail": "plan-T-014-structured-logging.md (105 lines)", "session_tokens": 5906, "model": "opus", "cost_usd": 0.6862435, "ts": "2026-08-03T17:57:18Z"}
+{"work_item": "FEAT-001", "task": "T-014", "step": "implementation", "event": "started", "ts": "2026-08-03T17:57:19Z"}
+{"work_item": "FEAT-001", "task": "T-014", "step": "implementation", "event": "artifact_committed", "session_tokens": 5052, "model": "opus", "cost_usd": 0.8988780000000001, "ts": "2026-08-03T17:59:20Z"}
+{"work_item": "FEAT-001", "task": "T-014", "step": "task-completion", "event": "started", "ts": "2026-08-03T17:59:27Z"}
+{"work_item": "FEAT-001", "task": "T-014", "step": "task-completion", "event": "completed", "detail": "S task, review skipped", "ts": "2026-08-03T17:59:36Z"}
+{"work_item": "FEAT-001", "task": "T-015", "step": "planning", "event": "started", "ts": "2026-08-03T17:59:44Z"}
+{"work_item": "FEAT-001", "task": "T-015", "step": "planning", "event": "accepted", "detail": "plan-T-015-docs-refresh.md (77 lines)", "session_tokens": 5415, "model": "opus", "cost_usd": 0.596492, "ts": "2026-08-03T18:01:18Z"}
+{"work_item": "FEAT-001", "task": "T-015", "step": "implementation", "event": "started", "ts": "2026-08-03T18:01:19Z"}
+{"work_item": "FEAT-001", "task": "T-015", "step": "implementation", "event": "artifact_committed", "session_tokens": 10943, "model": "opus", "cost_usd": 1.5165975, "ts": "2026-08-03T18:05:19Z"}
+{"work_item": "FEAT-001", "task": "T-015", "step": "task-completion", "event": "started", "ts": "2026-08-03T18:05:40Z"}
+{"work_item": "FEAT-001", "task": "T-015", "step": "task-completion", "event": "completed", "detail": "S task, review skipped", "ts": "2026-08-03T18:05:48Z"}
+{"work_item": "FEAT-001", "step": "closure", "event": "started", "ts": "2026-08-03T18:05:49Z"}
+{"work_item": "FEAT-001", "step": "closure", "event": "completed", "detail": "traceability verified; validate-specs --strict clean; scorecard archived to metrics/FEAT-001-scorecard.txt", "ts": "2026-08-03T18:09:19Z"}
+{"work_item": "FEAT-001", "step": "closure", "event": "completed", "session_tokens": 9642, "model": "opus", "cost_usd": 1.4348344999999998, "ts": "2026-08-03T18:10:18Z"}

@@ -26,7 +26,7 @@ jobs:
           test "$version" = "$head" || { echo "::error::scaffold VERSION ($version) != CHANGELOG head ($head) - run the release steps"; exit 1; }
 
       - name: Tools compile
-        run: python -m py_compile tools/*.py evals/*.py
+        run: python -m py_compile tools/*.py evals/*.py evals/proof-suite/briefs/*/exam/*.py
 
       # Validators, the sequencing gate (every CHANGELOG-cited trapped state rebuilt as a
       # temp git repo), the eval checker and the baseline tooling. Stdlib unittest, no model.

@@ -6,6 +6,11 @@ input distribution. These evals turn "the prompts still work" into a checkable c
 
 This directory is framework-repo-only. It is **not** shipped into the scaffold.
 
+Two neighbours complete the picture: `baselines/` holds archived generated samples with
+their recorded results (the regression corpus CI rescores), and `proof-suite/` is the
+whole-pipeline level above these prompt evals — frozen briefs built end to end per
+framework release and graded by an external exam (`proof-suite/README.md`).
+
 ## How it works
 
 Each case is a frozen fixture project plus declarative assertions:
