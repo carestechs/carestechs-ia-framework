@@ -2,6 +2,46 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.10.2] — 2026-10-09
+
+### Added
+- **First live proof-suite record: Shortlist on 2.10.1, default arm**
+  (`evals/proof-suite/results/2.10.1/shortlist-default/`). Same seven human inputs as the 2026-08-03
+  arms, 67 days later: **exam 16/16**, implementation-review first-pass **8/10 (80%)** against 8/12
+  (67%), the task-list review converged in **one** round where August ratcheted through three and
+  hit the cap (the first measurement of v2.8.0 on the brief that motivated it), **zero** parks,
+  hand marks or escalations against five, 13 tasks and 55 green tests against 11 and 30, **$15.89
+  and 56 minutes** against $29.75 and 3 h 13 min. A fresh review caught a defect the exam does not
+  probe (non-ASCII destination URL made the redirect a bare 500 while counting the click); the fix
+  session filed and resolved `BUG-001` on its own. Findings addressed to the framework: the
+  stakeholder-constraint blind spot in the review rubric replicated (the default arm again hard-codes
+  the listen port, unflagged); the implementation-fix prompt still lets a fixer touch its own review
+  (the runner's guard caught it); the scorecard's current-verdict acceptance overstates by 20 points
+  once more. One run is a smoke test; the control arm and a repeat are the next data points.
+
+### Fixed
+- **The Shortlist brief could not seed a run** (proof suite). Two defects in the v1 freeze, both found
+  by the first live seed on 2.10.1 and both the things a human had fixed by hand in the 2026-08-03
+  bootstrap commit ("session output salvaged + validator fixes to human docs", `052f580`):
+  - the work item lacked the `(new)` markers on its two shard references, so a fresh seed failed
+    `validate-specs.py` and the runner's preflight refused to start. At `052f580` the shards already
+    existed, so the markers had been dropped; `testsys-orch @ dd07f41` restored them at its own
+    preflight. The frozen work item is now that version.
+  - the brief had no UI-specification docs, so the scaffold's UI stubs with unfilled stamps stayed in
+    place and the runner's strict bootstrap gate failed on them after a $0.36 spec-generation session
+    that had done its job. The product has no UI, so no pipeline step ever writes those files: they
+    are human input ("Shortlist has no UI"), now frozen from `052f580`. The brief is seven files.
+  - the brief's freshness stamps are set to the seed date at seed time (brief manifest, suite
+    procedure step 1). The strict gate rejects stamps older than 30 days, so a frozen brief would
+    otherwise expire a month after it was cut, which is exactly what happened: `ARCHITECTURE.md`
+    was 67 days old.
+  - Measured on the way, recorded in the 2.10.1 record for the runner and the scaffold to act on: the
+    strict bootstrap gate grades scaffold artefacts the spec-generation session is not asked to touch
+    (`docs/ui-specification/` stubs when `bootstrap_ui_spec` is false; the `ARCHITECTURE.md` stamp),
+    so a fresh scaffold plus a correct spec session fails bootstrap unless a human pre-writes or
+    removes the UI stubs. Candidate fixes: the runner excludes a spec tree it will not bootstrap from
+    the strict gate, or the scaffold ships an API-only variant of the UI docs.
+
 ## [2.10.1] — 2026-10-09
 
 ### Added

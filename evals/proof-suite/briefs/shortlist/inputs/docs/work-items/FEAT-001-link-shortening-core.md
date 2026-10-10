@@ -66,7 +66,7 @@ A running Shortlist service where every endpoint of the v1 scope lock works exac
 |--------|----------------|--------------------|
 | Link | The only entity: code → URL mapping with click stats | Code unique; generated codes 6-char base62; custom codes 4–32 chars `[A-Za-z0-9_-]`; URL must be absolute http/https; `clickCount` increments atomically; `lastClickedAt` null until first click |
 
-**New entities required:** Link → `docs/data-model/entities/link.md`
+**New entities required:** Link → `docs/data-model/entities/link.md` (new)
 
 ---
 
@@ -80,7 +80,7 @@ A running Shortlist service where every endpoint of the v1 scope lock works exac
 | `/api/links/{code}` | DELETE | New | 204 / 404 |
 | `/{code}` | GET | New | Redirect 302; 404; documented in the links resource shard |
 
-**New endpoints required:** links resource (including the redirect route) → `docs/api-spec/endpoints/links.md`
+**New endpoints required:** links resource (including the redirect route) → `docs/api-spec/endpoints/links.md` (new)
 
 ---
 

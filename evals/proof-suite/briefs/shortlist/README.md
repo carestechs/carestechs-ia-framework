@@ -7,7 +7,7 @@ Minimal API with zero production NuGet dependencies, one API project and one tes
 | Field | Value |
 |---|---|
 | Brief version | v1 (frozen 2026-10-09) |
-| Provenance | `Repos/proof/testsys-shortlist @ 052f580` (2026-08-03), the human inputs both autonomous arms and the `/orchestrate` fixture started from; `testsys-orch`'s first commit states "human inputs identical to testsys-shortlist @ 052f580" |
+| Provenance | `Repos/proof/testsys-shortlist @ 052f580` (2026-08-03), the human inputs both autonomous arms and the `/orchestrate` fixture started from; `testsys-orch`'s first commit states "human inputs identical to testsys-shortlist @ 052f580". The work item carries the two `(new)` markers `testsys-orch @ dd07f41` restored at its preflight ("shards do not exist yet in this arm"): at 052f580 the bootstrap had already generated the shards, so the markers had been dropped, and a fresh seed fails `validate-specs.py` without them (found on the first 2.10.1 seed, 2026-10-10) |
 | Framework the inputs were authored against | 2.6.0 scaffold (the run upgraded to 2.7.0 in flight) |
 | Work items | FEAT-001 Link Shortening Core (the entire v1 scope) |
 | Exam | `exam/shortlist_exam.py`, 16 checks, exam version 1 |
@@ -23,13 +23,25 @@ inputs/
   docs/ARCHITECTURE.md                        two projects, in-memory store, Problem Details
   docs/personas/primary-user.md               the team developer
   docs/work-items/FEAT-001-link-shortening-core.md
+  docs/ui-specification/index.md              "Shortlist has no UI" - the scope decision as a well-formed anchor
+  docs/ui-specification/components.md         none, by scope lock
 ```
 
-These five files are the brief. Everything else in a run (data model, API spec, UI spec
-stub, task list, plans, reviews, code, tests) is produced by the pipeline and is what the
-run measures. The 2026-08-03 bootstrap commit also applied "validator fixes to human docs";
-the frozen copies are the post-fix versions, so a run under a current framework starts from
-inputs that pass `validate-specs.py`.
+These seven files are the brief. Everything else in a run (data model, API spec, task list,
+plans, reviews, code, tests) is produced by the pipeline and is what the run measures.
+
+The two UI-specification files are human input, not generation: the product has no UI, so
+nothing in the pipeline ever writes them, yet the scaffold ships UI stubs with unfilled
+freshness stamps and the runner's bootstrap gate is `validate-specs.py --strict`. On
+2026-08-03 the bootstrap failed on exactly that and a human wrote these two files by hand
+("session output salvaged + validator fixes to human docs", commit `052f580`); the first
+2.10.1 seed reproduced the failure before they were added to the freeze (2026-10-09).
+
+**Stamps are set at seed time.** Every `Last verified against code` stamp in these inputs is
+rewritten to the seed date when a run is seeded (the frozen copies keep their 2026-08-03
+dates for provenance). The stamps describe intent at seed time, not verified code, and the
+strict gate fails any stamp older than 30 days, so a frozen brief would otherwise expire a
+month after it was cut.
 
 ## Seeding a run
 
@@ -37,6 +49,9 @@ inputs that pass `validate-specs.py`.
 mkdir shortlist-<version>-<arm> && cd shortlist-<version>-<arm> && git init
 cp -r <framework-checkout>/scaffold/. .
 cp -r <framework-checkout>/evals/proof-suite/briefs/shortlist/inputs/. .
+# stamps describe intent at seed time; the strict bootstrap gate rejects old or unfilled ones
+sed -i -E "s/(\*\*Last verified against code:\*\* *)[0-9]{4}-[0-9]{2}-[0-9]{2}/\1$(date +%F)/" \
+    docs/ARCHITECTURE.md docs/ui-specification/index.md docs/ui-specification/components.md
 git add -A && git commit -m "seed: shortlist@v1 on framework <version>"
 ```
 

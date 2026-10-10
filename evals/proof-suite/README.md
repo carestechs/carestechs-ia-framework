@@ -110,8 +110,13 @@ For each brief and each arm:
 
 1. **Seed.** `mkdir Repos/proof/<brief>-<version>-<arm>` and `git init`. Copy
    `scaffold/.` from the framework checkout at the version under test, then copy
-   `briefs/<brief>/inputs/.` over it (the brief's `CLAUDE.md` wins). For brownfield briefs
-   also copy `inputs/seed/.`. Commit: `seed: <brief>@v<brief-version> on framework <version>`.
+   `briefs/<brief>/inputs/.` over it (the brief's `CLAUDE.md` wins; when the scaffold's
+   framework section has moved on, keep the brief's project sections and take the scaffold's
+   framework section, and say so in the record). Set every freshness stamp in the brief's
+   human inputs to the seed date: they describe intent, not verified code, and the runner's
+   strict bootstrap gate rejects stamps that are unfilled or older than 30 days, so an
+   un-restamped brief expires a month after it is frozen. For brownfield briefs also copy
+   `inputs/seed/.`. Commit: `seed: <brief>@v<brief-version> on framework <version>`.
 2. **Dry run.** `python runner.py --project <path> --policy <arm policy> --dry-run` and read
    the bootstrap decisions and the first step. Fix nothing in the project; if the dry run is
    wrong, the finding goes to the record and the run is skipped.
