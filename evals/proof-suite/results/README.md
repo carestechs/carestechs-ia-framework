@@ -7,6 +7,7 @@ version, newest first, and add a row per record.
 
 | Framework | Brief | Arm | Exam | Kill rate (adjusted) | Impl. review first-pass (events) | Tasks | Human triage | Notional cost | Record |
 |---|---|---|---|---|---|---|---|---|---|
+| 2.10.4 | shortlist v1 | default + kill-matrix playbook + **orchestration brief** (runner-maintained page inlined in every session prompt) | v2 19/19 | 86% (raw 79%; all 6 real gaps were ledger advisories no step acted on) | 6/7 rounds (86%; no matrix-driven revise) | 13 | 0 | $15.31, 83 min (one external interruption, resumed from the repository) | [record](2.10.4/shortlist-brief/record.md) |
 | 2.10.3 | shortlist v1 | default + `verify/mutation-kill-matrix@0.2.0` injected into Testing-task reviews | v2 19/19 | **100%** (raw 92%) | 6/9 (67%; 2 of 3 revises matrix-driven, each adding boundary tests) | 13 | 0 | $17.55, 86 min | [record](2.10.3/shortlist-default/record.md) |
 | 2.10.1 | shortlist v1 | default (Sonnet workers) | v1 16/16, v2 19/19 | 78% (raw 61%) | 8/10 (80%) | 13 | 0 (task-list review approved after one round; pipeline filed and fixed its own BUG-001) | $15.89, 56 min | [record](2.10.1/shortlist-default/record.md) |
 | 2.7.0 | shortlist v1 | default (Sonnet workers) | v1 16/16, v2 19/19 | 89% (raw 89%) | 8/12 (67%) | 11 | 1 park, 3 marks, review accepted at cap | $29.75, 3 h 13 min | [record](2.7.0/shortlist-default/record.md) |
