@@ -2,6 +2,31 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.10.2] — 2026-10-09
+
+### Fixed
+- **The Shortlist brief could not seed a run** (proof suite). Two defects in the v1 freeze, both found
+  by the first live seed on 2.10.1 and both the things a human had fixed by hand in the 2026-08-03
+  bootstrap commit ("session output salvaged + validator fixes to human docs", `052f580`):
+  - the work item lacked the `(new)` markers on its two shard references, so a fresh seed failed
+    `validate-specs.py` and the runner's preflight refused to start. At `052f580` the shards already
+    existed, so the markers had been dropped; `testsys-orch @ dd07f41` restored them at its own
+    preflight. The frozen work item is now that version.
+  - the brief had no UI-specification docs, so the scaffold's UI stubs with unfilled stamps stayed in
+    place and the runner's strict bootstrap gate failed on them after a $0.36 spec-generation session
+    that had done its job. The product has no UI, so no pipeline step ever writes those files: they
+    are human input ("Shortlist has no UI"), now frozen from `052f580`. The brief is seven files.
+  - the brief's freshness stamps are set to the seed date at seed time (brief manifest, suite
+    procedure step 1). The strict gate rejects stamps older than 30 days, so a frozen brief would
+    otherwise expire a month after it was cut, which is exactly what happened: `ARCHITECTURE.md`
+    was 67 days old.
+  - Measured on the way, recorded in the 2.10.1 record for the runner and the scaffold to act on: the
+    strict bootstrap gate grades scaffold artefacts the spec-generation session is not asked to touch
+    (`docs/ui-specification/` stubs when `bootstrap_ui_spec` is false; the `ARCHITECTURE.md` stamp),
+    so a fresh scaffold plus a correct spec session fails bootstrap unless a human pre-writes or
+    removes the UI stubs. Candidate fixes: the runner excludes a spec tree it will not bootstrap from
+    the strict gate, or the scaffold ships an API-only variant of the UI docs.
+
 ## [2.10.1] — 2026-10-09
 
 ### Added
