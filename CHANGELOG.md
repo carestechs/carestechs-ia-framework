@@ -2,6 +2,25 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.10.4] — 2026-10-10
+
+### Added
+- **Proof-suite record: Shortlist on 2.10.3 with a review playbook injected**
+  (`evals/proof-suite/results/2.10.3/shortlist-default/`). Same brief, same default arm as the 2.10.1
+  record, one change: the pipeline-runner bound `verify/mutation-kill-matrix@0.2.0` to the
+  implementation review of Testing-type tasks (orchestrator-side binding; the framework carries no
+  playbook reference). Result on the delivered build, same operators and seed as every earlier
+  matrix: **adjusted kill rate 78% → 100%** (raw 61% → 92%; the three survivors are removed log
+  lines), **exam v2 19/19**, zero human triage, **+10% notional cost, +30 min** wall-clock, tokens
+  within 1.4%. The reviewers quoted the matrix in every Testing-task review, classified survivors by
+  task ownership, turned four surviving length-boundary mutants into a `revise` whose fix added the
+  exact-edge tests, and one reviewer hand-mutated a route-constraint regex the tool cannot reach,
+  finding five more. First-pass acceptance fell from 80% to 67% because the sensor got stricter:
+  two of three revises produced tests. Measured on the way, unrelated to the tool: the build never
+  got a `.gitignore` (T-001, an S task that skipped review, did not create one this time) and the
+  runner's `git add -A` committed 456 build files - candidate for a sweep guard in the runner.
+  `results/README.md` gains the row.
+
 ## [2.10.3] — 2026-10-10
 
 ### Changed
