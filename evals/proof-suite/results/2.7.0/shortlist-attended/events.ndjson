@@ -1,0 +1,5 @@
+{"work_item": "bootstrap", "step": "spec-generation", "event": "started", "ts": "2026-08-03T14:55:50Z"}
+{"step": "task-generation", "work_item": "FEAT-001", "event": "artifact_committed", "session_tokens": 80034, "model": "opus", "ts": "2026-08-03T18:24:03Z"}
+{"step": "task-review", "work_item": "FEAT-001", "event": "revised", "session_tokens": 70404, "model": "claude-opus-5", "ts": "2026-08-03T18:28:43Z"}
+{"step": "task-list-revision", "work_item": "FEAT-001", "event": "artifact_committed", "session_tokens": 45392, "model": "claude-opus-5", "ts": "2026-08-03T18:31:31Z"}
+{"step": "task-review", "work_item": "FEAT-001", "event": "revised", "session_tokens": 82132, "model": "claude-opus-5", "ts": "2026-08-03T18:37:09Z"}

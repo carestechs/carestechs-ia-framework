@@ -1,0 +1,122 @@
+{
+  "brief": "shortlist",
+  "exam_version": 1,
+  "base_url": "http://localhost:5080",
+  "run_id": "b796e4",
+  "passed": 16,
+  "total": 16,
+  "checks": [
+    {
+      "id": "E01",
+      "ac": "AC-1",
+      "name": "POST valid URL -> 201 with generated 6-char base62 code, zero stats",
+      "status": "PASS",
+      "detail": "201, code=21yIYS"
+    },
+    {
+      "id": "E02",
+      "ac": "AC-1",
+      "name": "GET /{generated} -> 302 to the original URL",
+      "status": "PASS",
+      "detail": "302 Location='https://example.com/dashboard'"
+    },
+    {
+      "id": "E03",
+      "ac": "AC-2",
+      "name": "POST with free custom code -> 201 echoing it",
+      "status": "PASS",
+      "detail": "201, code=exam-free-b796e4"
+    },
+    {
+      "id": "E04",
+      "ac": "AC-2",
+      "name": "POST with taken custom code -> 409 Problem Details",
+      "status": "PASS",
+      "detail": "409 Problem Details"
+    },
+    {
+      "id": "E05",
+      "ac": "AC-2",
+      "name": "POST invalid URL -> 400 Problem Details with errors['url']",
+      "status": "PASS",
+      "detail": "400 + errors['url'] for 'ftp://example.com/x', 'not a url', '/relative/path', ''"
+    },
+    {
+      "id": "E06",
+      "ac": "AC-2",
+      "name": "POST malformed custom code -> 400 with errors['customCode']",
+      "status": "PASS",
+      "detail": "400 + errors['customCode'] for too short, bad chars, too long, non-ASCII"
+    },
+    {
+      "id": "E07",
+      "ac": "AC-3",
+      "name": "each redirect increments clickCount exactly once; lastClickedAt set",
+      "status": "PASS",
+      "detail": "clickCount=3, lastClickedAt=2026-10-10T01:06:36.0213041+00:00"
+    },
+    {
+      "id": "E08",
+      "ac": "AC-3",
+      "name": "concurrent redirects lose no increments",
+      "status": "PASS",
+      "detail": "50 concurrent redirects -> clickCount=50"
+    },
+    {
+      "id": "E09",
+      "ac": "AC-3/4",
+      "name": "unknown code -> 404 Problem Details on redirect and detail routes",
+      "status": "PASS",
+      "detail": "redirect route: 404 Problem Details; detail route: 404 Problem Details"
+    },
+    {
+      "id": "E10",
+      "ac": "AC-4",
+      "name": "GET /api/links lists created links with clickCount and lastClickedAt",
+      "status": "PASS",
+      "detail": "200, 4 link(s), all created codes present with stats"
+    },
+    {
+      "id": "E11",
+      "ac": "AC-4",
+      "name": "GET /api/links/{code} returns the link",
+      "status": "PASS",
+      "detail": "200, code='21yIYS', url='https://example.com/dashboard'"
+    },
+    {
+      "id": "E12",
+      "ac": "AC-4",
+      "name": "DELETE -> 204; redirect and second delete -> 404",
+      "status": "PASS",
+      "detail": "204, then redirect 404 Problem Details, second delete 404 Problem Details"
+    },
+    {
+      "id": "E13",
+      "ac": "S9",
+      "name": "custom code 'api' (reserved prefix) -> 400",
+      "status": "PASS",
+      "detail": "errors['customCode'] present"
+    },
+    {
+      "id": "E14",
+      "ac": "S9",
+      "name": "query string and fragment round-trip byte-identical",
+      "status": "PASS",
+      "detail": "302 Location='https://example.com/path/a%20b?tab=1&x=y%26z#section-2'"
+    },
+    {
+      "id": "E15",
+      "ac": "S9",
+      "name": "delete then re-create the same custom code -> 201",
+      "status": "PASS",
+      "detail": "re-create returned 201: {\"code\":\"exam-again-b796e4\",\"url\":\"https://example.com/second\",\"clickCount\":0,\"l"
+    },
+    {
+      "id": "E16",
+      "ac": "S9",
+      "name": "custom code equal to a generated code -> 409 (single namespace)",
+      "status": "PASS",
+      "detail": "409 Problem Details"
+    }
+  ]
+}

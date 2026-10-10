@@ -122,11 +122,26 @@ its output lands in git, `accepted`/`revised` when a human or reviewer rules on 
 
 ---
 
+## Level 5 — Whole-pipeline proof suite (framework releases)
+
+Levels 1–4 measure a project or a prompt. The framework repo's `evals/proof-suite/`
+measures a **release**: fixed briefs (frozen human inputs: conventions, strategy, work
+items, and for brownfield briefs a seed codebase) are built end to end by the
+pipeline-runner on each minor version, in two arms (the default model policy and an
+all-strong-model control), and the delivered product is graded by an **external exam** the
+builders never see. Outcomes are recorded per version next to the raw event log, so a
+release can cite "exam 16/16, first-pass 67%" the way it cites live failures. The first
+brief, Shortlist, is the test system from the 2026-08-03 autonomous runs. See
+`evals/proof-suite/README.md`.
+
+---
+
 ## Cadence
 
 | When | What |
 |------|------|
 | Every prompt change | `evals/run-evals.py` (multi-sample if the change is behavioral) |
+| Every minor framework release | `evals/proof-suite/`: Shortlist in both arms; record the outcome under `results/<version>/` |
 | Every work item | Append events; commit at step boundaries (no extra effort beyond that) |
 | Monthly | `metrics-report.py` scorecard review — watch acceptance rate and correction burden trends |
 | Quarterly | Layer ablation + judge-score drift check |
