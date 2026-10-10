@@ -2,6 +2,31 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.10.3] — 2026-10-10
+
+### Changed
+- **Rubric point 6 (test adequacy) asks for boundaries and loops explicitly**
+  (`prompts/review-implementation.md`). Evidence: a mutation kill matrix run on 2026-10-10 against
+  the three preserved Shortlist builds (framework 2.7.0 default and control arms, 2.10.1 default arm)
+  showed every agent-written suite probing only the clearly-invalid side of each constraint: the URL
+  length limit at its edge and the generated-code collision retry loop were untested in all three;
+  the 2.10.1 suite also never tests custom codes of exactly 4 or 32 characters (it tests 3 and 33 as
+  rejected), and in the pipeline's own `BUG-001` fix the mutant `c >= 0x7E` survives every test and
+  would reject every URL containing a tilde - a latent regression the fresh review approved. The
+  rubric now requires the last accepted and first rejected values on both sides of a length, range or
+  character-class constraint, and at least one exercise of retry and fallback loops. The measurement
+  (adjusted kill rates: August Sonnet suite 89% with 30 tests, August Opus 80% with 53, October
+  Sonnet 78% with 55 - more tests, weaker boundaries) is recorded in the proof-suite records.
+- **Shortlist exam v2** (`evals/proof-suite/briefs/shortlist/exam/shortlist_exam.py`, 19 checks).
+  Exam v1 shared the suites' blind spot. E17 probes custom codes of exactly 4 and 32 characters,
+  E18 a tilde in the path round-tripping byte-identical, E19 a 2048-character valid URL. Re-run
+  against all three preserved builds: 19/19 each (the real code is correct; only the mutants were
+  not), so the records now state both exam versions. Calibration test updated to 19/19.
+- **Proof-suite records carry the mutation kill rate** next to the exam: raw and adjusted figures,
+  equivalent-survivor counts and the named gaps, in `results/2.7.0/*` and `results/2.10.1/*`, plus
+  a column in `results/README.md`. The matrices themselves are archived with the measuring tool,
+  outside this repository; the records cite it as `verify/mutation-kill-matrix@0.1.0`.
+
 ## [2.10.2] — 2026-10-09
 
 ### Added

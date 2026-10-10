@@ -1,8 +1,9 @@
 """Calibration of the Shortlist exam (evals/proof-suite/briefs/shortlist/exam/).
 
 The exam is a measurement instrument: before it grades a pipeline's product it must score a
-contract-perfect server 16/16 and fail a broken server on exactly the checks that cover the
-breakage. A small stdlib HTTP server implementing the brief's wire contract plays both roles.
+contract-perfect server with full marks (19/19 in exam v2) and fail a broken server on exactly
+the checks that cover the breakage. A small stdlib HTTP server implementing the brief's wire
+contract plays both roles.
 """
 
 import json
@@ -172,9 +173,10 @@ class ExamCalibration(FrameworkTestCase):
         proc, verdict = self.run_exam(self.serve())
         failed = [c for c in verdict["checks"] if c["status"] != "PASS"]
         self.assertEqual(failed, [], proc.stdout)
-        self.assertEqual((verdict["passed"], verdict["total"]), (16, 16))
+        self.assertEqual((verdict["passed"], verdict["total"]), (19, 19))
+        self.assertEqual(verdict["exam_version"], 2)
         self.assertEqual(proc.returncode, 0)
-        self.assertIn("exam: 16/16 passed", proc.stdout)
+        self.assertIn("exam: 19/19 passed", proc.stdout)
 
     def test_lost_increments_fail_exactly_the_click_checks(self):
         proc, verdict = self.run_exam(self.serve(broken={"lost_clicks"}))

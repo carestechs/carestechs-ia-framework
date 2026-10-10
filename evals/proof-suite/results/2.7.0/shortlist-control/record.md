@@ -18,7 +18,7 @@ the same five human inputs as the default arm (`testsys-shortlist @ 052f580`).
 
 | Metric | Value |
 |---|---|
-| Exam | **16/16** (exam v1, run `79741e`, 2026-10-09, Release build of `c671658` started with `--urls http://127.0.0.1:5182`) |
+| Exam | **16/16** (exam v1, run `79741e`, 2026-10-09, Release build of `c671658` started with `--urls http://127.0.0.1:5182`); **19/19** on exam v2, run `42d304`, 2026-10-10 (`exam-v2.json`) |
 | Work items | FEAT-001 closed; 0 parked |
 | Tasks | 15: S 6, M 7, L 2 (Backend 10, Testing 3, DevOps 1, Documentation 1) |
 | First-pass acceptance (event log) | task-list review 0/3; planning 15/15; implementation review 9/13 (69%): T-005, T-006, T-009, T-012 revised once each |
@@ -27,6 +27,7 @@ the same five human inputs as the default arm (`testsys-shortlist @ 052f580`).
 | Agents' own tests (AC-5) | 53 passed, 0 failed (`dotnet test`, re-run 2026-10-09); 42 `[Fact]`/`[Theory]` declarations; 22 `.cs` files |
 | Tokens / notional cost | 465,767 logged / $56.59 (1.9x the default arm) |
 | Current-verdict first-pass (`metrics-report.py`) | 9/10 (90%), versus 69% from the event log |
+| Mutation kill rate (external measurement, `verify/mutation-kill-matrix@0.1.0`, 2026-10-10, 43 mutants) | raw **69%** (20 killed, 9 survived, 13 invalid, 1 timeout); **80% adjusted** after 4 equivalent survivors (log lines). Real gaps: URL max-length boundary, generated-code collision retry loop. 13 invalid: nullable flow analysis turns negated null checks into compile errors |
 
 ## Findings
 

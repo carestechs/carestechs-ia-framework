@@ -18,7 +18,7 @@ first full autonomous build the framework ever completed.
 
 | Metric | Value |
 |---|---|
-| Exam | **16/16** (exam v1, run `b796e4`, 2026-10-09, Release build of `ac57b5a` on `http://localhost:5080`) |
+| Exam | **16/16** (exam v1, run `b796e4`, 2026-10-09, Release build of `ac57b5a` on `http://localhost:5080`); **19/19** on exam v2, run `400c35`, 2026-10-10 (`exam-v2.json`) |
 | Work items | FEAT-001 closed; 0 parked at close |
 | Tasks | 11: S 3, M 7, L 1 (Backend 6, Testing 4, Documentation 1) |
 | First-pass acceptance (event log) | task-list review 0/3; planning 11/11; implementation review 8/12 (67%): T-004, T-006 and T-009 revised, T-009 twice |
@@ -27,6 +27,7 @@ first full autonomous build the framework ever completed.
 | Agents' own tests (AC-5) | 30 passed, 0 failed (`dotnet test`, re-run 2026-10-09); 28 `[Fact]`/`[Theory]` declarations; 20 `.cs` files |
 | Tokens / notional cost | 355,939 logged (under-logged, see findings) / $29.75 |
 | Current-verdict first-pass (`metrics-report.py`) | 8/9 (89%), versus 67% from the event log: re-reviews overwrote three revise files |
+| Mutation kill rate (external measurement, `verify/mutation-kill-matrix@0.1.0`, 2026-10-10, 51 mutants) | raw **89%** (41 killed, 5 survived, 4 invalid, 1 timeout); adjusted 89% (no equivalent survivors). Real gaps: URL max-length boundary, generated-code collision retry loop. The strongest of the three Shortlist suites with the fewest tests |
 
 ## Findings
 
