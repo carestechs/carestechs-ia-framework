@@ -7,6 +7,11 @@ acceptance criteria AC-1..AC-4, the edge cases of section 9, and the routing con
 section 10. AC-5 (the agents' own test suite) is deliberately not graded here - this exam
 exists precisely because self-graded tests are not independent evidence.
 
+Exam version 2 (2026-10-10) adds E17-E19: the exact boundaries of the custom-code length,
+unreserved path characters (a tilde) and a 2048-character URL. A mutation kill matrix run on
+the three Shortlist builds showed every agent-written suite - and exam v1 - probed only the
+clearly-invalid side of each boundary. Records state which exam version graded them.
+
 Usage:
     python shortlist_exam.py --base-url http://127.0.0.1:5181 [--json exam.json]
                              [--concurrency 50] [--wait 30]
@@ -299,6 +304,43 @@ class Exam:
         status, hdrs, _, body = self.create("https://example.com/clash", code)
         return is_problem(status, hdrs, body, 409)
 
+    # --- exam version 2 (2026-10-10): boundaries every Shortlist suite skipped ------------
+    def e17_custom_code_length_boundaries(self):
+        """4 and 32 characters are the last accepted lengths (brief section 4.1); v1 only
+        probed 3 and 33 as rejected, as did every agent-written suite."""
+        four = "e" + self.run_id[:3]
+        thirty_two = ("x" + self.run_id).ljust(32, "k")[:32]
+        for custom in (four, thirty_two):
+            status, _, text, body = self.create(f"https://example.com/len/{len(custom)}", custom)
+            if status != 201 or get(body, "code") != custom:
+                return False, f"custom code of length {len(custom)} -> {status}: {text[:100]}"
+        return True, "201 for custom codes of exactly 4 and exactly 32 characters"
+
+    def e18_unreserved_path_characters_round_trip(self):
+        """A tilde is a legal, common path character (RFC 3986 unreserved). A mutation check on
+        the 2.10.1 build showed its non-ASCII guard would reject it with no test noticing."""
+        custom = self.code("tilde")
+        url = "https://example.com/~user/a-b_c.d/index.html"
+        status, _, text, body = self.create(url, custom)
+        if status != 201:
+            return False, f"create returned {status}: {text[:100]}"
+        if get(body, "url") != url:
+            return False, f"stored url altered: {get(body, 'url')!r}"
+        status, hdrs, _, _ = call(self.base, "GET", f"/{custom}")
+        loc = hdrs.get("Location")
+        return (status == 302 and loc == url), f"{status} Location={loc!r}"
+
+    def e19_long_url_accepted(self):
+        """The brief sets no URL length limit: a 2048-character valid URL must be accepted and
+        round-trip; the generated specs chose 2048 as the limit and no suite tested the edge."""
+        custom = self.code("long")
+        url = "https://example.com/" + "a" * (2048 - len("https://example.com/"))
+        status, _, text, body = self.create(url, custom)
+        if status != 201:
+            return False, f"2048-char URL -> {status}: {text[:100]}"
+        status, hdrs, _, _ = call(self.base, "GET", f"/{custom}")
+        return (status == 302 and hdrs.get("Location") == url), f"{status}, Location length {len(hdrs.get('Location') or '')}"
+
     def run(self):
         checks = [
             ("E01", "AC-1", "POST valid URL -> 201 with generated 6-char base62 code, zero stats", self.e01_create_generated),
@@ -317,6 +359,9 @@ class Exam:
             ("E14", "S9", "query string and fragment round-trip byte-identical", self.e14_query_and_fragment_round_trip),
             ("E15", "S9", "delete then re-create the same custom code -> 201", self.e15_recreate_after_delete),
             ("E16", "S9", "custom code equal to a generated code -> 409 (single namespace)", self.e16_generated_code_is_single_namespace),
+            ("E17", "AC-2", "custom codes of exactly 4 and exactly 32 characters -> 201 (boundaries)", self.e17_custom_code_length_boundaries),
+            ("E18", "AC-1", "tilde and other unreserved path characters round-trip byte-identical", self.e18_unreserved_path_characters_round_trip),
+            ("E19", "AC-1", "a 2048-character valid URL is accepted and round-trips", self.e19_long_url_accepted),
         ]
         for cid, ac, name, fn in checks:
             self.check(cid, ac, name, fn)
@@ -359,7 +404,7 @@ def main():
     print(f"\nexam: {passed}/{len(results)} passed  (run {exam.run_id}, {args.base_url})")
     if args.json:
         with open(args.json, "w", encoding="utf-8") as f:
-            json.dump({"brief": "shortlist", "exam_version": 1, "base_url": args.base_url,
+            json.dump({"brief": "shortlist", "exam_version": 2, "base_url": args.base_url,
                        "run_id": exam.run_id, "passed": passed, "total": len(results),
                        "checks": results}, f, indent=2)
         print(f"written {args.json}")

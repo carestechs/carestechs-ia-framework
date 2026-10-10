@@ -10,7 +10,7 @@ Minimal API with zero production NuGet dependencies, one API project and one tes
 | Provenance | `Repos/proof/testsys-shortlist @ 052f580` (2026-08-03), the human inputs both autonomous arms and the `/orchestrate` fixture started from; `testsys-orch`'s first commit states "human inputs identical to testsys-shortlist @ 052f580". The work item carries the two `(new)` markers `testsys-orch @ dd07f41` restored at its preflight ("shards do not exist yet in this arm"): at 052f580 the bootstrap had already generated the shards, so the markers had been dropped, and a fresh seed fails `validate-specs.py` without them (found on the first 2.10.1 seed, 2026-10-10) |
 | Framework the inputs were authored against | 2.6.0 scaffold (the run upgraded to 2.7.0 in flight) |
 | Work items | FEAT-001 Link Shortening Core (the entire v1 scope) |
-| Exam | `exam/shortlist_exam.py`, 16 checks, exam version 1 |
+| Exam | `exam/shortlist_exam.py`, 19 checks, exam version 2 (v1 had 16; v2 added E17-E19 on 2026-10-10 after a mutation kill matrix showed every suite and exam v1 skipped the exact boundaries) |
 | Test command for the runner policy | `dotnet test` |
 | Runner policies | default: `pipeline-runner/policies/testsys-shortlist.json`; control: `pipeline-runner/policies/testsys-shortlist-opus.json` |
 
@@ -81,6 +81,9 @@ python <framework-checkout>/evals/proof-suite/briefs/shortlist/exam/shortlist_ex
 | E09 | AC-3, AC-4 | unknown code 404 Problem Details on both the redirect and detail routes |
 | E10, E11, E12 | AC-4 | list carries stats; detail matches; delete 204 then 404 |
 | E13..E16 | section 9 | reserved prefix `api` is 400; query string and fragment round-trip byte-identical; delete then re-create allowed; a custom code equal to a generated one is 409 |
+| E17 | AC-2 (v2) | custom codes of exactly 4 and exactly 32 characters are accepted: the last accepted lengths, where v1 and every agent suite only probed 3 and 33 as rejected |
+| E18 | AC-1 (v2) | a path with a tilde and other unreserved characters round-trips byte-identical: a mutation check showed the 2.10.1 build's non-ASCII guard would reject tildes with no test noticing |
+| E19 | AC-1 (v2) | a 2048-character valid URL is accepted and round-trips: the brief sets no limit; the generated specs chose 2048 and no suite tested the edge |
 
 Not graded by the exam: AC-5 (the agents' own test suite, a pipeline gate rather than
 evidence), generated-code collision regeneration (not observable from outside), and
