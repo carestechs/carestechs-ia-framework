@@ -4,6 +4,21 @@ Framework versions follow [semantic versioning](https://semver.org/). Projects c
 
 ## [2.10.2] — 2026-10-09
 
+### Added
+- **First live proof-suite record: Shortlist on 2.10.1, default arm**
+  (`evals/proof-suite/results/2.10.1/shortlist-default/`). Same seven human inputs as the 2026-08-03
+  arms, 67 days later: **exam 16/16**, implementation-review first-pass **8/10 (80%)** against 8/12
+  (67%), the task-list review converged in **one** round where August ratcheted through three and
+  hit the cap (the first measurement of v2.8.0 on the brief that motivated it), **zero** parks,
+  hand marks or escalations against five, 13 tasks and 55 green tests against 11 and 30, **$15.89
+  and 56 minutes** against $29.75 and 3 h 13 min. A fresh review caught a defect the exam does not
+  probe (non-ASCII destination URL made the redirect a bare 500 while counting the click); the fix
+  session filed and resolved `BUG-001` on its own. Findings addressed to the framework: the
+  stakeholder-constraint blind spot in the review rubric replicated (the default arm again hard-codes
+  the listen port, unflagged); the implementation-fix prompt still lets a fixer touch its own review
+  (the runner's guard caught it); the scorecard's current-verdict acceptance overstates by 20 points
+  once more. One run is a smoke test; the control arm and a repeat are the next data points.
+
 ### Fixed
 - **The Shortlist brief could not seed a run** (proof suite). Two defects in the v1 freeze, both found
   by the first live seed on 2.10.1 and both the things a human had fixed by hand in the 2026-08-03
