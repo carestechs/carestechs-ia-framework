@@ -161,7 +161,12 @@ carestechs-ia-framework/
 │   └── next-step.py             # Pipeline-position derivation + next legal step (sequencing gate)
 ├── evals/                       # Prompt regression evals (framework-repo only, not shipped)
 │   ├── run-evals.py             # Deterministic assertion runner
-│   └── cases/                   # Golden fixture projects + assertions per prompt
+│   ├── run-baseline.py          # N-sample baselines; --rescore LABEL --gate re-checks archives (CI)
+│   ├── cases/                   # Golden fixture projects + assertions per prompt
+│   └── baselines/               # Archived generated samples + recorded results (regression corpus)
+├── tests/                       # The framework's own regression suite (stdlib unittest, no model calls)
+├── .gitattributes               # *.sh pinned to LF (bash rejects CRLF)
+├── .github/workflows/check.yml  # CI: scaffold drift, VERSION/CHANGELOG, compile, tests, baseline rescore
 ├── prompts/                     # Claude-optimized prompt templates (agent-first, chat appendix)
 │   ├── base-template.md         # Canonical task schema + common prompt structure
 │   ├── feature-tasks.md         # Generate feature tasks   → tasks/FEAT-XXX-tasks.md
@@ -184,12 +189,21 @@ carestechs-ia-framework/
 
 ### Editing the framework
 
-Root `templates/`, `prompts/`, and `guides/` are the single source of truth. `scaffold/.ai-framework/` is a generated copy — after editing root files, run:
+Root `templates/`, `prompts/`, `guides/`, and `tools/` are the single source of truth. `scaffold/.ai-framework/` is a generated copy — after editing root files, run:
 
 ```bash
 scripts/sync-scaffold.sh          # regenerate the scaffold copy
 scripts/sync-scaffold.sh --check  # verify no drift (use in CI / pre-commit)
 ```
+
+Before opening a PR, run what CI runs (no model calls, under a minute):
+
+```bash
+python -m unittest discover -s tests                 # validators, sequencing gate, eval checker
+python evals/run-baseline.py --rescore v2.4.6 --gate # archived eval samples vs today's checker
+```
+
+`tests/` rebuilds every trapped state a CHANGELOG fix cites as a temp git repo, so a fix stays fixed; it also mirrors the scaffold-drift and VERSION checks for environments without bash. Changing a validator or an assertion deliberately means re-recording the affected baseline (`--rescore <label>` without `--gate`) — see `evals/README.md`.
 
 `scaffold/.ai-framework/README.md` and `VERSION` are maintained by hand and are not overwritten by the sync.
 
@@ -248,4 +262,4 @@ Testing, Integration, and Prioritization have context recipes in the guide but n
 
 ## Version History
 
-See [`CHANGELOG.md`](CHANGELOG.md). Highlights of the v2 line: 10 core templates across 6 layers (v1 had 4), work-item templates and prompts with dual agent/chat usage, ADR/DDR compilation, release lifecycle guide. v2.1 adds defined output locations (`tasks/`, `plans/`, `mockups/`), a canonical task schema, Claude Code slash commands in the scaffold, stack-neutral prompts, and the scaffold sync script. v2.2 shards the spec docs for retrieval-key context loading, splits contract from rationale, adds freshness stamps, and ships the `validate-tasks.py` output gate. v2.3 adds the verification harnesses: shard frontmatter, the `validate-specs.py` cross-shard linter, the fresh-context task-list review prompt, and the `evals/` golden-set regression harness. v2.6 ships the sequencing gate: `next-step.py` derives pipeline position from artifacts (plus a per-work-item progress overlay for states artifacts can't express) and prints the next legal step with its gate command, driven in-repo by the `/orchestrate` command — orchestrator-integration.md §8. v2.9 makes the data-model template and spec-generation prompt architecture-neutral: module ownership stays as the shard directory, and how modules reference each other (ID-only vs navigation properties, shared vs per-module persistence unit) is a project decision recorded in the Key Modeling Decisions table, not a template default.
+See [`CHANGELOG.md`](CHANGELOG.md). Highlights of the v2 line: 10 core templates across 6 layers (v1 had 4), work-item templates and prompts with dual agent/chat usage, ADR/DDR compilation, release lifecycle guide. v2.1 adds defined output locations (`tasks/`, `plans/`, `mockups/`), a canonical task schema, Claude Code slash commands in the scaffold, stack-neutral prompts, and the scaffold sync script. v2.2 shards the spec docs for retrieval-key context loading, splits contract from rationale, adds freshness stamps, and ships the `validate-tasks.py` output gate. v2.3 adds the verification harnesses: shard frontmatter, the `validate-specs.py` cross-shard linter, the fresh-context task-list review prompt, and the `evals/` golden-set regression harness. v2.6 ships the sequencing gate: `next-step.py` derives pipeline position from artifacts (plus a per-work-item progress overlay for states artifacts can't express) and prints the next legal step with its gate command, driven in-repo by the `/orchestrate` command — orchestrator-integration.md §8. v2.9 makes the data-model template and spec-generation prompt architecture-neutral: module ownership stays as the shard directory, and how modules reference each other (ID-only vs navigation properties, shared vs per-module persistence unit) is a project decision recorded in the Key Modeling Decisions table, not a template default. v2.10 makes the framework test itself: a stdlib `tests/` suite rebuilds every CHANGELOG-cited trapped state of `next-step.py` as a temp git repo and covers both validators and the eval checker, CI rescores every archived eval baseline against today's tooling (`run-baseline.py --rescore --gate`), and the step-2 gate accepts BUG/IMP lists without a coverage table, as the prompts always said.

@@ -1,0 +1,4 @@
+# Shell scripts are run by bash, which rejects CRLF line endings
+# ("set: pipefail: invalid option name"). Windows checkouts with core.autocrlf=true
+# converted scripts/sync-scaffold.sh and made the release gate unrunnable locally.
+*.sh text eol=lf

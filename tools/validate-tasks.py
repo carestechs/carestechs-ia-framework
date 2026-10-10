@@ -11,8 +11,10 @@ Checks (schema reference: .ai-framework/prompts/base-template.md):
   - Dependencies reference existing task IDs and form a DAG (no cycles)
   - every "Files to Modify/Create" entry exists under --root, or is marked (new)
   - every task has at least one acceptance criterion checkbox
-  - with --work-item: the "Acceptance Criteria Coverage" table exists, its task IDs
-    resolve, and its row count matches the work item's acceptance criteria
+  - with --work-item: the "Acceptance Criteria Coverage" table exists (mandatory for
+    FEAT lists; a warning when a BUG/IMP list omits it - the bugfix and refactor prompts
+    call it recommended, and the step-2 gate passes --work-item for every type), its
+    task IDs resolve, and its row count matches the work item's acceptance criteria
 
 Exit code 0 when no errors (with --strict, warnings also fail); 1 otherwise.
 Python 3.8+, standard library only.
@@ -72,6 +74,26 @@ class Task:
         self.order = []          # field names in appearance order
 
 
+def is_coverage_header(cells):
+    """Header row of the coverage table, however it is annotated.
+
+    Generators write '| Work Item AC (Section 9 success criteria) | Covered By |' or add a
+    'How' column; matching the first cell exactly against 'Work Item AC' counted such headers
+    as data rows with no task IDs (a false error caught by the baseline gate)."""
+    first = cells[0].lower().strip("*").strip()
+    if first.startswith("work item ac") or first in ("ac", "acceptance criterion", "acceptance criteria"):
+        return True
+    return any(c.lower().strip("*").strip() in ("covered by", "covered-by") for c in cells)
+
+
+def covered_by_column(cells):
+    """Index of the 'Covered By' column in a header row, or None (then the last column)."""
+    for i, c in enumerate(cells):
+        if "covered by" in c.lower() or "covered-by" in c.lower():
+            return i
+    return None
+
+
 def strip_code_fences(lines):
     """Yield (lineno, text) for lines outside fenced code blocks."""
     fence = None
@@ -96,6 +118,7 @@ def parse_tasks(path, rep):
     coverage_ids = []
     coverage_rows = 0
     coverage_line = None
+    coverage_col = None
     in_coverage = False
 
     for lineno, raw in strip_code_fences(lines):
@@ -109,6 +132,7 @@ def parse_tasks(path, rep):
         if COVERAGE_HEADING_RE.match(raw):
             in_coverage = True
             coverage_line = lineno
+            coverage_col = None
             current = None
             current_field = None
             continue
@@ -122,9 +146,14 @@ def parse_tasks(path, rep):
         if in_coverage:
             cells = [c.strip() for c in raw.strip().strip("|").split("|")]
             if raw.strip().startswith("|") and len(cells) >= 2 \
-                    and not set(cells[0]) <= set("-: ") and cells[0].lower() != "work item ac":
-                coverage_rows += 1
-                coverage_ids.append((lineno, DEP_ID_RE.findall(cells[-1])))
+                    and not set(cells[0]) <= set("-: "):
+                if is_coverage_header(cells):
+                    coverage_col = covered_by_column(cells)
+                else:
+                    coverage_rows += 1
+                    col = coverage_col if coverage_col is not None and coverage_col < len(cells) \
+                        else len(cells) - 1
+                    coverage_ids.append((lineno, DEP_ID_RE.findall(cells[col])))
             continue
         if current is None:
             continue
@@ -269,9 +298,32 @@ def check_dependencies(path, tasks, rep):
                 path_ids.pop()
 
 
+WI_KIND_RE = re.compile(r"^(FEAT|BUG|IMP)-\d{1,4}")
+
+
+def work_item_kind(work_item, task_list):
+    """FEAT / BUG / IMP from the work item's filename, else the task list's; None if neither."""
+    for path in (work_item, task_list):
+        m = WI_KIND_RE.match(path.name)
+        if m:
+            return m.group(1)
+    return None
+
+
 def check_coverage(path, tasks, coverage, work_item, rep):
     ids = {t.id for t in tasks}
     if coverage["line"] is None:
+        # The table is mandatory for feature lists (feature-tasks.md) and recommended for
+        # bug and refactor lists (bugfix-tasks.md, refactor-tasks.md). next-step.py prints
+        # the step-2 gate with --work-item for every type, so a BUG/IMP list without the
+        # table must warn here, not fail - an error would make the gate reject lists the
+        # generating prompt calls correct (the framework's own golden references did).
+        kind = work_item_kind(work_item, path)
+        if kind in ("BUG", "IMP"):
+            rep.warn(path, 1, f"no '## Acceptance Criteria Coverage' section - recommended "
+                              f"for {kind} task lists (mandatory for FEAT); add it so the "
+                              f"validator can cross-check AC coverage")
+            return
         rep.error(path, 1, "work item given but no '## Acceptance Criteria Coverage' "
                            "section found in the task list")
         return
