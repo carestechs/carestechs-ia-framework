@@ -2,6 +2,26 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.10.8] — 2026-10-10
+
+### Changed
+- **Task-list review probes stakeholder constraints** (`prompts/review-tasks.md`: Required
+  Context gains `docs/stakeholder-definition.md`, Scope Lock and Constraints sections; rubric point
+  7 **Constraint fidelity**; the blocking bar names a constraint violation as wrong software; the
+  CLAUDE.md routing row, the scaffold and the `/review-tasks` command hand the reviewer the file).
+  Measured: in two of six autonomous Shortlist builds the generated task list said the service
+  "listens on `http://localhost:5080`" and the implementation pinned it, while the brief's one
+  constraint on configuration is "no configuration beyond the listen port"; both task-list reviews
+  approved, and both T-001 implementation reviews filed the pin as an advisory. The reviewer never
+  had the stakeholder definition in context: rubric point 2 asked about the Scope Lock without the
+  document that states it. The new point asks three questions of every constraint a task could
+  touch: does a task pin a value the constraints make configurable (port, host, path, limit,
+  credential), introduce something they exclude (database, service, dependency, platform), or drop
+  a property they require (single binary, offline, no telemetry)? A violation is a CONFIRMED
+  finding whose required change names the element, so implementers and implementation reviewers
+  inherit it. The generator's trap is also named: CLAUDE.md's Common Commands are examples, not
+  requirements (the Shortlist brief's own `dotnet run` line shows a port). Parity test added.
+
 ## [2.10.7] — 2026-10-10
 
 ### Changed
