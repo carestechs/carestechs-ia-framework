@@ -1,0 +1,501 @@
+{
+  "playbook": "verify/mutation-kill-matrix",
+  "schema_version": 1,
+  "root": "C:\\Users\\carlos.escalona\\Desktop\\Repos\\proof\\shortlist-2.10.5-brief-b",
+  "head": "ec1c5d4",
+  "test": "dotnet test Tests/Shortlist.Api.Tests -v q --nologo",
+  "files": [
+    "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+    "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+    "Shortlist.Api/Models/CreateLinkRequest.cs",
+    "Shortlist.Api/Models/Link.cs",
+    "Shortlist.Api/Models/LinkResponse.cs",
+    "Shortlist.Api/Store/ILinkStore.cs",
+    "Shortlist.Api/Store/InMemoryLinkStore.cs",
+    "Shortlist.Api/Store/IShortCodeGenerator.cs",
+    "Shortlist.Api/Store/ShortCodeGenerator.cs"
+  ],
+  "operators": [
+    "cmp",
+    "bool",
+    "logic",
+    "negate",
+    "const",
+    "remove"
+  ],
+  "skip_lines": [
+    "Log(Information|Debug|Trace|Warning)[(]",
+    "ThrowIfCancellationRequested"
+  ],
+  "seed": 1,
+  "max_mutants": 50,
+  "candidates": 63,
+  "baseline_seconds": 6.9,
+  "totals": {
+    "killed": 31,
+    "survived": 8,
+    "invalid": 10,
+    "timeout": 1
+  },
+  "kill_rate": 0.7948717948717948,
+  "mutants": [
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 9,
+      "op": "const",
+      "original": "2048",
+      "mutated": "2049",
+      "outcome": "killed",
+      "seconds": 6.8
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 10,
+      "op": "const",
+      "original": "4",
+      "mutated": "5",
+      "outcome": "killed",
+      "seconds": 6.5
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 11,
+      "op": "const",
+      "original": "32",
+      "mutated": "33",
+      "outcome": "killed",
+      "seconds": 6.9
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 18,
+      "op": "negate",
+      "original": "urlError is not null",
+      "mutated": "!(urlError is not null)",
+      "outcome": "invalid",
+      "seconds": 3.9
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 34,
+      "op": "negate",
+      "original": "string.IsNullOrWhiteSpace(url)",
+      "mutated": "!(string.IsNullOrWhiteSpace(url))",
+      "outcome": "invalid",
+      "seconds": 3.4
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 39,
+      "op": "cmp",
+      "original": ">",
+      "mutated": ">=",
+      "outcome": "killed",
+      "seconds": 6.8
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 45,
+      "op": "cmp",
+      "original": "!=",
+      "mutated": "==",
+      "outcome": "killed",
+      "seconds": 7.8
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 45,
+      "op": "logic",
+      "original": "&&",
+      "mutated": "||",
+      "outcome": "killed",
+      "seconds": 7.3
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 45,
+      "op": "logic",
+      "original": "||",
+      "mutated": "&&",
+      "outcome": "invalid",
+      "seconds": 4.1
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 51,
+      "op": "cmp",
+      "original": "<",
+      "mutated": "<=",
+      "outcome": "killed",
+      "seconds": 6.6
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 51,
+      "op": "cmp",
+      "original": ">",
+      "mutated": ">=",
+      "outcome": "killed",
+      "seconds": 6.8
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 51,
+      "op": "logic",
+      "original": "||",
+      "mutated": "&&",
+      "outcome": "killed",
+      "seconds": 6.0
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 51,
+      "op": "negate",
+      "original": "url.Any(c => c < ' ' || c > '~')",
+      "mutated": "!(url.Any(c => c < ' ' || c > '~'))",
+      "outcome": "killed",
+      "seconds": 6.0
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 66,
+      "op": "negate",
+      "original": "string.Equals(code, ReservedCode, StringComparison.OrdinalIgnoreCase)",
+      "mutated": "!(string.Equals(code, ReservedCode, StringComparison.OrdinalIgnoreCase))",
+      "outcome": "killed",
+      "seconds": 6.3
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 71,
+      "op": "cmp",
+      "original": ">",
+      "mutated": ">=",
+      "outcome": "killed",
+      "seconds": 6.5
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 71,
+      "op": "cmp",
+      "original": "<",
+      "mutated": "<=",
+      "outcome": "killed",
+      "seconds": 5.8
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 71,
+      "op": "logic",
+      "original": "||",
+      "mutated": "&&",
+      "outcome": "killed",
+      "seconds": 6.4
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 71,
+      "op": "negate",
+      "original": "code.Length < MinCodeLength || code.Length > MaxCodeLength",
+      "mutated": "!(code.Length < MinCodeLength || code.Length > MaxCodeLength)",
+      "outcome": "killed",
+      "seconds": 6.5
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 78,
+      "op": "cmp",
+      "original": ">=",
+      "mutated": ">",
+      "outcome": "killed",
+      "seconds": 6.8
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 78,
+      "op": "cmp",
+      "original": "<=",
+      "mutated": "<",
+      "outcome": "killed",
+      "seconds": 6.7
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 78,
+      "op": "cmp",
+      "original": ">=",
+      "mutated": ">",
+      "outcome": "killed",
+      "seconds": 7.5
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 78,
+      "op": "cmp",
+      "original": "<=",
+      "mutated": "<",
+      "outcome": "killed",
+      "seconds": 6.7
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 78,
+      "op": "cmp",
+      "original": ">=",
+      "mutated": ">",
+      "outcome": "killed",
+      "seconds": 6.7
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 78,
+      "op": "cmp",
+      "original": "<=",
+      "mutated": "<",
+      "outcome": "killed",
+      "seconds": 6.2
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 78,
+      "op": "logic",
+      "original": "or",
+      "mutated": "and",
+      "outcome": "killed",
+      "seconds": 6.4
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 78,
+      "op": "logic",
+      "original": "and",
+      "mutated": "or",
+      "outcome": "invalid",
+      "seconds": 3.9
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 78,
+      "op": "logic",
+      "original": "or",
+      "mutated": "and",
+      "outcome": "killed",
+      "seconds": 6.2
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 78,
+      "op": "logic",
+      "original": "or",
+      "mutated": "and",
+      "outcome": "killed",
+      "seconds": 5.9
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/CreateLinkRequestValidator.cs",
+      "line": 79,
+      "op": "negate",
+      "original": "!allowed",
+      "mutated": "!(!allowed)",
+      "outcome": "killed",
+      "seconds": 5.6
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+      "line": 14,
+      "op": "remove",
+      "original": "group.MapGet(\"/\", ListAsync);",
+      "mutated": "/* mutant: statement removed */",
+      "outcome": "survived",
+      "seconds": 6.4,
+      "context": "group.MapGet(\"/\", ListAsync);"
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+      "line": 15,
+      "op": "remove",
+      "original": "group.MapGet(\"/{code}\", GetAsync);",
+      "mutated": "/* mutant: statement removed */",
+      "outcome": "survived",
+      "seconds": 7.6,
+      "context": "group.MapGet(\"/{code}\", GetAsync);"
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+      "line": 16,
+      "op": "remove",
+      "original": "group.MapDelete(\"/{code}\", DeleteAsync);",
+      "mutated": "/* mutant: statement removed */",
+      "outcome": "survived",
+      "seconds": 7.3,
+      "context": "group.MapDelete(\"/{code}\", DeleteAsync);"
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+      "line": 18,
+      "op": "remove",
+      "original": "app.MapGet(\"/{code}\", RedirectAsync);",
+      "mutated": "/* mutant: statement removed */",
+      "outcome": "survived",
+      "seconds": 6.2,
+      "context": "app.MapGet(\"/{code}\", RedirectAsync);"
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+      "line": 55,
+      "op": "negate",
+      "original": "link is null",
+      "mutated": "!(link is null)",
+      "outcome": "invalid",
+      "seconds": 3.1
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+      "line": 69,
+      "op": "negate",
+      "original": "!await store.TryDeleteAsync(code, cancellationToken)",
+      "mutated": "!(!await store.TryDeleteAsync(code, cancellationToken))",
+      "outcome": "survived",
+      "seconds": 5.9,
+      "context": "if (!await store.TryDeleteAsync(code, cancellationToken))"
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+      "line": 91,
+      "op": "cmp",
+      "original": ">",
+      "mutated": ">=",
+      "outcome": "survived",
+      "seconds": 5.4,
+      "context": "if (errors.Count > 0)"
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+      "line": 91,
+      "op": "const",
+      "original": "0",
+      "mutated": "1",
+      "outcome": "survived",
+      "seconds": 5.4,
+      "context": "if (errors.Count > 0)"
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+      "line": 91,
+      "op": "negate",
+      "original": "errors.Count > 0",
+      "mutated": "!(errors.Count > 0)",
+      "outcome": "survived",
+      "seconds": 5.5,
+      "context": "if (errors.Count > 0)"
+    },
+    {
+      "file": "Shortlist.Api/Endpoints/LinkEndpoints.cs",
+      "line": 98,
+      "op": "negate",
+      "original": "link is null",
+      "mutated": "!(link is null)",
+      "outcome": "invalid",
+      "seconds": 3.0
+    },
+    {
+      "file": "Shortlist.Api/Store/InMemoryLinkStore.cs",
+      "line": 32,
+      "op": "negate",
+      "original": "customCode is not null",
+      "mutated": "!(customCode is not null)",
+      "outcome": "invalid",
+      "seconds": 3.2
+    },
+    {
+      "file": "Shortlist.Api/Store/InMemoryLinkStore.cs",
+      "line": 34,
+      "op": "const",
+      "original": "0",
+      "mutated": "1",
+      "outcome": "killed",
+      "seconds": 5.5
+    },
+    {
+      "file": "Shortlist.Api/Store/InMemoryLinkStore.cs",
+      "line": 38,
+      "op": "const",
+      "original": "0",
+      "mutated": "1",
+      "outcome": "killed",
+      "seconds": 5.7
+    },
+    {
+      "file": "Shortlist.Api/Store/InMemoryLinkStore.cs",
+      "line": 41,
+      "op": "const",
+      "original": "0",
+      "mutated": "1",
+      "outcome": "killed",
+      "seconds": 5.4
+    },
+    {
+      "file": "Shortlist.Api/Store/InMemoryLinkStore.cs",
+      "line": 81,
+      "op": "bool",
+      "original": "true",
+      "mutated": "false",
+      "outcome": "invalid",
+      "seconds": 3.2
+    },
+    {
+      "file": "Shortlist.Api/Store/InMemoryLinkStore.cs",
+      "line": 81,
+      "op": "negate",
+      "original": "true",
+      "mutated": "!(true)",
+      "outcome": "invalid",
+      "seconds": 3.4
+    },
+    {
+      "file": "Shortlist.Api/Store/InMemoryLinkStore.cs",
+      "line": 83,
+      "op": "negate",
+      "original": "!_links.TryGetValue(code, out var entry)",
+      "mutated": "!(!_links.TryGetValue(code, out var entry))",
+      "outcome": "invalid",
+      "seconds": 3.5
+    },
+    {
+      "file": "Shortlist.Api/Store/InMemoryLinkStore.cs",
+      "line": 99,
+      "op": "negate",
+      "original": "_links.TryUpdate(code, updated, entry)",
+      "mutated": "!(_links.TryUpdate(code, updated, entry))",
+      "outcome": "timeout",
+      "seconds": 120.1
+    },
+    {
+      "file": "Shortlist.Api/Store/ShortCodeGenerator.cs",
+      "line": 9,
+      "op": "const",
+      "original": "6",
+      "mutated": "7",
+      "outcome": "killed",
+      "seconds": 6.8
+    },
+    {
+      "file": "Shortlist.Api/Store/ShortCodeGenerator.cs",
+      "line": 14,
+      "op": "cmp",
+      "original": "<",
+      "mutated": "<=",
+      "outcome": "killed",
+      "seconds": 4.9
+    },
+    {
+      "file": "Shortlist.Api/Store/ShortCodeGenerator.cs",
+      "line": 14,
+      "op": "const",
+      "original": "0",
+      "mutated": "1",
+      "outcome": "killed",
+      "seconds": 6.9
+    }
+  ]
+}

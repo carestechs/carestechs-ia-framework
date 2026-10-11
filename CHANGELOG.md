@@ -2,6 +2,29 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.10.6] — 2026-10-10
+
+### Added
+- **Proof-suite records: the orchestration brief, matched set on 2.10.5**
+  (`evals/proof-suite/results/2.10.5/`: `shortlist-brief-experiment.md` plus one record per build in
+  `shortlist-control/`, `shortlist-brief-a/`, `shortlist-brief-b/`). Three fresh builds of the same
+  brief on one afternoon, same seed tree, same runner: a control with the 2.10.3 arm (kill-matrix
+  playbook on Testing-task reviews, no brief) and two runs of the brief arm after the changes the
+  2.10.4 record asked for (an advisory inside the current task's scope is a required change; the
+  ledger folds by status instead of dropping by age; a fold step before closure applies what is
+  still open and a fresh review with the matrix checks it). Result: **exam v2 19/19 on all three**;
+  adjusted kill rate **control 92% (3 real gaps), brief-a 100%, brief-b 100%**; tests at closure 70
+  against 118 and 131; self-approval guard 5 firings against 0 and 0; cost $22.66 against $20.24 and
+  $15.79; pipeline time 118 min against 108 and 84; zero human triage everywhere. Most of the folding
+  happened upstream: plans carried the in-scope advisories and reviews marked them resolved per
+  task, so the fold itself applied four and six small changes and approved first time. The brief arm
+  is adopted as the default arm for this brief. Also measured: the same-day control differs from
+  the 2.10.3 control by 8 points of kill rate and double the revises with no change between them
+  (the variance band single runs could not see); an S-sized Testing task escaped the playbook for
+  the third time in five builds; the control pinned its listen port because its generated task list
+  said so (two of six Sonnet builds, both wrong at task generation). `results/README.md` gains three
+  rows. No doctrine, prompt, validator or tool changed.
+
 ## [2.10.5] — 2026-10-10
 
 ### Added
