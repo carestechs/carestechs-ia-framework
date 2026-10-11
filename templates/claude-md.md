@@ -469,7 +469,7 @@ Then follow this sequence for **each task**:
 3. **Generate an implementation plan** using `.ai-framework/prompts/plan-generation.md`. Output: `plans/plan-<WORK-ITEM-ID>-T-XXX-short-title.md`.
 4. **Implement** following the steps in the plan.
 5. **Verify** the acceptance criteria from the task definition are met.
-6. **Implementation review (recommended for M+ complexity):** in a NEW session, run the Implementation review row from the routing table above (`.ai-framework/prompts/review-implementation.md` → `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md`) — the reviewer must not be the session that implemented the task. Address every required change before marking the task complete.
+6. **Implementation review (recommended for M+ complexity; required for Testing-type tasks whatever their complexity):** in a NEW session, run the Implementation review row from the routing table above (`.ai-framework/prompts/review-implementation.md` → `tasks/<WORK-ITEM-ID>-<TASK-ID>-implementation-review.md`) — the reviewer must not be the session that implemented the task. Address every required change before marking the task complete.
 
 This sequence applies to every task. The plan file is a developer-facing artifact — it bridges "what to do" (task definition) and "how to do it" (exact code changes).
 

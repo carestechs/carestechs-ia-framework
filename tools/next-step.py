@@ -195,6 +195,16 @@ def parse_task_list(path):
     return tasks
 
 
+def is_testing_task(task):
+    """Testing-type tasks are reviewed whatever their complexity (2.10.7).
+
+    The implementation review is where test adequacy is judged and where orchestrators
+    bind evidence tools (a mutation kill matrix); the S skip rule removed that review from
+    one Testing task in three of five autonomous Shortlist builds, and each time later
+    reviews happened to cover the gap. Type may be compound ("Testing + Backend")."""
+    return "testing" in (task.get("type") or "").lower()
+
+
 def glob_by_task_id(directory, pattern, id_re):
     """Map task id (int) -> [(owner_wi_or_None, path)] for task artifacts.
 
@@ -713,13 +723,18 @@ def compute_work_item(root, wi, subjects, id_owners=None):
                     note="If the fixes were already applied and accepted, record it: "
                          + mark_hint.replace("T-XXX", tag)))
         elif state == "implemented":
-            if task["complexity"] == "S":
+            if task["complexity"] == "S" and not is_testing_task(task):
                 result["next_steps"].append(step(
                     "task-completion",
                     f"{tag} is S-complexity: implementation review is optional (guide step 7 "
                     f"skip rule). Confirm tests are green and mark it done.",
                     mark_hint.replace("T-XXX", tag), task=tag))
             else:
+                review_note = None
+                if task["complexity"] == "S":
+                    review_note = (f"{tag} is S-complexity but Testing-type: the step 7 skip "
+                                   f"rule does not apply to Testing tasks, which are always "
+                                   f"reviewed (test adequacy is judged there).")
                 result["next_steps"].append(step(
                     "implementation-review",
                     f"FRESH REVIEW - you did not implement this. Read CLAUDE.md. Review the "
@@ -727,7 +742,7 @@ def compute_work_item(root, wi, subjects, id_owners=None):
                     f"Gather evidence first (run tests, linters, validate-specs) and treat it "
                     f"as ground truth. Write tasks/{wi_id}-{tag}-implementation-review.md.",
                     f"parse '## Verdict' in tasks/{wi_id}-{tag}-implementation-review.md",
-                    fresh=True, task=tag))
+                    fresh=True, task=tag, note=review_note))
             frontier_tids.append(tid)
         elif state in ("assigned", "in-progress"):
             result["next_steps"].append(step(

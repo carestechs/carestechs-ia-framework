@@ -226,7 +226,7 @@ authority for per-task state (deliberate; see §6).
 | Output | `tasks/<WI>-<T>-implementation-review.md` — verdict, findings (AC satisfaction, plan adherence, scope, conventions, spec sync, test adequacy), required changes. ≤ ~120 lines. |
 | Gate | Parse verdict. `revise` ⇒ fix session on the same branch with the review in context, then re-review (cap 2 loops → human). `approve` ⇒ merge the task branch, mark `<T>` complete, emit `accepted` + `completed`. |
 | Commit | `review(<T>): implementation <verdict>` (the review file goes to the main branch or the task branch per your merge flow — pick one and stay consistent). |
-| Skip rule | Recommended for M+ complexity; S tasks may go straight to merge on green tests. Measured: these reviews catch unplanned real defects, not just planted ones — skip sparingly. |
+| Skip rule | Recommended for M+ complexity; S tasks may go straight to merge on green tests — **except Testing-type tasks, which are always reviewed** whatever their complexity (`next-step.py` never emits `task-completion` for them): the review is where test adequacy is judged and where orchestrators bind evidence tools, and the skip removed it from one Testing task in three of five autonomous builds. Measured: these reviews catch unplanned real defects, not just planted ones — skip sparingly. |
 
 ### Step 8 — Task completion
 
