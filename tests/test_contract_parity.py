@@ -107,6 +107,22 @@ class ScaffoldMirror(unittest.TestCase):
             problems += self.diff(REPO_ROOT / d, SCAFFOLD_DIR / ".ai-framework" / d)
         self.assertEqual(problems, [], "run scripts/sync-scaffold.sh")
 
+    def test_task_review_context_names_the_stakeholder_definition(self):
+        """v2.10.8: the task-list reviewer judges Scope Lock and constraints (rubric points 2
+        and 7), so the prompt, the routing row and the slash command must all hand it
+        docs/stakeholder-definition.md - the reviewer that let a pinned listen port through
+        twice never had the file."""
+        for rel in ("prompts/review-tasks.md", "templates/claude-md.md",
+                    "scaffold/CLAUDE.md", "scaffold/.claude/commands/review-tasks.md"):
+            text = (REPO_ROOT / rel).read_text(encoding="utf-8")
+            row = text if rel.startswith("prompts") else next(
+                (l for l in text.splitlines() if "Task list review" in l and "|" in l), text)
+            self.assertIn("stakeholder-definition.md", row, rel)
+        prompt = (REPO_ROOT / "prompts/review-tasks.md").read_text(encoding="utf-8")
+        self.assertIn("| 7 | **Constraint fidelity** |", prompt)
+        self.assertNotIn("six rubric points", prompt)
+        self.assertNotIn("six-point rubric", prompt)
+
     def test_bundled_version_matches_changelog_head(self):
         version = (SCAFFOLD_DIR / ".ai-framework" / "VERSION").read_text(encoding="utf-8").strip()
         head = re.search(r"^## \[(\d+\.\d+\.\d+)\]", (REPO_ROOT / "CHANGELOG.md")

@@ -16,7 +16,7 @@ The reviewer's job is to find problems, not to fix them: hallucinated references
 
 ## How to Use
 
-- **AI agents (Claude Code, etc.):** Run in a **new session** — never the session that generated the task list. Read the context files listed in your project CLAUDE.md's routing table for "Task list review" (the task list, its work item, each spec's index plus the shards the work item's impact tables name, and CLAUDE.md), follow the sections below, and **write** the review to `tasks/<WORK-ITEM-ID>-review.md` (e.g., `tasks/FEAT-001-review.md`).
+- **AI agents (Claude Code, etc.):** Run in a **new session** — never the session that generated the task list. Read the context files listed in your project CLAUDE.md's routing table for "Task list review" (the task list, its work item, the stakeholder definition's Scope Lock and Constraints, each spec's index plus the shards the work item's impact tables name, and CLAUDE.md), follow the sections below, and **write** the review to `tasks/<WORK-ITEM-ID>-review.md` (e.g., `tasks/FEAT-001-review.md`).
 - **Chat workflows (manual copy-paste):** Use the XML skeleton in the [Chat Workflow Template (XML)](#chat-workflow-template-xml) appendix **in a fresh conversation**. Include this prompt's Guidance, Output Format, and Constraints sections alongside the skeleton.
 
 ---
@@ -27,8 +27,9 @@ The reviewer's context is deliberately minimal. Load **only**:
 
 1. **The task list under review** — `tasks/FEAT-XXX-tasks.md` (or `BUG-XXX` / `IMP-XXX` / adhoc equivalent)
 2. **The work item** — `docs/work-items/FEAT-XXX-short-title.md` (or `BUG-XXX` / `IMP-XXX`)
-3. **Each spec's `index.md` plus only the shards named by the work item's impact tables** (Entities / API / UI), mapped via the kebab-case naming rule: entity `TaskLabel` → `docs/data-model/entities/task-label.md` (singular); resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md` (matches the route segment); screen "Project Board" → `docs/ui-specification/screens/project-board.md`. Do not read whole spec directories.
-4. **CLAUDE.md** — conventions, workflow rules, Development Pipeline
+3. **The stakeholder definition's Scope Lock and Constraints sections** — `docs/stakeholder-definition.md`; the evidence for rubric points 2 and 7. Read those sections, not the whole document. Measured (Shortlist, five autonomous builds): the reviewer had the task list say "listens on `http://localhost:5080`" twice while the Constraints said the listen port is the product's one configurable value, and could not flag it because this file was not in its context.
+4. **Each spec's `index.md` plus only the shards named by the work item's impact tables** (Entities / API / UI), mapped via the kebab-case naming rule: entity `TaskLabel` → `docs/data-model/entities/task-label.md` (singular); resource `/api/task-labels` → `docs/api-spec/endpoints/task-labels.md` (matches the route segment); screen "Project Board" → `docs/ui-specification/screens/project-board.md`. Do not read whole spec directories.
+5. **CLAUDE.md** — conventions, workflow rules, Development Pipeline. Its Common Commands are examples of how a developer runs the project today, not requirements: a value that appears there and that the Constraints make configurable (a port, a host, a path) must not be pinned by a task.
 
 **Explicitly forbidden context:**
 
@@ -54,7 +55,7 @@ The tools check structure (schema, enums, DAG, file paths, AC coverage table, sh
 
 ### Step 2 — Judge semantics against the fixed rubric
 
-Evaluate the task list against all six points. Every point gets examined; a clean point produces no finding.
+Evaluate the task list against all seven points. Every point gets examined; a clean point produces no finding.
 
 | # | Rubric Point | What to Verify |
 |---|-------------|----------------|
@@ -64,6 +65,7 @@ Evaluate the task list against all six points. Every point gets examined; a clea
 | 4 | **Dependency logic** | The order is buildable: schema before code that uses it, API before frontend integration, investigation before fix; no dependency that forces rework or an unbuildable intermediate state |
 | 5 | **Sizing** | No task spans multiple `Type` values; no task is effectively larger than XL — such tasks must be split |
 | 6 | **Workflow correctness** | `mockup-first` on new/significantly-changed user-facing screens (per the work item's UI impact), `investigation-first` where requirements depend on unknowns, `standard` otherwise — per the generating prompt's rules |
+| 7 | **Constraint fidelity** | Every constraint in the stakeholder definition's Constraints section (and in the work item's own constraints, if it has any) that a task could violate is honoured by that task's description, acceptance criteria and technical notes. Three shapes to probe for: a task that **pins a value the constraints make configurable** (a listen port or host, a path, a limit, a credential — "listens on `http://localhost:5080`" when the constraint is "no configuration beyond the listen port"); a task that **introduces something the constraints exclude** (a database, an external service, a dependency, a platform); a task that **drops a property the constraints require** (single binary, offline operation, no telemetry). A violation written into a task is a CONFIRMED finding citing the constraint, and the required change names the configurable or excluded element explicitly, so the implementer and the implementation reviewer inherit it |
 
 The rubric applies to all three task-list types; interpret it through the generating prompt's rules:
 
@@ -88,7 +90,7 @@ Severity:
 
 Blocking is an **outcome test**, not a severity label:
 
-- **revise** — any validator error, or any CONFIRMED finding meaning the list implemented AS WRITTEN would yield **wrong** software (a task contradicts a spec shard or the work item), an **unbuildable** state (dependency or ordering defects), or an **unverified** acceptance criterion (an AC clause no task's criteria assert).
+- **revise** — any validator error, or any CONFIRMED finding meaning the list implemented AS WRITTEN would yield **wrong** software (a task contradicts a spec shard, the work item, or a stakeholder constraint — rubric point 7), an **unbuildable** state (dependency or ordering defects), or an **unverified** acceptance criterion (an AC clause no task's criteria assert).
 - **approve** — everything else, including CONFIRMED findings whose cost is convention, budget, sizing, or consistency polish: record them under `## Advisories`. PLAUSIBLE findings never block on their own, whatever their severity.
 
 Why the bar is outcome-anchored (measured): fresh reviewers are non-exhaustive — each new one surfaces a different legitimate slice — so "any CONFIRMED medium ⇒ revise" makes revise loops ratchet instead of converge (measured live: three consecutive revise rounds with disjoint finding sets, replicated across worker models). Reserve `revise` for findings that would ship a defect; everything else rides along as advisories.
@@ -141,7 +143,7 @@ Structure:
 - **Evidence discipline** — every CONFIRMED finding cites its evidence; every PLAUSIBLE finding is labeled as such; no finding without at least one task reference or an explicit list-level scope
 - **Review, don't rewrite** — the reviewer does not edit the task list; all changes flow through the required-changes checklist
 - **No scope expansion** — do not demand tasks for work outside the work item; flagging a genuinely missing in-scope task is rubric point 1, inventing new scope is not
-- **Complete rubric coverage** — all six rubric points are examined every time; absence of findings on a point means it passed, not that it was skipped
+- **Complete rubric coverage** — all seven rubric points are examined every time; absence of findings on a point means it passed, not that it was skipped
 
 ---
 
@@ -150,7 +152,7 @@ Structure:
 After writing the review, verify:
 
 - [ ] Both tools were run (`validate-tasks.py` with `--work-item`, then `validate-specs.py`) and their results appear in the header; every tool error surfaced as a CONFIRMED finding
-- [ ] All six rubric points were examined
+- [ ] All seven rubric points were examined, point 7 against the stakeholder definition's Constraints section
 - [ ] Every finding has ID, severity, CONFIRMED/PLAUSIBLE class, task reference(s), evidence or reasoning, and a required change
 - [ ] The verdict follows the Step 4 rules (a finding meets the outcome-anchored blocking bar or a validator error ⇒ `revise`; otherwise `approve`)
 - [ ] Verdict = `revise` ⇒ the Required Changes Before Implementation checklist is present and covers every blocking finding
@@ -178,6 +180,12 @@ Use in a **fresh conversation** — do not paste this into the conversation that
 <!-- REQUIRED: The work item the task list was generated from -->
 [Paste full docs/work-items/FEAT-XXX-short-title.md content]
 </work-item>
+
+<stakeholder-constraints>
+<!-- REQUIRED: The Scope Lock and Constraints sections of docs/stakeholder-definition.md
+     (rubric points 2 and 7) -->
+[Paste those two sections]
+</stakeholder-constraints>
 
 <spec-shards>
 <!-- REQUIRED: Each spec's index.md + ONLY the shards named by the work item's
@@ -208,7 +216,7 @@ Use in a **fresh conversation** — do not paste this into the conversation that
 <task-type>Task List Review</task-type>
 
 <request>
-Adversarially review this task list against the six-point rubric from
+Adversarially review this task list against the seven-point rubric from
 prompts/review-tasks.md. Treat the validator output as ground truth. Produce the
 review in the Output Format (Verdict, Findings table, Required Changes checklist).
 </request>
