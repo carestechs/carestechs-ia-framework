@@ -2,6 +2,27 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.10.5] — 2026-10-10
+
+### Added
+- **Proof-suite record: Shortlist on 2.10.4 with an orchestration brief**
+  (`evals/proof-suite/results/2.10.4/shortlist-brief/`). Same brief, same arm and the same injected
+  review playbook as the 2.10.3 record, one change: the pipeline-runner maintained a one-page brief
+  (test command and last gate, validator state, position, every committed review's advisories with
+  verdict, this run's revise rounds and parks) regenerated from the repository before every step and
+  inlined at the top of every session prompt. Result: **exam v2 19/19**, zero human triage, cost
+  $15.31 (-$2.24), tokens within 1.3%, implementation-review first pass 86% of rounds (67% before),
+  and every review carried a "standing advisories" section citing earlier IDs with a status instead
+  of re-raising them. The cost of that precision showed in the other column: **adjusted kill rate
+  100% → 86%**, and the six real surviving mutants are exactly three advisories the ledger already
+  held (the 2048 URL cap on both sides, the generator's modulo-bias guard, two constructor null
+  guards), each marked "cheap to fold in" and acted on by no step. The 6,000-character cap dropped
+  the oldest advisory groups from the seventh review on. Candidates recorded for the runner: an
+  advisory inside the current task's scope is a required change; a closure-time fold step; fold the
+  ledger by status instead of dropping by age; Testing tasks sized S skip the bound playbook; the
+  pipeline was interrupted once by the host's memory reaper (orphaned app servers left by worker
+  sessions) and resumed from the repository without loss. `results/README.md` gains the row.
+
 ## [2.10.4] — 2026-10-10
 
 ### Added
