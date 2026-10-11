@@ -95,6 +95,16 @@ the wire contract the exam will probe (field names, status codes, error shape).
 | default | `policy.json` + `policies/<brief>.json` (test command, bootstrap flags) | Sonnet workers, Opus task/implementation reviewers, Haiku closure | the recommended production policy |
 | control | `policies/<brief>-opus.json` | Opus everywhere | attribution: separates framework weakness from worker-model weakness |
 
+Orchestrator-side additions are arms too, named by what the runner injects. For Shortlist since
+2.10.3: **default + kill-matrix playbook** (`policies/shortlist-kill-matrix.json`, the
+`verify/mutation-kill-matrix` playbook bound to Testing-task reviews), and since the 2.10.5 matched
+set the recommended arm is **default + kill-matrix playbook + orchestration brief with the fold step**
+(`policies/shortlist-brief-fold.json`, which equals the runner's defaults from that point); the
+kill-matrix arm without the brief is kept as the same-day control of a comparison. A single run per
+arm cannot separate a change from reviewer variance on this brief (the 2.10.5 set measured 8 points
+of adjusted kill rate between two unchanged controls); when a comparison matters, run at least two
+builds per arm.
+
 An optional third arm, **attended**, drives the same brief through `/orchestrate` in a
 Claude Code session (one step per invocation, human runs the gates). It measures the
 in-repo mode rather than the runner and is the analogue of `testsys-orch`.
