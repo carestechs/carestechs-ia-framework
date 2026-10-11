@@ -189,6 +189,35 @@ class TaskFrontier(PipelineBase):
         self.assertEqual((step["step"], step["task"]), ("task-completion", "T-003"))
         self.assertIn("--mark T-003=done", step["gate"])
 
+    def test_s_testing_task_is_reviewed_not_completed(self):
+        """v2.10.7: the skip rule never applies to Testing-type tasks. Three of five
+        autonomous Shortlist builds sized one Testing task S and lost its review, the step
+        where test adequacy is judged and the kill matrix binds."""
+        tasks = [
+            dict(id=1, title="Create label schema", type="Database", complexity="M",
+                 files=["src/db/label.py (new)"]),
+            dict(id=2, title="Unit-test the label schema", type="Testing", deps="T-001",
+                 complexity="S", files=["tests/test_label.py (new)"]),
+            dict(id=3, title="Smoke tests", type="Testing + Backend", deps="T-001",
+                 complexity="S", files=["tests/test_smoke.py (new)"]),
+        ]
+        self.open_frontier(tasks)
+        self.p.mark(self.WI, "T-001=done")
+        self.p.commit("test(T-002): unit-test the label schema")
+        self.p.commit("test(T-003): smoke tests")
+        wi = self.p.wi()
+        self.assertEqual(states(wi)["T-002"], "implemented")
+        by_task = {s["task"]: s for s in wi["next_steps"]}
+        for tag in ("T-002", "T-003"):
+            self.assertEqual(by_task[tag]["step"], "implementation-review")
+            self.assertTrue(by_task[tag]["fresh"])
+            self.assertIn(f"tasks/FEAT-001-{tag}-implementation-review.md", by_task[tag]["gate"])
+            self.assertIn("Testing-type", by_task[tag]["note"])
+        self.assertNotIn("task-completion", [s["step"] for s in wi["next_steps"]])
+        # An approved review completes it exactly as for an M task.
+        self.p.review("tasks/FEAT-001-T-002-implementation-review.md", "approve")
+        self.assertEqual(states(self.p.wi())["T-002"], "done")
+
     def test_docs_commit_is_not_evidence_for_non_documentation_tasks(self):
         """v2.8.2 keeps the docs exclusion for every other type."""
         self.open_frontier()

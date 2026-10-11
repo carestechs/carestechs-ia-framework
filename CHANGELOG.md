@@ -2,6 +2,21 @@
 
 Framework versions follow [semantic versioning](https://semver.org/). Projects can check which version they bundle via `.ai-framework/VERSION`.
 
+## [2.10.7] — 2026-10-10
+
+### Changed
+- **Testing-type tasks are always reviewed, whatever their complexity** (`tools/next-step.py`,
+  `is_testing_task`; guides, template and scaffold `CLAUDE.md` step 6 say so). The step 7 skip
+  rule let an S task go from green tests to done without an implementation review. For a Testing
+  task that review is where test adequacy (rubric point 6) is judged and where orchestrators bind
+  evidence tools such as the mutation kill matrix, so the skip removed the one sensor the task
+  exists to pass. Measured: three of the five autonomous Shortlist builds sized one Testing task S
+  (2.10.3's test-project scaffold, 2.10.4's list/detail/delete tests, 2.10.5 brief-a's unit tests),
+  and each time a later review or the fold step happened to cover the gap. `next-step.py` now
+  emits `implementation-review` for an implemented Testing task of any complexity, with a note
+  naming the rule; the step shape, gate and review file name are those of an M task, so
+  orchestrators need no change. Type may be compound (`Testing + Backend`).
+
 ## [2.10.6] — 2026-10-10
 
 ### Added
